@@ -20,10 +20,18 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 60 * 24
 
     # CORS
-    cors_origins: list[str] = ["http://localhost:5173", "http://localhost:8080"]
+    cors_origins: list[str] = ["http://localhost:5173", "http://localhost:8080", "http://localhost:3000"]
 
-    # AI (placeholder — wire LangChain/LangGraph here later)
+    # AI Configuration & Multi-Provider Keys
+    llm_provider: str = "openrouter"
+    llm_model: str = "google/gemini-2.5-flash"
+    llm_temperature: float = 0.7
+    llm_max_tokens: int = 4096
+
+    openrouter_api_key: str | None = "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"
     openai_api_key: str | None = None
+    google_api_key: str | None = None
+    anthropic_api_key: str | None = None
 
 
 @lru_cache

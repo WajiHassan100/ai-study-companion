@@ -30,29 +30,29 @@ export function Navbar({ withSidebarTrigger = false }: { withSidebarTrigger?: bo
   const displayName = profile?.full_name || user?.email || "Account";
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border bg-background/85 px-4 backdrop-blur md:px-6">
+    <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border/40 bg-background/90 px-4 backdrop-blur md:px-8">
       {withSidebarTrigger ? <SidebarTrigger /> : null}
 
-      <Link to="/" className="flex items-center gap-2">
-        <span className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
-          <GraduationCap className="h-4 w-4" />
+      <Link to="/" className="flex items-center gap-2.5">
+        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-800 text-white shadow-xs">
+          <GraduationCap className="h-5 w-5" />
         </span>
-        <span className="font-display text-lg font-semibold tracking-tight">Scholar</span>
+        <span className="font-display text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Scholar</span>
       </Link>
 
       <div className="ml-auto flex items-center gap-2">
         {isAuthenticated ? (
           <>
             {role ? (
-              <Badge variant="secondary" className="hidden capitalize sm:inline-flex">
+              <Badge variant="secondary" className="hidden capitalize sm:inline-flex bg-emerald-50 text-emerald-800 border-emerald-200">
                 {role}
               </Badge>
             ) : null}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2">
+                <Button variant="outline" size="sm" className="gap-2 rounded-full px-4">
                   <UserIcon className="h-4 w-4" />
-                  <span className="max-w-36 truncate">{displayName}</span>
+                  <span className="max-w-36 truncate font-medium">{displayName}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
@@ -70,7 +70,7 @@ export function Navbar({ withSidebarTrigger = false }: { withSidebarTrigger?: bo
             </DropdownMenu>
           </>
         ) : (
-          <Button asChild size="sm">
+          <Button asChild size="sm" className="bg-emerald-800 hover:bg-emerald-900 text-white font-semibold rounded-full px-6 text-xs sm:text-sm shadow-xs">
             <Link to="/auth">Sign in</Link>
           </Button>
         )}
@@ -78,3 +78,4 @@ export function Navbar({ withSidebarTrigger = false }: { withSidebarTrigger?: bo
     </header>
   );
 }
+

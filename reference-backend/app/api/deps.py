@@ -10,17 +10,20 @@ from app.core.security import decode_access_token
 from app.db.session import get_db
 from app.models.models import AppRole, User
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login", auto_error=False)
 
 
 def get_current_user(
-    token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
+    token: str | None = Depends(oauth2_scheme), db: Session = Depends(get_db)
 ) -> User:
     credentials_error = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    if not token:
+        raise credentials_error
+
     payload = decode_access_token(token)
     if payload is None or "sub" not in payload:
         raise credentials_error
@@ -29,6 +32,17 @@ def get_current_user(
     if user is None:
         raise credentials_error
     return user
+
+
+def get_optional_current_user(
+    token: str | None = Depends(oauth2_scheme), db: Session = Depends(get_db)
+) -> User | None:
+    if not token:
+        return None
+    payload = decode_access_token(token)
+    if payload is None or "sub" not in payload:
+        return None
+    return db.get(User, payload["sub"])
 
 
 def require_roles(*roles: AppRole) -> Callable[[User], User]:

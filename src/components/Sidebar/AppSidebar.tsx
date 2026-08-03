@@ -26,7 +26,7 @@ type Item = { title: string; url: string; icon: LucideIcon };
 
 const studentItems: Item[] = [
   { title: "Overview", url: "/dashboard/student", icon: GaugeCircle },
-  { title: "Courses", url: "/dashboard/student", icon: BookOpen },
+  { title: "Courses", url: "/courses/biol_101", icon: BookOpen },
   { title: "Assignments", url: "/dashboard/student", icon: ClipboardList },
 ];
 
