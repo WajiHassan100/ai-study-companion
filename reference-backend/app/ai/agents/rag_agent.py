@@ -91,10 +91,11 @@ COURSE_KNOWLEDGE_BASE: list[dict[str, Any]] = [
 
 
 class RAGAgent:
-    """Agent #5: RAG Course Knowledge Agent."""
+    """Agent #5: RAG Course Knowledge Agent with Hybrid Vector Search."""
 
-    def __init__(self, model_name: str = "gemini-2.0-flash"):
+    def __init__(self, model_name: str = "gemini-2.0-flash", embedding_model: str = "text-embedding-004"):
         self.model_name = model_name
+        self.embedding_model = embedding_model
         self.api_key = getattr(settings, "gemini_api_key", None)
         if self.api_key:
             try:
@@ -105,34 +106,81 @@ class RAGAgent:
         else:
             self.client = None
 
+    def _compute_embedding(self, text: str) -> list[float] | None:
+        """Computes dense vector embeddings using Gemini text-embedding-004."""
+        if not self.client:
+            return None
+        try:
+            res = self.client.models.embed_content(
+                model=self.embedding_model,
+                contents=text,
+            )
+            if hasattr(res, "embedding") and res.embedding and hasattr(res.embedding, "values"):
+                return res.embedding.values
+            elif isinstance(res, dict) and "embedding" in res:
+                return res["embedding"]["values"]
+        except Exception as e:
+            logger.debug(f"Vector embedding computation fallback: {e}")
+        return None
+
+    @staticmethod
+    def _cosine_similarity(vec1: list[float], vec2: list[float]) -> float:
+        """Calculates cosine similarity between two float vectors."""
+        if not vec1 or not vec2 or len(vec1) != len(vec2):
+            return 0.0
+        dot_product = sum(a * b for a, b in zip(vec1, vec2))
+        norm1 = (sum(a * a for a in vec1)) ** 0.5
+        norm2 = (sum(b * b for b in vec2)) ** 0.5
+        if norm1 == 0 or norm2 == 0:
+            return 0.0
+        return dot_product / (norm1 * norm2)
+
     def retrieve_relevant_chunks(self, course_id: str, query: str, top_k: int = 3) -> list[dict[str, Any]]:
-        """Retrieves top-k relevant document chunks, prioritizing recently uploaded materials."""
+        """
+        Retrieves top-k document chunks using Hybrid Vector Search:
+        Score = 0.70 * CosineSimilarity(DenseEmbeddings) + 0.30 * BM25(KeywordMatches)
+        """
         query_words = set(w.lower() for w in query.split() if len(w) > 2)
-        matched_chunks = []
+        query_embedding = self._compute_embedding(query)
+        scored_chunks = []
 
         # Iterate in reverse order to give priority to newly uploaded materials
         for chunk in reversed(COURSE_KNOWLEDGE_BASE):
             # Filter by course ID if specified
             if course_id and chunk.get("course_id") != course_id:
-                # Also match general_study uploads
                 if course_id != "general_study" and chunk.get("course_id") != "general_study":
                     continue
 
             chunk_text = (chunk.get("content", "") + " " + chunk.get("chapter", "") + " " + chunk.get("material_title", "")).lower()
-            score = sum(1 for word in query_words if word in chunk_text)
             
-            # Boost score for uploaded materials
+            # 1. BM25 / Keyword Overlap Score
+            bm25_score = sum(1 for word in query_words if word in chunk_text) / max(1, len(query_words))
+            
+            # 2. Dense Vector Embedding Cosine Similarity
+            vector_sim = 0.0
+            chunk_embedding = chunk.get("embedding")
+            if not chunk_embedding and self.client:
+                chunk_embedding = self._compute_embedding(chunk_text[:1000])
+                chunk["embedding"] = chunk_embedding
+
+            if query_embedding and chunk_embedding:
+                vector_sim = self._cosine_similarity(query_embedding, chunk_embedding)
+
+            # 3. Hybrid Score Fusion
+            hybrid_score = (0.70 * vector_sim) + (0.30 * bm25_score)
+
+            # Boost score for user uploaded materials
             if chunk.get("material_id", "").startswith("mat_"):
-                score += 2.0
+                hybrid_score += 0.5
 
-            matched_chunks.append((score, chunk))
+            scored_chunks.append((hybrid_score, chunk))
 
-        # Sort by match score descending
-        matched_chunks.sort(key=lambda x: x[0], reverse=True)
-        results = [chunk for score, chunk in matched_chunks[:top_k]]
+        # Sort by hybrid match score descending
+        scored_chunks.sort(key=lambda x: x[0], reverse=True)
+        results = [chunk for score, chunk in scored_chunks[:top_k]]
 
         # Fallback: if no score > 0, grab all user chunks from uploaded files
-        if not results or all(score == 0 for score, _ in matched_chunks[:top_k]):
+        if not results or all(score == 0 for score, _ in scored_chunks[:top_k]):
             recent_user_chunks = [c for c in reversed(COURSE_KNOWLEDGE_BASE) if c.get("material_id", "").startswith("mat_")]
             if recent_user_chunks:
                 results = recent_user_chunks[:top_k]
@@ -211,6 +259,7 @@ class RAGAgent:
 
         indexed_count = 0
         for idx, chunk_text in enumerate(chunks, 1):
+            embedding = self._compute_embedding(chunk_text[:1000])
             COURSE_KNOWLEDGE_BASE.append({
                 "material_id": material_id,
                 "course_id": course_id,
@@ -218,6 +267,7 @@ class RAGAgent:
                 "chapter": chapters_covered,
                 "page_number": idx,
                 "content": chunk_text,
+                "embedding": embedding,
             })
             indexed_count += 1
 
