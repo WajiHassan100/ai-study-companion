@@ -66,12 +66,34 @@ class TutorAgent:
 
         chat_messages = history.messages
 
+        # Persistent Memory Context Summary
+        memory_context = "No previous context."
+        if chat_messages:
+            recent_turns = [f"{m.type}: {m.content[:100]}" for m in chat_messages[-4:]]
+            memory_context = "Recent Session History:\n" + "\n".join(recent_turns)
+
+        # Adaptive Hint Scaling: Check if student is stuck
+        stuck_keywords = ["stuck", "don't understand", "dont get it", "confused", "explain again", "hard", "help me", "don't know"]
+        is_stuck = any(kw in message.lower() for kw in stuck_keywords)
+        
+        # Check previous student messages for stuck count
+        stuck_count = 1 if is_stuck else 0
+        if is_stuck:
+            for msg_item in reversed(chat_messages):
+                if getattr(msg_item, "type", "") == "human":
+                    if any(kw in str(msg_item.content).lower() for kw in stuck_keywords):
+                        stuck_count += 1
+
+        assistance_mode = "worked_example" if stuck_count >= 2 else "socratic_hint"
+
         # Render prompt with inputs & history
         prompt_value = self.prompt.format_prompt(
             student_id=student_id,
             student_level=student_level,
             learning_style=learning_style,
             course_id=course_id or "General",
+            assistance_mode=assistance_mode,
+            memory_context=memory_context,
             chat_history=chat_messages,
             message=message,
         )

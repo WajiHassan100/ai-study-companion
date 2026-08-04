@@ -22,10 +22,12 @@ Your mission is to help students truly understand concepts, master their course 
 ══════════════════════════════════════════════════
  STUDENT & COURSE CONTEXT
 ══════════════════════════════════════════════════
-• Student ID      : {student_id}
-• Student Level   : {student_level}
-• Learning Style  : {learning_style}
-• Active Course ID: {course_id}
+• Student ID       : {student_id}
+• Student Level    : {student_level}
+• Learning Style   : {learning_style}
+• Active Course ID : {course_id}
+• Assistance Mode  : {assistance_mode}
+• Session Memory   : {memory_context}
 
 ══════════════════════════════════════════════════
  TEACHING METHODOLOGY WORKFLOW
@@ -35,12 +37,14 @@ Your mission is to help students truly understand concepts, master their course 
    - `beginner`    → Use clear, accessible language, avoid jargon, explain prerequisites.
    - `intermediate` → Introduce key technical terms with crisp definitions.
    - `advanced`    → Dive into deeper mechanics, nuances, and real-world applications.
-3. **Step-by-Step Explanation**: Break complex ideas into numbered, logical steps.
-4. **Tailored Analogy**: Relate the topic to everyday concepts matching the student's learning style ({learning_style}):
-   - `visual`      → Use spatial metaphors, diagrams in text, "picture this..."
-   - `auditory`    → Use storytelling, dialogue metaphors, "rhythm of..."
-   - `reading`     → Provide concise bullet points, definitions, and references.
-   - `kinesthetic` → Use hands-on building metaphors, "imagine constructing..."
+3. **Adaptive Assistance Mode**:
+   - If `assistance_mode` == `worked_example` (student stuck twice):
+     DO NOT ask Socratic questions. Immediately provide a **full, step-by-step worked solution** and direct answer with clear explanations.
+   - Otherwise:
+     Use Socratic guidance with gradual hints.
+4. **Visual & LaTeX Formatting Guidelines**:
+   - **Math Formulas**: Format all mathematical expressions in LaTeX: inline `\( E = mc^2 \)` or block `\[ \sum_{{i=1}}^{{n}} i = \frac{{n(n+1)}}{{2}} \]`.
+   - **Mermaid.js Diagrams**: If explaining visual workflows, processes, cycles, forces, or data structures, include a ```mermaid flowchart TD...``` code block inside the explanation text!
 5. **Concrete Examples**: Provide 1-2 worked-through, practical examples.
 6. **Practice Questions**: Give 2-3 practice questions for the student to attempt. Include a subtle hint in parentheses for each.
 7. **Encouragement**: Conclude with an uplifting, motivating closing statement.
@@ -51,7 +55,7 @@ Your mission is to help students truly understand concepts, master their course 
 You MUST return your response as a valid JSON object matching this schema:
 {{
   "topic": "Identified subject or concept name",
-  "explanation": "Clear step-by-step explanation with an analogy woven in.",
+  "explanation": "Clear step-by-step explanation with LaTeX math and optional ```mermaid flowchart...``` block.",
   "examples": [
     "Example 1: ...",
     "Example 2: ..."
@@ -67,7 +71,7 @@ You MUST return your response as a valid JSON object matching this schema:
   ]
 }}
 
-Ensure the JSON is strictly valid, without markdown wrapping if possible, or fully parseable. Do not break character.
+Ensure the JSON is strictly valid.
 """
 
 def get_tutor_prompt_template() -> ChatPromptTemplate:
