@@ -71,14 +71,46 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Assistant</SidebarGroupLabel>
+          <SidebarGroupLabel>Switch Role View</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={currentPath.startsWith("/dashboard/student")}>
+                  <Link to="/dashboard/student" className="flex items-center gap-2">
+                    <GraduationCap className="h-4 w-4 text-emerald-600" />
+                    {!collapsed && <span>Student Portal</span>}
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={currentPath.startsWith("/dashboard/teacher")}>
+                  <Link to="/dashboard/teacher" className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-blue-600" />
+                    {!collapsed && <span>Teacher Portal</span>}
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={currentPath.startsWith("/dashboard/admin")}>
+                  <Link to="/dashboard/admin" className="flex items-center gap-2">
+                    <ShieldCheck className="h-4 w-4 text-purple-600" />
+                    {!collapsed && <span>Admin Console</span>}
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>AI Assistant</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <Link to="/dashboard" className="flex items-center gap-2">
-                    <Sparkles className="h-4 w-4" />
-                    {!collapsed && <span>AI assistant</span>}
+                    <Sparkles className="h-4 w-4 text-amber-500" />
+                    {!collapsed && <span>AI Socratic Panel</span>}
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
