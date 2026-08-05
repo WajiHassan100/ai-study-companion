@@ -38,16 +38,17 @@ interface UpcomingRow {
 }
 
 const upcoming: UpcomingRow[] = [
-  { id: "1", title: "Essay: Industrial Revolution", course: "History", due: "Coming soon", status: "Placeholder" },
-  { id: "2", title: "Problem set 4", course: "Mathematics", due: "Coming soon", status: "Placeholder" },
-  { id: "3", title: "Lab report", course: "Chemistry", due: "Coming soon", status: "Placeholder" },
+  { id: "1", title: "Class Assignment #1: Photosynthesis & Light Reactions", course: "BIOL 101", due: "Tomorrow at 11:59 PM", status: "Pending Submission" },
+  { id: "2", title: "Problem Set #3: Partial Derivatives & Gradient Vectors", course: "MATH 201", due: "In 3 Days", status: "In Progress" },
+  { id: "3", title: "Lab Report #2: Newton's Motion & Inclined Friction", course: "PHYS 102", due: "Completed", status: "Graded (94/100)" },
+  { id: "4", title: "Coding Problem Set #1: Big-O Complexity Analysis", course: "CS 101", due: "In 5 Days", status: "Pending" },
 ];
 
 const columns: Column<UpcomingRow>[] = [
   { key: "title", header: "Assignment", render: (r) => <span className="font-medium">{r.title}</span> },
-  { key: "course", header: "Course", render: (r) => r.course },
-  { key: "due", header: "Due", render: (r) => r.due },
-  { key: "status", header: "Status", render: (r) => <Badge variant="outline">{r.status}</Badge> },
+  { key: "course", header: "Course", render: (r) => <Badge variant="outline" className="text-[10px] font-bold uppercase">{r.course}</Badge> },
+  { key: "due", header: "Due Date", render: (r) => <span className="text-xs text-muted-foreground">{r.due}</span> },
+  { key: "status", header: "Status", render: (r) => <Badge className={r.status.includes("Graded") ? "bg-emerald-700 text-white font-bold" : "bg-secondary text-secondary-foreground"}>{r.status}</Badge> },
 ];
 
 function StudentDashboard() {
@@ -71,13 +72,13 @@ function StudentDashboard() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Link to="/courses/biol_101" className="block hover:opacity-90 transition-opacity cursor-pointer">
-          <StatCard title="Enrolled courses" value="3" hint="Click to open course pages" icon={BookOpen} />
+          <StatCard title="Enrolled courses" value="6" hint="Click to open course pages" icon={BookOpen} />
         </Link>
         <Link to="/assignments" className="block hover:opacity-90 transition-opacity cursor-pointer">
           <StatCard title="Open assignments" value="4" hint="Click to view & grade coursework" icon={ClipboardList} />
         </Link>
-        <StatCard title="Average grade" value="88%" hint="Current term" icon={TrendingUp} />
-        <StatCard title="Next deadline" value="Fri" hint="Lab Report Due" icon={CalendarClock} />
+        <StatCard title="Average grade" value="91%" hint="Current term mastery" icon={TrendingUp} />
+        <StatCard title="Next deadline" value="Tomorrow" hint="Photosynthesis Lab Due" icon={CalendarClock} />
       </div>
 
       {/* ── ENROLLED COURSES SECTION ── */}
@@ -179,16 +180,18 @@ function StudentDashboard() {
             onAskTutor={(query) => setSelectedQuery(query)}
           />
           <ProgressChart
-            title="Weekly study progress"
-            description="Sample data — replace once assignment tracking is live."
+            title="Weekly AI Study Progress"
+            description="Completed study blocks & AI Tutor practice sessions across active courses."
             data={[
-              { label: "Mon", value: 0 },
-              { label: "Tue", value: 0 },
-              { label: "Wed", value: 0 },
-              { label: "Thu", value: 0 },
-              { label: "Fri", value: 0 },
+              { label: "Mon", value: 4 },
+              { label: "Tue", value: 6 },
+              { label: "Wed", value: 5 },
+              { label: "Thu", value: 8 },
+              { label: "Fri", value: 7 },
+              { label: "Sat", value: 9 },
+              { label: "Sun", value: 6 },
             ]}
-            seriesLabel="Tasks done"
+            seriesLabel="Tasks & Quizzes Completed"
           />
         </div>
 
