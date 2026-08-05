@@ -283,6 +283,22 @@ class TeacherGradeResponse(BaseModel):
     suggested_remediation: list[str]
 
 
+# ── Agent #0: AI Orchestrator Agent Schemas ───────────────────────
+class OrchestrationRequest(BaseModel):
+    student_id: str = Field(default="demo_student", description="Student ID")
+    query: str = Field(min_length=1, description="Student request prompt")
+    course_id: str = Field(default="biol_101", description="Active course ID")
+    session_id: str | None = Field(default=None, description="Active session ID")
+
+
+class OrchestrationResponse(BaseModel):
+    orchestrator_decision: dict = Field(description="Intent classification & reasoning")
+    response: str = Field(description="Primary response text")
+    delegated_agents: list[str] = Field(default_factory=list, description="List of specialized agents invoked")
+    session_id: str | None = Field(default=None, description="Optional active session ID")
+
+
+
 
 
 

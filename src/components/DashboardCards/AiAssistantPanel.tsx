@@ -4,13 +4,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { sendTutorMessage, type TutorChatResponse, type ChatMessage } from "@/lib/api/ai";
+import { orchestrateMessage, type OrchestratorResponse, type ChatMessage } from "@/lib/api/ai";
 import { uploadFileObjectToRAG, queryRAGDocument, type RAGQueryResponse } from "@/lib/api/rag";
 
 export function AiAssistantPanel({
-  title = "AI Study Assistant",
-  description = "Will explain concepts, plan revision and summarise your notes.",
-  suggestions = ["Explain this topic", "Build a revision plan", "Summarise my notes"],
+  title = "AI Orchestrated Study Assistant",
+  description = "Central Orchestrator routes your requests across Tutor, RAG, Planner & Profiler agents.",
+  suggestions = ["Explain thylakoid light reactions", "Create a 7-day study revision plan", "Check my biology mastery level"],
   studentId,
   studentLevel = "beginner",
   learningStyle = "visual",
@@ -42,7 +42,6 @@ export function AiAssistantPanel({
     }
   }, [externalPrompt]);
 
-
   const scrollToBottom = () => {
     setTimeout(() => {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -61,7 +60,6 @@ export function AiAssistantPanel({
     setError(null);
 
     try {
-      // Send raw File object to FastAPI backend for Python pypdf / python-docx parsing!
       const res = await uploadFileObjectToRAG("general_study", file);
       setAttachedDoc({
         name: file.name,
@@ -98,8 +96,6 @@ export function AiAssistantPanel({
       if (attachedDoc) {
         // RAG GROUNDED CHAT MODE (AGENT #5)
         const ragRes: RAGQueryResponse = await queryRAGDocument("general_study", textToSend);
-        
-        // Clean answer formatting without raw binary junk
         const cleanAnswer = (ragRes.answer || "")
           .replace(/PK[\s\S]*?xml/g, "")
           .replace(/[^\x20-\x7E\x0A\x0D]/g, " ")
@@ -114,29 +110,33 @@ export function AiAssistantPanel({
             topic: `RAG Grounded: ${attachedDoc.name}`,
             encouragement: `Answers strictly grounded in '${attachedDoc.name}' (Confidence: ${(ragRes.confidence_score * 100).toFixed(0)}%).`,
             citations: ragRes.cited_sources || [],
-          },
+          } as any,
         };
         setMessages((prev) => [...prev, tutorMsg]);
       } else {
-        // STANDARD SOCRATIC TUTOR MODE (AGENT #1)
-        const response: TutorChatResponse = await sendTutorMessage({
+        // CENTRAL AI ORCHESTRATOR PIPELINE
+        const response: OrchestratorResponse = await orchestrateMessage({
           student_id: studentId,
-          message: textToSend,
+          query: textToSend,
           session_id: sessionId,
-          student_level: studentLevel,
-          learning_style: learningStyle,
+          course_id: "biol_101",
         });
 
         if (response.session_id) {
           setSessionId(response.session_id);
         }
 
+        const decision = response.orchestrator_decision || {};
         const tutorMsg: ChatMessage = {
           id: (Date.now() + 1).toString(),
           sender: "tutor",
-          text: response.answer || response.explanation || "Explanation completed.",
+          text: response.response || "Task executed successfully.",
           timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-          data: response,
+          data: {
+            topic: `Orchestrated Intent: ${decision.intent || "General"}`,
+            encouragement: `Reasoning: ${decision.reasoning || "Delegated to active agents."}`,
+            recommendations: response.delegated_agents || [],
+          } as any,
         };
 
         setMessages((prev) => [...prev, tutorMsg]);

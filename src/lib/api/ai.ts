@@ -1,7 +1,7 @@
 /**
  * AI Service Client
  * =================
- * Frontend API client for calling the Python FastAPI AI Tutor Agent endpoints.
+ * Frontend API client for calling the Python FastAPI AI Tutor & Orchestrator Agent endpoints.
  */
 
 export interface TutorChatPayload {
@@ -22,6 +22,25 @@ export interface TutorChatResponse {
   practice_questions?: string[];
   encouragement?: string;
   recommendations?: string[];
+}
+
+export interface OrchestratorPayload {
+  student_id?: string;
+  query: string;
+  course_id?: string;
+  session_id?: string;
+}
+
+export interface OrchestratorResponse {
+  orchestrator_decision: {
+    intent: string;
+    target_agent: string;
+    reasoning: string;
+    delegated_agents: string[];
+  };
+  response: string;
+  delegated_agents: string[];
+  session_id?: string;
 }
 
 export interface ChatMessage {
@@ -56,6 +75,37 @@ export async function sendTutorMessage(payload: TutorChatPayload, token?: string
       session_id: payload.session_id || null,
       student_level: payload.student_level || "beginner",
       learning_style: payload.learning_style || "visual",
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ detail: "Unknown error" }));
+    throw new Error(errorData.detail || `Server returned status ${response.status}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Sends a query message to the central AI Orchestrator Agent endpoint (/api/v1/ai/orchestrate).
+ */
+export async function orchestrateMessage(payload: OrchestratorPayload, token?: string): Promise<OrchestratorResponse> {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${API_BASE_URL}/ai/orchestrate`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      student_id: payload.student_id || "demo_student",
+      query: payload.query,
+      course_id: payload.course_id || "biol_101",
+      session_id: payload.session_id || null,
     }),
   });
 

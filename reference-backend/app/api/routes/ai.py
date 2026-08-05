@@ -16,8 +16,16 @@ from sqlalchemy.orm import Session as DBSession
 from app.api.deps import get_optional_current_user
 from app.db.session import get_db
 from app.models.models import User, AIChatMessage
-from app.schemas.schemas import ChatRequest, ChatResponse, TutorChatRequest, TutorChatResponse
+from app.schemas.schemas import (
+    ChatRequest,
+    ChatResponse,
+    TutorChatRequest,
+    TutorChatResponse,
+    OrchestrationRequest,
+    OrchestrationResponse,
+)
 from app.ai.agents.tutor_agent import TutorAgent
+from app.ai.agents.orchestrator_agent import orchestrator_agent
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +33,40 @@ router = APIRouter(prefix="/ai", tags=["ai"])
 
 # Singleton agent instance
 tutor_agent = TutorAgent()
+
+
+@router.post("/orchestrate", response_model=OrchestrationResponse)
+async def orchestrate_request(
+    payload: OrchestrationRequest,
+    db: DBSession = Depends(get_db),
+    current_user: User | None = Depends(get_optional_current_user),
+) -> OrchestrationResponse:
+    """
+    Central AI Orchestrator endpoint.
+    Analyzes student prompt intent, delegates execution to specialized agents,
+    and returns unified multi-agent response with decision reasoning.
+    """
+    student_id = payload.student_id or (current_user.id if current_user else f"demo_{uuid.uuid4().hex[:8]}")
+    try:
+        res = await orchestrator_agent.orchestrate(
+            db=db,
+            student_id=student_id,
+            query=payload.query,
+            course_id=payload.course_id,
+            session_id=payload.session_id,
+        )
+        return OrchestrationResponse(
+            orchestrator_decision=res.get("orchestrator_decision", {}),
+            response=res.get("response", ""),
+            delegated_agents=res.get("delegated_agents", []),
+            session_id=res.get("session_id"),
+        )
+    except Exception as e:
+        logger.error("AI Orchestrator query failed: %s", str(e), exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"AI Orchestrator Agent error: {str(e)}",
+        )
 
 
 @router.post("/tutor/chat", response_model=TutorChatResponse)
