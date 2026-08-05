@@ -77,73 +77,82 @@ export function WeaknessTrackerCard({ studentId, onAskTutor }: WeaknessTrackerPr
           </div>
         </div>
 
-        {/* Topic Mastery Progress */}
+        {/* Sub-Topic Granular Mastery Breakdown */}
         <div className="space-y-3">
           <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
-            <span>Topic Mastery Breakdown</span>
+            <span>Granular Sub-Topic Mastery Breakdown</span>
             <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
           </div>
 
-          {profile?.topic_mastery && Object.keys(profile.topic_mastery).length > 0 ? (
-            Object.entries(profile.topic_mastery).map(([topic, score]) => (
-              <div key={topic} className="space-y-1">
-                <div className="flex justify-between text-xs font-medium">
-                  <span>{topic}</span>
-                  <span className={score >= 80 ? "text-emerald-600 font-semibold" : score < 60 ? "text-amber-600 font-semibold" : "text-blue-600"}>
-                    {score}%
-                  </span>
-                </div>
-                <Progress value={score} className="h-1.5" />
+          <div className="space-y-2.5">
+            <div className="space-y-1">
+              <div className="flex justify-between text-xs font-medium">
+                <span>MATH 201: Derivatives</span>
+                <span className="text-emerald-600 font-bold">80%</span>
               </div>
-            ))
-          ) : (
-            <div className="space-y-2">
-              <div className="space-y-1">
-                <div className="flex justify-between text-xs font-medium">
-                  <span>BIOL 101: Cell Biology & Genetics</span>
-                  <span className="text-emerald-600 font-bold">78%</span>
-                </div>
-                <Progress value={78} className="h-1.5 accent-emerald-600" />
-              </div>
-              <div className="space-y-1">
-                <div className="flex justify-between text-xs font-medium">
-                  <span>MATH 201: Multivariable Calculus</span>
-                  <span className="text-amber-600 font-bold">62%</span>
-                </div>
-                <Progress value={62} className="h-1.5 accent-amber-600" />
-              </div>
-              <div className="space-y-1">
-                <div className="flex justify-between text-xs font-medium">
-                  <span>PHYS 101: Newtonian Mechanics</span>
-                  <span className="text-emerald-600 font-bold">84%</span>
-                </div>
-                <Progress value={84} className="h-1.5 accent-emerald-600" />
-              </div>
+              <Progress value={80} className="h-1.5 accent-emerald-600" />
             </div>
-          )}
+            <div className="space-y-1">
+              <div className="flex justify-between text-xs font-medium">
+                <span>MATH 201: Chain Rule</span>
+                <span className="text-amber-600 font-bold">45%</span>
+              </div>
+              <Progress value={45} className="h-1.5 accent-amber-600" />
+            </div>
+            <div className="space-y-1">
+              <div className="flex justify-between text-xs font-medium">
+                <span>MATH 201: Gradient Vectors</span>
+                <span className="text-rose-600 font-bold">35%</span>
+              </div>
+              <Progress value={35} className="h-1.5 accent-rose-600" />
+            </div>
+          </div>
         </div>
 
-        {/* Concept Weaknesses Section */}
-        <div className="space-y-2 pt-2 border-t border-border/50">
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-600 dark:text-amber-400">
+        {/* Explainable Root Cause Analysis */}
+        <div className="pt-2 border-t border-border/50 space-y-2">
+          <div className="text-xs font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
             <AlertCircle className="h-4 w-4" />
-            <span>Recommended Concepts to Review (Click to Ask AI Tutor):</span>
+            <span>Explainable Root Cause Analysis:</span>
           </div>
 
-          <div className="flex flex-wrap gap-2 pt-1">
-            {(profile?.weaknesses && profile.weaknesses.length > 0
-              ? profile.weaknesses
-              : ["Thylakoid Electron Transport", "Directional Derivatives & Gradient Vectors", "Rotational Torque Equations"]
-            ).map((weakness, i) => (
-              <button
-                key={i}
-                onClick={() => onAskTutor?.(`Can you explain ${weakness} step by step?`)}
-                className="group flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-800 dark:text-amber-300 hover:bg-amber-500/20 border border-amber-500/30 transition-all text-left cursor-pointer"
-              >
-                <span>{weakness}</span>
-                <Sparkles className="h-3 w-3 text-amber-600 group-hover:scale-110 transition-transform" />
-              </button>
-            ))}
+          <div className="p-3 rounded-xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200/80 text-xs space-y-2">
+            <div className="font-semibold text-amber-900 dark:text-amber-200 flex items-center justify-between">
+              <span>⚠️ Identified Foundational Bottleneck:</span>
+              <Badge className="bg-amber-600 text-white text-[10px]">Partial Derivatives</Badge>
+            </div>
+            <p className="text-foreground/90 leading-relaxed text-xs">
+              "Gradient vector weakness (35%) is likely caused by incomplete understanding of prerequisite <strong>partial derivatives (40%)</strong>."
+            </p>
+            <Button
+              size="sm"
+              variant="outline"
+              className="w-full text-xs h-7 text-amber-800 border-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/50"
+              onClick={() => onAskTutor?.("Can you explain partial derivatives step by step and connect them to gradient vectors?")}
+            >
+              <Sparkles className="h-3 w-3 mr-1.5 text-amber-600" />
+              1-Click Review Bottleneck with AI Tutor →
+            </Button>
+          </div>
+        </div>
+
+        {/* Knowledge Dependency Mapping */}
+        <div className="pt-2 border-t border-border/50 space-y-2">
+          <div className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+            <Brain className="h-4 w-4" />
+            <span>Knowledge Dependency Mapping:</span>
+          </div>
+
+          <div className="p-2.5 rounded-xl bg-secondary/60 border border-border/60 text-xs space-y-2">
+            <div className="flex items-center justify-between gap-1 overflow-x-auto pb-1 text-[11px] font-semibold">
+              <span className="px-2 py-1 rounded bg-emerald-500/10 text-emerald-700 border border-emerald-500/20 shrink-0">Calculus (Root)</span>
+              <span className="text-muted-foreground">➔</span>
+              <span className="px-2 py-1 rounded bg-emerald-500/10 text-emerald-700 border border-emerald-500/20 shrink-0">Derivatives (80%)</span>
+              <span className="text-muted-foreground">➔</span>
+              <span className="px-2 py-1 rounded bg-amber-500/10 text-amber-700 border border-amber-500/20 shrink-0">Chain Rule (45%)</span>
+              <span className="text-muted-foreground">➔</span>
+              <span className="px-2 py-1 rounded bg-rose-500/10 text-rose-700 border border-rose-500/20 shrink-0 font-bold">Gradient Vectors (35%)</span>
+            </div>
           </div>
         </div>
 

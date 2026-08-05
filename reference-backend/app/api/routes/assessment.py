@@ -108,3 +108,22 @@ def get_student_profile(
         topic_mastery=topic_mastery,
         updated_at=profile.updated_at or datetime.now(timezone.utc),
     )
+
+
+@router.get("/student/analysis/{student_id}")
+def analyze_student_knowledge(
+    student_id: str,
+    db: DBSession = Depends(get_db),
+):
+    """
+    Returns explainable student knowledge depth analysis, root cause analysis,
+    and prerequisite knowledge dependency mapping trees.
+    """
+    try:
+        return profiler_agent.analyze_knowledge_depth(db, student_id)
+    except Exception as e:
+        logger.error("Knowledge analysis failed: %s", str(e), exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Knowledge Analysis Error: {str(e)}",
+        )
