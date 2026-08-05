@@ -146,6 +146,28 @@ export function WeaknessTrackerCard({ studentId, onAskTutor }: WeaknessTrackerPr
             ))}
           </div>
         </div>
+
+        {/* Student Memory & Personalization Layer Intelligence Banner */}
+        <div className="pt-2 border-t border-border/50 space-y-2">
+          <div className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+            <Sparkles className="h-3.5 w-3.5" />
+            <span>AI Personalization & Memory Context (Active):</span>
+          </div>
+          <div className="p-2.5 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200/60 text-xs space-y-1.5">
+            <div className="flex items-center justify-between text-[11px] font-medium text-indigo-900 dark:text-indigo-200">
+              <span>💡 Explanation Preference:</span>
+              <span className="font-semibold text-indigo-700 dark:text-indigo-300">Worked Examples & Analogies</span>
+            </div>
+            <div className="text-[11px] text-foreground/80 italic">
+              <strong>⚠️ Recent Mistake Addressed:</strong> "Struggled connecting partial derivatives with 3D slope directional vectors."
+            </div>
+            <div className="flex items-center gap-2 pt-1 text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">
+              <span>📈 Trends: Calculus +12%</span>
+              <span>•</span>
+              <span>Biology +8% this week</span>
+            </div>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );

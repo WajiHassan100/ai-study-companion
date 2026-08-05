@@ -29,6 +29,8 @@ Your mission is to help students truly understand concepts, master their course 
 • Assistance Mode  : {assistance_mode}
 • Session Memory   : {memory_context}
 
+{student_memory_context}
+
 ══════════════════════════════════════════════════
  TEACHING METHODOLOGY WORKFLOW
 ══════════════════════════════════════════════════

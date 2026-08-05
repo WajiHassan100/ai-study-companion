@@ -15,13 +15,14 @@ from sqlalchemy.orm import Session as DBSession
 from app.ai.services.llm_service import get_llm
 from app.ai.prompts.planner_prompt import get_planner_prompt_template
 from app.models.models import StudentProfile, Assignment, StudyPlan, Course
+from app.ai.services.student_memory_service import student_memory_service
 
 logger = logging.getLogger(__name__)
 
 
 class PlannerAgent:
     """
-    Study Planner Agent for dynamic study schedule generation.
+    AI Study Planner Agent for generating 7-day Spaced Repetition timetables.
     """
 
     def __init__(self):
@@ -36,13 +37,14 @@ class PlannerAgent:
         custom_goals: str | None = None,
     ) -> dict[str, Any]:
         """
-        Generates and saves a personalized study schedule for a student.
+        Generates a personalized study plan incorporating student memory intelligence.
         """
-        # Fetch student profile data
-        profile = db.query(StudentProfile).filter_by(student_id=student_id).first()
-        student_level = profile.current_level if profile else "beginner"
-        weaknesses = json.loads(profile.weaknesses_json) if (profile and profile.weaknesses_json) else ["General Concepts"]
-        topic_mastery = json.loads(profile.topic_mastery_json) if (profile and profile.topic_mastery_json) else {}
+        # Fetch deep student profile memory context
+        p = student_memory_service.get_or_create_profile(db, student_id)
+        student_level = p.get("current_level", "beginner")
+        weaknesses = p.get("weaknesses", ["General Concepts"])
+        previous_mistakes = p.get("previous_mistakes", [])
+        topic_mastery = p.get("topic_mastery", {})
 
         # Fetch upcoming assignment deadlines
         assignments = db.query(Assignment).limit(5).all()

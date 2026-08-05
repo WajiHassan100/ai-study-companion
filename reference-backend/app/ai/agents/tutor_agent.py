@@ -18,6 +18,8 @@ from app.ai.prompts.tutor_prompt import get_tutor_prompt_template
 from app.ai.memory.conversation_memory import DBChatMessageHistory
 from app.models.models import StudentProfile
 
+from app.ai.services.student_memory_service import student_memory_service
+
 logger = logging.getLogger(__name__)
 
 
@@ -44,8 +46,11 @@ class TutorAgent:
         """
         Executes a tutor session query.
         """
+        # Retrieve deep student personalization & memory context
+        student_memory_context = student_memory_service.retrieve_student_memory_context(db, student_id)
+
         # Automatically pull student profile from DB if available
-        if student_id:
+        if student_id and db:
             profile = db.query(StudentProfile).filter_by(student_id=student_id).first()
             if profile:
                 if student_level == "beginner" and profile.current_level:
@@ -55,7 +60,6 @@ class TutorAgent:
 
         if not session_id:
             session_id = str(uuid.uuid4())
-
 
         history = DBChatMessageHistory(
             db=db,
@@ -67,7 +71,7 @@ class TutorAgent:
         chat_messages = history.messages
 
         # Persistent Memory Context Summary
-        memory_context = "No previous context."
+        memory_context = "No previous session history."
         if chat_messages:
             recent_turns = [f"{m.type}: {m.content[:100]}" for m in chat_messages[-4:]]
             memory_context = "Recent Session History:\n" + "\n".join(recent_turns)
@@ -94,6 +98,7 @@ class TutorAgent:
             course_id=course_id or "General",
             assistance_mode=assistance_mode,
             memory_context=memory_context,
+            student_memory_context=student_memory_context,
             chat_history=chat_messages,
             message=message,
         )

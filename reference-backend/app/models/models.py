@@ -113,7 +113,13 @@ class StudentProfile(Base):
     student_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), unique=True, index=True)
     current_level: Mapped[str] = mapped_column(String(20), default="beginner")
     learning_style: Mapped[str] = mapped_column(String(20), default="visual")
+    preferred_explanation_method: Mapped[str] = mapped_column(String(50), default="worked_examples")
     weaknesses_json: Mapped[str] = mapped_column(Text, default="[]")
+    strong_topics_json: Mapped[str] = mapped_column(Text, default="[]")
+    previous_mistakes_json: Mapped[str] = mapped_column(Text, default="[]")
+    study_history_json: Mapped[str] = mapped_column(Text, default="[]")
+    progress_trends_json: Mapped[str] = mapped_column(Text, default="{}")
+    recent_queries_json: Mapped[str] = mapped_column(Text, default="[]")
     topic_mastery_json: Mapped[str] = mapped_column(Text, default="{}")
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, onupdate=_now)
 
