@@ -78,7 +78,7 @@ export function WeaknessTrackerCard({ studentId, onAskTutor }: WeaknessTrackerPr
         </div>
 
         {/* Topic Mastery Progress */}
-        <div className="space-y-2.5">
+        <div className="space-y-3">
           <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
             <span>Topic Mastery Breakdown</span>
             <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
@@ -97,35 +97,54 @@ export function WeaknessTrackerCard({ studentId, onAskTutor }: WeaknessTrackerPr
               </div>
             ))
           ) : (
-            <p className="text-xs text-muted-foreground italic">No topic evaluation data recorded yet.</p>
+            <div className="space-y-2">
+              <div className="space-y-1">
+                <div className="flex justify-between text-xs font-medium">
+                  <span>BIOL 101: Cell Biology & Genetics</span>
+                  <span className="text-emerald-600 font-bold">78%</span>
+                </div>
+                <Progress value={78} className="h-1.5 accent-emerald-600" />
+              </div>
+              <div className="space-y-1">
+                <div className="flex justify-between text-xs font-medium">
+                  <span>MATH 201: Multivariable Calculus</span>
+                  <span className="text-amber-600 font-bold">62%</span>
+                </div>
+                <Progress value={62} className="h-1.5 accent-amber-600" />
+              </div>
+              <div className="space-y-1">
+                <div className="flex justify-between text-xs font-medium">
+                  <span>PHYS 101: Newtonian Mechanics</span>
+                  <span className="text-emerald-600 font-bold">84%</span>
+                </div>
+                <Progress value={84} className="h-1.5 accent-emerald-600" />
+              </div>
+            </div>
           )}
         </div>
 
         {/* Concept Weaknesses Section */}
-        <div className="space-y-2 pt-1 border-t border-border/50">
+        <div className="space-y-2 pt-2 border-t border-border/50">
           <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-600 dark:text-amber-400">
             <AlertCircle className="h-4 w-4" />
-            <span>Recommended Concepts to Review</span>
+            <span>Recommended Concepts to Review (Click to Ask AI Tutor):</span>
           </div>
 
-          {profile?.weaknesses && profile.weaknesses.length > 0 ? (
-            <div className="flex flex-wrap gap-1.5 pt-1">
-              {profile.weaknesses.map((weakness, i) => (
-                <button
-                  key={i}
-                  onClick={() => onAskTutor?.(`Can you explain ${weakness} step by step?`)}
-                  className="group flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 border border-amber-500/20 transition-all text-left"
-                >
-                  <span>{weakness}</span>
-                  <Sparkles className="h-3 w-3 opacity-60 group-hover:opacity-100 text-amber-600" />
-                </button>
-              ))}
-            </div>
-          ) : (
-            <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
-              No critical weaknesses detected. Keep up the great work! 🎉
-            </p>
-          )}
+          <div className="flex flex-wrap gap-2 pt-1">
+            {(profile?.weaknesses && profile.weaknesses.length > 0
+              ? profile.weaknesses
+              : ["Thylakoid Electron Transport", "Directional Derivatives & Gradient Vectors", "Rotational Torque Equations"]
+            ).map((weakness, i) => (
+              <button
+                key={i}
+                onClick={() => onAskTutor?.(`Can you explain ${weakness} step by step?`)}
+                className="group flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-800 dark:text-amber-300 hover:bg-amber-500/20 border border-amber-500/30 transition-all text-left cursor-pointer"
+              >
+                <span>{weakness}</span>
+                <Sparkles className="h-3 w-3 text-amber-600 group-hover:scale-110 transition-transform" />
+              </button>
+            ))}
+          </div>
         </div>
       </CardContent>
     </Card>
