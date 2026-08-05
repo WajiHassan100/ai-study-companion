@@ -73,7 +73,9 @@ function StudentDashboard() {
         <Link to="/courses/biol_101" className="block hover:opacity-90 transition-opacity cursor-pointer">
           <StatCard title="Enrolled courses" value="3" hint="Click to open course pages" icon={BookOpen} />
         </Link>
-        <StatCard title="Open assignments" value="4" hint="Active coursework" icon={ClipboardList} />
+        <Link to="/assignments" className="block hover:opacity-90 transition-opacity cursor-pointer">
+          <StatCard title="Open assignments" value="4" hint="Click to view & grade coursework" icon={ClipboardList} />
+        </Link>
         <StatCard title="Average grade" value="88%" hint="Current term" icon={TrendingUp} />
         <StatCard title="Next deadline" value="Fri" hint="Lab Report Due" icon={CalendarClock} />
       </div>

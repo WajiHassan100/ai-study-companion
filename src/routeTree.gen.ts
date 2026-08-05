@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedAssignmentsRouteImport } from './routes/_authenticated/assignments'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCoursesCourseIdRouteImport } from './routes/_authenticated/courses.$courseId'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
@@ -33,6 +34,12 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAssignmentsRoute =
+  AuthenticatedAssignmentsRouteImport.update({
+    id: '/assignments',
+    path: '/assignments',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -72,6 +79,7 @@ const AuthenticatedDashboardTeacherRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/assignments': typeof AuthenticatedAssignmentsRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/courses/$courseId': typeof AuthenticatedCoursesCourseIdRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
@@ -82,6 +90,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/assignments': typeof AuthenticatedAssignmentsRoute
   '/courses/$courseId': typeof AuthenticatedCoursesCourseIdRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/dashboard/student': typeof AuthenticatedDashboardStudentRoute
@@ -93,6 +102,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/assignments': typeof AuthenticatedAssignmentsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/_authenticated/courses/$courseId': typeof AuthenticatedCoursesCourseIdRoute
   '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
@@ -105,6 +115,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/assignments'
     | '/dashboard'
     | '/courses/$courseId'
     | '/dashboard/admin'
@@ -115,6 +126,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/assignments'
     | '/courses/$courseId'
     | '/dashboard/admin'
     | '/dashboard/student'
@@ -125,6 +137,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/assignments'
     | '/_authenticated/dashboard'
     | '/_authenticated/courses/$courseId'
     | '/_authenticated/dashboard/admin'
@@ -161,6 +174,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/assignments': {
+      id: '/_authenticated/assignments'
+      path: '/assignments'
+      fullPath: '/assignments'
+      preLoaderRoute: typeof AuthenticatedAssignmentsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
@@ -228,11 +248,13 @@ const AuthenticatedDashboardRouteWithChildren =
   )
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAssignmentsRoute: typeof AuthenticatedAssignmentsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRouteWithChildren
   AuthenticatedCoursesCourseIdRoute: typeof AuthenticatedCoursesCourseIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAssignmentsRoute: AuthenticatedAssignmentsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRouteWithChildren,
   AuthenticatedCoursesCourseIdRoute: AuthenticatedCoursesCourseIdRoute,
 }
