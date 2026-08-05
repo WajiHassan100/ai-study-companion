@@ -33,7 +33,7 @@ COURSE_KNOWLEDGE_BASE: list[dict[str, Any]] = [
         "content": (
             "Light-dependent reactions convert solar energy to chemical energy. Chlorophyll pigments "
             "embedded within the thylakoid membrane of chloroplasts absorb photons, exciting electrons in "
-            "Photosystem II and Photosystem I. This initiates an electron transport chain across the thylakoid "
+            "Photosystem II (P680) and Photosystem I (P700). This initiates an electron transport chain across the thylakoid "
             "membrane, establishing a proton gradient that drives ATP Synthase to phosphorylate ADP into ATP, "
             "while NADP+ reductase generates NADPH."
         ),
@@ -51,40 +51,85 @@ COURSE_KNOWLEDGE_BASE: list[dict[str, Any]] = [
         ),
     },
     {
-        "material_id": "mat2",
+        "material_id": "mat1_dna",
         "course_id": "biol_101",
-        "material_title": "Lecture Slides: Light Reactions & Electron Transport",
-        "chapter": "Slide 14: ATP Synthase Mechanism",
-        "page_number-[FIX]": 14,
-        "page_number": 14,
+        "material_title": "Campbell Biology - Chapter 16: Molecular Basis of Inheritance",
+        "chapter": "Chapter 16.2: DNA Replication Mechanism",
+        "page_number": 315,
         "content": (
-            "ATP Synthase functions as a molecular rotary motor. As hydrogen ions (protons) flow down their "
-            "concentration gradient from the thylakoid lumen back into the stroma, the rotor subunit turns, "
-            "catalyzing the mechanical binding of inorganic phosphate to ADP, creating ATP."
+            "DNA replication occurs semi-conservatively. DNA Helicase unwinds the double helix at the origin of replication, "
+            "forming a replication fork. Topoisomerase relieves strain, while Single-Strand Binding Proteins stabilize unzipped strands. "
+            "DNA Polymerase III synthesizes the leading strand continuously 5' to 3', while the lagging strand is synthesized discontinuously "
+            "in short Okazaki fragments bound by DNA Ligase."
         ),
     },
     {
-        "material_id": "mat1",
+        "material_id": "mat2",
         "course_id": "math_201",
-        "material_title": "Stewart Calculus - Chapter 4: Derivatives & Integrals",
-        "chapter": "Chapter 4.1: Fundamental Theorem of Calculus",
+        "material_title": "Stewart Calculus - Chapter 4: Fundamental Theorem of Calculus",
+        "chapter": "Chapter 4.1: Fundamental Theorem",
         "page_number": 204,
         "content": (
-            "The Fundamental Theorem of Calculus establishes the connection between differentiation and "
-            "integration. Part 1 states that if f is continuous on [a, b], then the function g defined by "
-            "g(x) = integral from a to x of f(t) dt is continuous and differentiable, with g'(x) = f(x)."
+            "The Fundamental Theorem of Calculus establishes the connection between differentiation and integration. "
+            "Part 1 states that if f is continuous on [a, b], then the function g defined by g(x) = integral from a to x of f(t) dt "
+            "is continuous and differentiable, with g'(x) = f(x)."
         ),
     },
     {
-        "material_id": "mat1",
+        "material_id": "mat2_multi",
+        "course_id": "math_201",
+        "material_title": "Stewart Multivariable Calculus - Chapter 14: Partial Derivatives",
+        "chapter": "Chapter 14.6: Directional Derivatives & Gradient Vectors",
+        "page_number": 940,
+        "content": (
+            "The gradient vector of a scalar function f(x, y, z), denoted grad f or nabla f, is defined as "
+            "nabla f = <df/dx, df/dy, df/dz>. The directional derivative D_u f in the direction of unit vector u is the dot product "
+            "D_u f = nabla f dot u. The gradient vector points in the direction of maximum rate of increase of f(x,y,z)."
+        ),
+    },
+    {
+        "material_id": "mat3_phys",
         "course_id": "phys_102",
         "material_title": "University Physics - Chapter 5: Newton's Laws of Motion",
-        "chapter": "Chapter 5.2: Second Law of Motion",
+        "chapter": "Chapter 5.2: Second Law & Friction Dynamics",
         "page_number": 145,
         "content": (
-            "Newton's Second Law states that the net force acting on an object is equal to the mass of the "
-            "object multiplied by its acceleration (F = m * a). Force and acceleration are vector quantities "
-            "acting in the exact same direction."
+            "Newton's Second Law states that the net force acting on an object is equal to the mass multiplied by its acceleration "
+            "(F_net = m * a). On an inclined plane, kinetic friction f_k = mu_k * N opposes motion, where normal force N = m * g * cos(theta)."
+        ),
+    },
+    {
+        "material_id": "mat3_em",
+        "course_id": "phys_102",
+        "material_title": "University Physics - Chapter 29: Maxwell's Equations",
+        "chapter": "Chapter 29.4: Electromagnetic Waves",
+        "page_number": 978,
+        "content": (
+            "Maxwell's equations unify electricity and magnetism into four fundamental laws: Gauss's Law for Electricity, "
+            "Gauss's Law for Magnetism, Faraday's Law of Induction (a changing magnetic field produces an electric field), "
+            "and Ampere-Maxwell Law (changing electric flux generates a magnetic field)."
+        ),
+    },
+    {
+        "material_id": "mat4_cs",
+        "course_id": "cs_101",
+        "material_title": "Introduction to Algorithms (CLRS) - Chapter 3: Asymptotic Notation",
+        "chapter": "Chapter 3.1: Big-O, Omega, and Theta Notations",
+        "page_number": 45,
+        "content": (
+            "Big-O notation describes the upper bound of an algorithm's execution time or space complexity in the worst-case scenario. "
+            "For example, Binary Search operates in O(log n) time complexity, whereas Merge Sort operates in O(n log n) time."
+        ),
+    },
+    {
+        "material_id": "mat5_chem",
+        "course_id": "chem_101",
+        "material_title": "Organic Chemistry (Wade) - Chapter 6: Nucleophilic Substitution",
+        "chapter": "Chapter 6.3: SN1 vs SN2 Mechanisms",
+        "page_number": 230,
+        "content": (
+            "The SN2 mechanism is a concerted one-step nucleophilic substitution reaction causing inversion of stereochemistry (Walden inversion). "
+            "The SN1 mechanism proceeds via a two-step process with a carbocation intermediate, leading to racemization of chiral centers."
         ),
     },
 ]

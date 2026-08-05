@@ -60,20 +60,38 @@ def seed_sample_data():
         courses_data = [
             {
                 "id": "biol_101",
-                "title": "BIOL 101: General Cell Biology",
-                "description": "Introduction to cellular structure, photosynthesis, respiration, and molecular genetics.",
+                "title": "BIOL 101: General Cell & Molecular Biology",
+                "description": "Introduction to cellular structure, thylakoid light reactions, DNA replication mechanics, and molecular genetics.",
                 "teacher_id": "demo_teacher",
             },
             {
                 "id": "math_201",
                 "title": "MATH 201: Multivariable Calculus",
-                "description": "Differential and integral calculus of functions of several variables, partial derivatives, and vector fields.",
+                "description": "Differential and integral calculus of functions of several variables, partial derivatives, and gradient vectors.",
                 "teacher_id": "demo_teacher",
             },
             {
                 "id": "phys_102",
                 "title": "PHYS 102: University Physics II",
-                "description": "Fundamentals of Newtonian mechanics, work-energy theorem, and electromagnetic fields.",
+                "description": "Fundamentals of Newtonian mechanics, inclined plane friction dynamics, and Maxwell's electromagnetic equations.",
+                "teacher_id": "demo_teacher",
+            },
+            {
+                "id": "cs_101",
+                "title": "CS 101: Data Structures & Algorithms",
+                "description": "Algorithmic complexity analysis (Big-O), binary search trees, graph algorithms, and dynamic programming.",
+                "teacher_id": "demo_teacher",
+            },
+            {
+                "id": "chem_101",
+                "title": "CHEM 101: Organic Chemistry & Reaction Mechanisms",
+                "description": "Nucleophilic substitution (SN1/SN2) mechanisms, stereochemistry, and organic synthesis pathways.",
+                "teacher_id": "demo_teacher",
+            },
+            {
+                "id": "hist_105",
+                "title": "HIST 105: Modern World History & Economics",
+                "description": "Industrial Revolution economic transformations, technological innovations, and global geopolitical movements.",
                 "teacher_id": "demo_teacher",
             },
         ]
@@ -98,8 +116,22 @@ def seed_sample_data():
                 "id": "assign_math1",
                 "course_id": "math_201",
                 "title": "Problem Set #3: Partial Derivatives & Gradient Vectors",
-                "description": "Solve problems 1-10 on directional derivatives and tangent plane equations.",
+                "description": "Calculate directional derivatives for multivariable functions f(x,y) and find tangent plane equations.",
                 "max_score": 50.0,
+            },
+            {
+                "id": "assign_phys1",
+                "course_id": "phys_102",
+                "title": "Lab Report #2: Newton's Motion & Inclined Friction Dynamics",
+                "description": "Analyze kinetic friction coefficients on inclined planes using sensor velocity data.",
+                "max_score": 100.0,
+            },
+            {
+                "id": "assign_cs1",
+                "course_id": "cs_101",
+                "title": "Coding Problem Set #1: Big-O Complexity Analysis",
+                "description": "Implement Binary Search and Merge Sort algorithms, proving worst-case O(n log n) space-time bounds.",
+                "max_score": 100.0,
             },
         ]
 
