@@ -10,6 +10,8 @@ export interface StudyBlock {
   duration_minutes: number;
   priority: "high" | "normal" | "low";
   description: string;
+  video_url?: string;
+  video_query?: string;
 }
 
 export interface StudyPlan {

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Calendar, Clock, Sparkles, CheckSquare, Square, RefreshCw, Zap, ChevronDown, ChevronUp, Play } from "lucide-react";
+import { Calendar, Clock, Sparkles, CheckSquare, Square, RefreshCw, Zap, ChevronDown, ChevronUp, Play, Video } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -160,18 +160,36 @@ export function StudyPlannerCard({ studentId, onAskTutor }: StudyPlannerProps) {
                           {block.description}
                         </div>
 
-                        <div className="flex items-center justify-between pt-1">
+                        <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
                           <span className="text-[11px] text-muted-foreground">
                             Target Duration: <strong>{block.duration_minutes} mins</strong>
                           </span>
-                          <Button
-                            size="sm"
-                            className="h-7 text-xs gap-1.5 bg-accent hover:bg-accent/90 text-accent-foreground font-medium"
-                            onClick={() => onAskTutor?.(`Teach me ${block.day}'s topic: ${block.topic} step by step with worked examples.`)}
-                          >
-                            <Play className="h-3 w-3 fill-current" />
-                            Start AI Tutor Session
-                          </Button>
+                          
+                          <div className="flex items-center gap-2">
+                            {/* Watch Relevant Video Lesson Button */}
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-7 text-xs gap-1.5 border-red-500/30 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 font-medium"
+                              onClick={() => {
+                                const targetUrl = block.video_url || `https://www.youtube.com/results?search_query=${encodeURIComponent(block.topic + ' educational explanation lesson')}`;
+                                window.open(targetUrl, '_blank');
+                              }}
+                            >
+                              <Video className="h-3.5 w-3.5 text-red-500 fill-red-500/20" />
+                              Watch Video Lesson
+                            </Button>
+
+                            {/* Start AI Tutor Session Button */}
+                            <Button
+                              size="sm"
+                              className="h-7 text-xs gap-1.5 bg-accent hover:bg-accent/90 text-accent-foreground font-medium"
+                              onClick={() => onAskTutor?.(`Teach me ${block.day}'s topic: ${block.topic} step by step with worked examples.`)}
+                            >
+                              <Play className="h-3 w-3 fill-current" />
+                              Start AI Tutor Session
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     )}

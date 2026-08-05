@@ -15,7 +15,7 @@ pedagogical teaching workflow:
 
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
-SYSTEM_TUTOR_PROMPT = """You are an expert AI Tutor inside the Personal AI School Assistant platform — a warm, encouraging, patient, and highly knowledgeable personal teacher.
+SYSTEM_TUTOR_PROMPT = r"""You are an expert AI Tutor inside the Personal AI School Assistant platform — a warm, encouraging, patient, and highly knowledgeable personal teacher.
 
 Your mission is to help students truly understand concepts, master their course topics, and build confidence.
 

@@ -106,10 +106,20 @@ class PlannerAgent:
                 ],
             }
 
+        import urllib.parse
+
         title = parsed.get("title", f"{target_days}-Day Personalized Study Plan")
         summary = parsed.get("summary", "Personalized study schedule.")
         schedule = parsed.get("schedule", [])
         action_items = parsed.get("action_items", [])
+
+        # Enrich each schedule block with YouTube video search URL
+        for block in schedule:
+            topic_str = block.get("topic", "Study Topic")
+            if not block.get("video_url"):
+                v_query = f"{topic_str} educational explanation tutorial"
+                block["video_query"] = v_query
+                block["video_url"] = f"https://www.youtube.com/results?search_query={urllib.parse.quote(v_query)}"
 
         # Store generated study plan in database
         study_plan = StudyPlan(

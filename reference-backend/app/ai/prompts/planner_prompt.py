@@ -49,14 +49,18 @@ You MUST return your response as a valid JSON object matching this schema:
       "topic": "Mathematics: Quadratic Factoring",
       "duration_minutes": 45,
       "priority": "high",
-      "description": "Review worked examples of factoring quadratic equations and solve 5 practice problems."
+      "description": "Review worked examples of factoring quadratic equations and solve 5 practice problems.",
+      "video_query": "Quadratic Factoring algebra tutorial",
+      "video_url": "https://www.youtube.com/results?search_query=Quadratic+Factoring+algebra+tutorial"
     }},
     {{
       "day": "Tuesday",
       "topic": "Biology: Photosynthesis",
       "duration_minutes": 30,
       "priority": "normal",
-      "description": "Summarize light-dependent and light-independent reaction steps."
+      "description": "Summarize light-dependent and light-independent reaction steps.",
+      "video_query": "Photosynthesis Light Reactions CrashCourse Biology",
+      "video_url": "https://www.youtube.com/results?search_query=Photosynthesis+Light+Reactions+CrashCourse+Biology"
     }}
   ],
   "action_items": [
