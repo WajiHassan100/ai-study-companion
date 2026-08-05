@@ -59,9 +59,28 @@ const classWeaknesses = [
 ];
 
 function TeacherDashboard() {
-  const { profile, user } = useAuth();
+  const { profile, user, role } = useAuth();
   const name = profile?.full_name?.split(" ")[0] || user?.email?.split("@")[0] || "Professor";
   const [gradingId, setGradingId] = useState<string | null>(null);
+
+  if (role === "student") {
+    return (
+      <div className="mx-auto max-w-2xl py-16 px-6 text-center space-y-5 rounded-3xl border border-red-500/30 bg-card shadow-lg my-12">
+        <div className="h-16 w-16 rounded-full bg-red-500/10 text-red-600 flex items-center justify-center mx-auto">
+          <AlertCircle className="h-8 w-8" />
+        </div>
+        <div className="space-y-2">
+          <h2 className="font-display text-2xl font-bold text-foreground">Access Denied — Educator Authorization Required</h2>
+          <p className="text-sm text-muted-foreground max-w-md mx-auto">
+            You are currently signed in with a <strong>Student Account</strong>. The Teacher Portal & Agent #6 Auto-Grader require an educator login.
+          </p>
+        </div>
+        <Button asChild className="rounded-full bg-emerald-800 hover:bg-emerald-900 text-white font-bold px-8 py-2.5">
+          <Link to="/dashboard/student">Return to Student Workspace →</Link>
+        </Button>
+      </div>
+    );
+  }
 
   const handleQuickAutoGrade = async (sub: SubmissionRow) => {
     setGradingId(sub.id);

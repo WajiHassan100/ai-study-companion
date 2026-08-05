@@ -60,44 +60,12 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild isActive={currentPath === item.url}>
                     <Link to={item.url} className="flex items-center gap-2">
-                      <item.icon className="h-4 w-4" />
+                      <item.icon className="h-4 w-4 text-emerald-700 dark:text-emerald-400" />
                       {!collapsed && <span>{item.title}</span>}
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup>
-          <SidebarGroupLabel>Switch Role View</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={currentPath.startsWith("/dashboard/student")}>
-                  <Link to="/dashboard/student" className="flex items-center gap-2">
-                    <GraduationCap className="h-4 w-4 text-emerald-600" />
-                    {!collapsed && <span>Student Portal</span>}
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={currentPath.startsWith("/dashboard/teacher")}>
-                  <Link to="/dashboard/teacher" className="flex items-center gap-2">
-                    <Users className="h-4 w-4 text-blue-600" />
-                    {!collapsed && <span>Teacher Portal</span>}
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={currentPath.startsWith("/dashboard/admin")}>
-                  <Link to="/dashboard/admin" className="flex items-center gap-2">
-                    <ShieldCheck className="h-4 w-4 text-purple-600" />
-                    {!collapsed && <span>Admin Console</span>}
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

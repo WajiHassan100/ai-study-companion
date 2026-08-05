@@ -151,7 +151,7 @@ function AuthPage() {
                   <TabsTrigger value="register">Register</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="signin" className="mt-4">
+                <TabsContent value="signin" className="mt-4 space-y-4">
                   <form onSubmit={handleSignIn} className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="signin-email">Email</Label>
@@ -175,11 +175,46 @@ function AuthPage() {
                         onChange={(e) => setPassword(e.target.value)}
                       />
                     </div>
-                    <Button type="submit" className="w-full" disabled={busy}>
+                    <Button type="submit" className="w-full bg-emerald-800 hover:bg-emerald-900 text-white font-bold" disabled={busy}>
                       {busy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                       Sign in
                     </Button>
                   </form>
+
+                  <div className="pt-2 space-y-2 border-t border-border/40">
+                    <Label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                      Quick Fill Demo Credentials:
+                    </Label>
+                    <div className="grid grid-cols-3 gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="text-xs rounded-xl font-semibold border-emerald-600/30 text-emerald-800 hover:bg-emerald-50"
+                        onClick={() => { setEmail("student@demo.com"); setPassword("demo123"); }}
+                      >
+                        🎓 Student
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="text-xs rounded-xl font-semibold border-blue-600/30 text-blue-800 hover:bg-blue-50"
+                        onClick={() => { setEmail("teacher@demo.com"); setPassword("demo123"); }}
+                      >
+                        👩‍🏫 Teacher
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="text-xs rounded-xl font-semibold border-purple-600/30 text-purple-800 hover:bg-purple-50"
+                        onClick={() => { setEmail("admin@demo.com"); setPassword("demo123"); }}
+                      >
+                        🛡️ Admin
+                      </Button>
+                    </div>
+                  </div>
                 </TabsContent>
 
                 <TabsContent value="register" className="mt-4">
