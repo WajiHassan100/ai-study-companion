@@ -30,17 +30,37 @@ export function Navbar({ withSidebarTrigger = false }: { withSidebarTrigger?: bo
   const displayName = profile?.full_name || user?.email || "Account";
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border/40 bg-background/90 px-4 backdrop-blur md:px-8">
+    <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-border/40 bg-background/95 px-6 backdrop-blur md:px-12">
       {withSidebarTrigger ? <SidebarTrigger /> : null}
 
-      <Link to="/" className="flex items-center gap-2.5">
-        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-800 text-white shadow-xs">
-          <GraduationCap className="h-5 w-5" />
-        </span>
-        <span className="font-display text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Scholar</span>
-      </Link>
+      <div className="flex items-center gap-10">
+        <Link to="/" className="flex items-center gap-2 text-2xl font-black tracking-tighter text-foreground">
+          <span className="text-emerald-700 dark:text-emerald-400">scholar</span>
+          <span className="text-blue-600 dark:text-blue-400 font-bold text-xs bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-500/20">
+            ai
+          </span>
+        </Link>
 
-      <div className="ml-auto flex items-center gap-2">
+        <nav className="hidden lg:flex items-center gap-7 text-sm font-semibold text-muted-foreground">
+          <button className="flex items-center gap-1 hover:text-foreground transition-colors">
+            Products <span className="text-xs">▾</span>
+          </button>
+          <button className="flex items-center gap-1 hover:text-foreground transition-colors">
+            Solutions <span className="text-xs">▾</span>
+          </button>
+          <button className="flex items-center gap-1 hover:text-foreground transition-colors">
+            Resources <span className="text-xs">▾</span>
+          </button>
+          <Link to="/courses/biol_101" className="hover:text-foreground transition-colors">
+            RAG Knowledge Studio
+          </Link>
+          <Link to="/assignments" className="hover:text-foreground transition-colors">
+            Assignments & Auto-Grader
+          </Link>
+        </nav>
+      </div>
+
+      <div className="flex items-center gap-3">
         {isAuthenticated ? (
           <>
             {role ? (
@@ -50,8 +70,8 @@ export function Navbar({ withSidebarTrigger = false }: { withSidebarTrigger?: bo
             ) : null}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2 rounded-full px-4">
-                  <UserIcon className="h-4 w-4" />
+                <Button variant="outline" size="sm" className="gap-2 rounded-full px-4 font-semibold">
+                  <UserIcon className="h-4 w-4 text-emerald-700" />
                   <span className="max-w-36 truncate font-medium">{displayName}</span>
                 </Button>
               </DropdownMenuTrigger>
@@ -59,7 +79,10 @@ export function Navbar({ withSidebarTrigger = false }: { withSidebarTrigger?: bo
                 <DropdownMenuLabel className="truncate">{user?.email}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link to="/dashboard">Dashboard</Link>
+                  <Link to="/dashboard/student">Student Dashboard</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/assignments">Assignments Hub</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut}>
@@ -70,9 +93,17 @@ export function Navbar({ withSidebarTrigger = false }: { withSidebarTrigger?: bo
             </DropdownMenu>
           </>
         ) : (
-          <Button asChild size="sm" className="bg-emerald-800 hover:bg-emerald-900 text-white font-semibold rounded-full px-6 text-xs sm:text-sm shadow-xs">
-            <Link to="/auth">Sign in</Link>
-          </Button>
+          <>
+            <Button asChild variant="outline" size="sm" className="rounded-full px-5 text-xs font-bold border-border/80 hidden sm:inline-flex">
+              <Link to="/dashboard/student">Join a Space</Link>
+            </Button>
+            <Button asChild variant="secondary" size="sm" className="rounded-full px-5 text-xs font-bold bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 hover:bg-blue-200">
+              <Link to="/auth">Sign in</Link>
+            </Button>
+            <Button asChild size="sm" className="rounded-full px-6 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-xs">
+              <Link to="/auth">Demo</Link>
+            </Button>
+          </>
         )}
       </div>
     </header>
