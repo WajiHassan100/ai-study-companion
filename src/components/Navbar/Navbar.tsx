@@ -33,29 +33,26 @@ export function Navbar({ withSidebarTrigger = false }: { withSidebarTrigger?: bo
     <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-border/40 bg-background/95 px-6 backdrop-blur md:px-12">
       {withSidebarTrigger ? <SidebarTrigger /> : null}
 
-      <div className="flex items-center gap-10">
+      <div className="flex items-center gap-8">
         <Link to="/" className="flex items-center gap-2 text-2xl font-black tracking-tighter text-foreground">
           <span className="text-emerald-700 dark:text-emerald-400">scholar</span>
-          <span className="text-blue-600 dark:text-blue-400 font-bold text-xs bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-500/20">
+          <span className="text-emerald-800 dark:text-emerald-300 font-bold text-xs bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
             ai
           </span>
         </Link>
 
-        <nav className="hidden lg:flex items-center gap-7 text-sm font-semibold text-muted-foreground">
-          <button className="flex items-center gap-1 hover:text-foreground transition-colors">
-            Products <span className="text-xs">▾</span>
-          </button>
-          <button className="flex items-center gap-1 hover:text-foreground transition-colors">
-            Solutions <span className="text-xs">▾</span>
-          </button>
-          <button className="flex items-center gap-1 hover:text-foreground transition-colors">
-            Resources <span className="text-xs">▾</span>
-          </button>
-          <Link to="/courses/biol_101" className="hover:text-foreground transition-colors">
-            RAG Knowledge Studio
+        <nav className="hidden lg:flex items-center gap-6 text-sm font-semibold text-muted-foreground">
+          <Link to="/dashboard/student" className="hover:text-emerald-700 transition-colors">
+            Student Workspace
           </Link>
-          <Link to="/assignments" className="hover:text-foreground transition-colors">
+          <Link to="/courses/biol_101" className="hover:text-emerald-700 transition-colors">
+            RAG Document Studio
+          </Link>
+          <Link to="/assignments" className="hover:text-emerald-700 transition-colors">
             Assignments & Auto-Grader
+          </Link>
+          <Link to="/dashboard/teacher" className="hover:text-emerald-700 transition-colors">
+            Teacher Portal
           </Link>
         </nav>
       </div>
@@ -70,7 +67,7 @@ export function Navbar({ withSidebarTrigger = false }: { withSidebarTrigger?: bo
             ) : null}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2 rounded-full px-4 font-semibold">
+                <Button variant="outline" size="sm" className="gap-2 rounded-full px-4 font-semibold border-emerald-600/30">
                   <UserIcon className="h-4 w-4 text-emerald-700" />
                   <span className="max-w-36 truncate font-medium">{displayName}</span>
                 </Button>
@@ -84,6 +81,9 @@ export function Navbar({ withSidebarTrigger = false }: { withSidebarTrigger?: bo
                 <DropdownMenuItem asChild>
                   <Link to="/assignments">Assignments Hub</Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/dashboard/teacher">Teacher Assistant</Link>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut}>
                   <LogOut className="mr-2 h-4 w-4" />
@@ -94,14 +94,11 @@ export function Navbar({ withSidebarTrigger = false }: { withSidebarTrigger?: bo
           </>
         ) : (
           <>
-            <Button asChild variant="outline" size="sm" className="rounded-full px-5 text-xs font-bold border-border/80 hidden sm:inline-flex">
-              <Link to="/dashboard/student">Join a Space</Link>
+            <Button asChild variant="outline" size="sm" className="rounded-full px-5 text-xs font-bold border-emerald-600/30 text-emerald-800 hover:bg-emerald-50 hidden sm:inline-flex">
+              <Link to="/dashboard/student">Open Student Dashboard</Link>
             </Button>
-            <Button asChild variant="secondary" size="sm" className="rounded-full px-5 text-xs font-bold bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 hover:bg-blue-200">
-              <Link to="/auth">Sign in</Link>
-            </Button>
-            <Button asChild size="sm" className="rounded-full px-6 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-xs">
-              <Link to="/auth">Demo</Link>
+            <Button asChild size="sm" className="rounded-full px-6 text-xs font-bold bg-emerald-700 hover:bg-emerald-800 text-white shadow-xs">
+              <Link to="/auth">Sign In / Register</Link>
             </Button>
           </>
         )}
