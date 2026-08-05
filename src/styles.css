@@ -155,3 +155,35 @@
   }
 }
 
+/* ── Infinite Slow Vertical Marquee Animations ── */
+@keyframes marqueeUp {
+  0% {
+    transform: translateY(0%);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+@keyframes marqueeDown {
+  0% {
+    transform: translateY(-50%);
+  }
+  100% {
+    transform: translateY(0%);
+  }
+}
+
+.animate-marquee-up {
+  animation: marqueeUp 24s linear infinite;
+}
+
+.animate-marquee-down {
+  animation: marqueeDown 30s linear infinite;
+}
+
+.animate-marquee-up:hover,
+.animate-marquee-down:hover {
+  animation-play-state: paused;
+}
+

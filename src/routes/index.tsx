@@ -244,52 +244,125 @@ function Index() {
                 </div>
               </div>
 
-              {/* Right Column Bento Cards showcasing OUR Actual Platform Features */}
-              <div className="lg:col-span-5 grid grid-cols-2 gap-3">
+              {/* Right Column: Infinite Slow Upward Moving Photo Gallery (SchoolAI Style) */}
+              <div className="lg:col-span-5 h-[460px] overflow-hidden relative rounded-3xl border border-border/80 bg-card/40 p-3 shadow-xl">
+                {/* Top & Bottom Mask Blurs for Smooth Fade */}
+                <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />
+                <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none" />
 
-                {/* Feature Card 1: 7-Day Revision Planner with Video Lessons */}
-                <div className="col-span-2 p-5 rounded-3xl bg-gradient-to-r from-amber-500/20 via-amber-500/10 to-card border border-amber-500/30 space-y-3 shadow-xs">
-                  <div className="flex items-center justify-between">
-                    <Badge className="bg-amber-600 text-white font-bold text-[10px] uppercase gap-1">
-                      <Zap className="h-3 w-3" /> Agent #3 Revision Planner
-                    </Badge>
-                    <span className="text-[11px] font-semibold text-amber-700 dark:text-amber-400 flex items-center gap-1">
-                      <Video className="h-3.5 w-3.5 text-red-500 fill-red-500/20" /> YouTube Lesson Links
-                    </span>
+                <div className="grid grid-cols-2 gap-3 animate-marquee-up hover:[animation-play-state:paused] cursor-pointer">
+                  
+                  {/* Column 1 Track */}
+                  <div className="space-y-3">
+                    {/* Item 1: Astronomy & Space Physics */}
+                    <div className="p-4 rounded-3xl bg-gradient-to-br from-blue-600 via-indigo-600 to-slate-900 text-white space-y-3 shadow-md hover:scale-102 transition-transform">
+                      <div className="h-10 w-10 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center font-bold text-xl">
+                        🧑‍🚀
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider bg-black/30 px-2 py-0.5 rounded-md text-blue-200">
+                          Physics & Dynamics
+                        </span>
+                        <h4 className="font-bold text-xs mt-1">Newtonian Gravity & Orbit Mechanics</h4>
+                      </div>
+                    </div>
+
+                    {/* Item 2: Colosseum & World History */}
+                    <div className="p-4 rounded-3xl bg-gradient-to-br from-amber-600 via-orange-600 to-amber-900 text-white space-y-3 shadow-md hover:scale-102 transition-transform">
+                      <div className="h-10 w-10 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center font-bold text-xl">
+                        🏛️
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider bg-black/30 px-2 py-0.5 rounded-md text-amber-200">
+                          World History
+                        </span>
+                        <h4 className="font-bold text-xs mt-1">Roman Empire & Industrial Revolution</h4>
+                      </div>
+                    </div>
+
+                    {/* Item 3: Thylakoid Cell & Frog Biology */}
+                    <div className="p-4 rounded-3xl bg-gradient-to-br from-emerald-600 via-teal-600 to-emerald-950 text-white space-y-3 shadow-md hover:scale-102 transition-transform">
+                      <div className="h-10 w-10 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center font-bold text-xl">
+                        🐸
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider bg-black/30 px-2 py-0.5 rounded-md text-emerald-200">
+                          Cell Biology
+                        </span>
+                        <h4 className="font-bold text-xs mt-1">Thylakoid Light & Calvin Reactions</h4>
+                      </div>
+                    </div>
+
+                    {/* Item 1 Duplicate for Infinite Loop */}
+                    <div className="p-4 rounded-3xl bg-gradient-to-br from-blue-600 via-indigo-600 to-slate-900 text-white space-y-3 shadow-md">
+                      <div className="h-10 w-10 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center font-bold text-xl">
+                        🧑‍🚀
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider bg-black/30 px-2 py-0.5 rounded-md text-blue-200">
+                          Physics & Dynamics
+                        </span>
+                        <h4 className="font-bold text-xs mt-1">Newtonian Gravity & Orbit Mechanics</h4>
+                      </div>
+                    </div>
                   </div>
-                  <h3 className="font-bold text-sm text-foreground">
-                    Day 1: Photosynthesis & Thylakoid Electron Transport
-                  </h3>
-                  <div className="flex items-center justify-between pt-1">
-                    <span className="text-xs text-muted-foreground">Duration: <strong>45 mins</strong></span>
-                    <Button size="sm" variant="outline" className="h-7 text-xs border-red-500/30 text-red-600 font-medium">
-                      <Video className="h-3.5 w-3.5 text-red-500" /> Watch Video Lesson
-                    </Button>
+
+                  {/* Column 2 Track (Staggered) */}
+                  <div className="space-y-3 pt-6">
+                    {/* Item 4: Agent #3 7-Day Revision Planner */}
+                    <div className="p-4 rounded-3xl bg-gradient-to-br from-purple-600 via-pink-600 to-purple-950 text-white space-y-3 shadow-md hover:scale-102 transition-transform">
+                      <div className="h-10 w-10 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center font-bold text-xl">
+                        ⚡
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider bg-black/30 px-2 py-0.5 rounded-md text-pink-200">
+                          Agent #3 Planner
+                        </span>
+                        <h4 className="font-bold text-xs mt-1">7-Day Schedule & Video Lessons</h4>
+                      </div>
+                    </div>
+
+                    {/* Item 5: Agent #5 PDF RAG Studio */}
+                    <div className="p-4 rounded-3xl bg-gradient-to-br from-cyan-600 via-blue-600 to-cyan-950 text-white space-y-3 shadow-md hover:scale-102 transition-transform">
+                      <div className="h-10 w-10 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center font-bold text-xl">
+                        📄
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider bg-black/30 px-2 py-0.5 rounded-md text-cyan-200">
+                          Agent #5 RAG Studio
+                        </span>
+                        <h4 className="font-bold text-xs mt-1">PDF & DOCX Page Citations</h4>
+                      </div>
+                    </div>
+
+                    {/* Item 6: Agent #6 Auto-Grader */}
+                    <div className="p-4 rounded-3xl bg-gradient-to-br from-rose-600 via-red-600 to-rose-950 text-white space-y-3 shadow-md hover:scale-102 transition-transform">
+                      <div className="h-10 w-10 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center font-bold text-xl">
+                        📝
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider bg-black/30 px-2 py-0.5 rounded-md text-rose-200">
+                          Agent #6 Auto-Grader
+                        </span>
+                        <h4 className="font-bold text-xs mt-1">Rubric Essay Evaluation</h4>
+                      </div>
+                    </div>
+
+                    {/* Item 4 Duplicate for Infinite Loop */}
+                    <div className="p-4 rounded-3xl bg-gradient-to-br from-purple-600 via-pink-600 to-purple-950 text-white space-y-3 shadow-md">
+                      <div className="h-10 w-10 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center font-bold text-xl">
+                        ⚡
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider bg-black/30 px-2 py-0.5 rounded-md text-pink-200">
+                          Agent #3 Planner
+                        </span>
+                        <h4 className="font-bold text-xs mt-1">7-Day Schedule & Video Lessons</h4>
+                      </div>
+                    </div>
                   </div>
+
                 </div>
-
-                {/* Feature Card 2: Agent #6 Auto-Grader */}
-                <div className="p-4 rounded-3xl bg-emerald-500/10 border border-emerald-500/30 space-y-2 shadow-xs">
-                  <Badge className="bg-emerald-700 text-white font-bold text-[10px] uppercase">
-                    Agent #6 Auto-Grader
-                  </Badge>
-                  <h4 className="font-bold text-xs text-foreground">Essay Evaluation</h4>
-                  <div className="text-xs text-emerald-800 dark:text-emerald-300 font-bold">
-                    Grade: A (94/100)
-                  </div>
-                </div>
-
-                {/* Feature Card 3: Agent #5 PDF RAG */}
-                <div className="p-4 rounded-3xl bg-cyan-500/10 border border-cyan-500/30 space-y-2 shadow-xs">
-                  <Badge className="bg-cyan-700 text-white font-bold text-[10px] uppercase">
-                    Agent #5 RAG Studio
-                  </Badge>
-                  <h4 className="font-bold text-xs text-foreground">PDF & DOCX Uploads</h4>
-                  <div className="text-[11px] text-muted-foreground">
-                    Page-cited textbook citations
-                  </div>
-                </div>
-
               </div>
 
             </div>
