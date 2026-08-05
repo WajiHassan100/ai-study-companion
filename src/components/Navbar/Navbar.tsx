@@ -41,18 +41,59 @@ export function Navbar({ withSidebarTrigger = false }: { withSidebarTrigger?: bo
           </span>
         </Link>
 
-        <nav className="hidden lg:flex items-center gap-6 text-sm font-semibold text-muted-foreground">
-          <Link to="/dashboard/student" className="hover:text-emerald-700 transition-colors">
-            Student Workspace
-          </Link>
+        <nav className="hidden lg:flex items-center gap-7 text-sm font-semibold text-muted-foreground">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center gap-1.5 hover:text-emerald-700 transition-colors focus:outline-none">
+                AI Agents <span className="text-[10px]">▼</span>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-64 p-2 space-y-1">
+              <DropdownMenuItem asChild className="rounded-xl cursor-pointer">
+                <Link to="/dashboard/student" className="flex flex-col items-start gap-0.5">
+                  <span className="font-bold text-foreground text-xs">Agent #1: Socratic Tutor</span>
+                  <span className="text-[11px] text-muted-foreground">Adaptive hint scaling & LaTeX math</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild className="rounded-xl cursor-pointer">
+                <Link to="/courses/biol_101" className="flex flex-col items-start gap-0.5">
+                  <span className="font-bold text-foreground text-xs">Agent #5: RAG PDF Studio</span>
+                  <span className="text-[11px] text-muted-foreground">Vector search & page-cited answers</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild className="rounded-xl cursor-pointer">
+                <Link to="/assignments" className="flex flex-col items-start gap-0.5">
+                  <span className="font-bold text-foreground text-xs">Agent #6: Teacher Auto-Grader</span>
+                  <span className="text-[11px] text-muted-foreground">Rubric essay grading & feedback</span>
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center gap-1.5 hover:text-emerald-700 transition-colors focus:outline-none">
+                Solutions <span className="text-[10px]">▼</span>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-56 p-2 space-y-1">
+              <DropdownMenuItem asChild className="rounded-xl cursor-pointer">
+                <Link to="/dashboard/student" className="font-semibold text-xs">For Students</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild className="rounded-xl cursor-pointer">
+                <Link to="/dashboard/teacher" className="font-semibold text-xs">For Teachers & Educators</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild className="rounded-xl cursor-pointer">
+                <Link to="/dashboard/admin" className="font-semibold text-xs">For University Admins</Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <Link to="/courses/biol_101" className="hover:text-emerald-700 transition-colors">
-            RAG Document Studio
+            Course RAG Studio
           </Link>
           <Link to="/assignments" className="hover:text-emerald-700 transition-colors">
-            Assignments & Auto-Grader
-          </Link>
-          <Link to="/dashboard/teacher" className="hover:text-emerald-700 transition-colors">
-            Teacher Portal
+            Assignments Hub
           </Link>
         </nav>
       </div>
@@ -60,6 +101,9 @@ export function Navbar({ withSidebarTrigger = false }: { withSidebarTrigger?: bo
       <div className="flex items-center gap-3">
         {isAuthenticated ? (
           <>
+            <Button asChild size="sm" className="rounded-full px-5 text-xs font-bold bg-emerald-800 hover:bg-emerald-900 text-white shadow-xs">
+              <Link to="/dashboard/student">My Dashboard →</Link>
+            </Button>
             {role ? (
               <Badge variant="secondary" className="hidden capitalize sm:inline-flex bg-emerald-50 text-emerald-800 border-emerald-200">
                 {role}
@@ -76,13 +120,13 @@ export function Navbar({ withSidebarTrigger = false }: { withSidebarTrigger?: bo
                 <DropdownMenuLabel className="truncate">{user?.email}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link to="/dashboard/student">Student Dashboard</Link>
+                  <Link to="/dashboard/student">Student Workspace</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/assignments">Assignments Hub</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/dashboard/teacher">Teacher Assistant</Link>
+                  <Link to="/dashboard/teacher">Teacher Portal</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut}>
@@ -94,11 +138,11 @@ export function Navbar({ withSidebarTrigger = false }: { withSidebarTrigger?: bo
           </>
         ) : (
           <>
-            <Button asChild variant="outline" size="sm" className="rounded-full px-5 text-xs font-bold border-emerald-600/30 text-emerald-800 hover:bg-emerald-50 hidden sm:inline-flex">
-              <Link to="/dashboard/student">Open Student Dashboard</Link>
+            <Button asChild variant="ghost" size="sm" className="rounded-full px-5 text-xs font-bold text-muted-foreground hover:text-foreground hidden sm:inline-flex">
+              <Link to="/auth">Sign in</Link>
             </Button>
-            <Button asChild size="sm" className="rounded-full px-6 text-xs font-bold bg-emerald-700 hover:bg-emerald-800 text-white shadow-xs">
-              <Link to="/auth">Sign In / Register</Link>
+            <Button asChild size="sm" className="rounded-full px-6 text-xs font-bold bg-emerald-800 hover:bg-emerald-900 text-white shadow-xs">
+              <Link to="/auth">Get Started Free</Link>
             </Button>
           </>
         )}
