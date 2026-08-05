@@ -125,6 +125,7 @@ class TutorAgent:
             logger.warning("Failed to parse JSON output directly: %s. Using raw fallback.", e)
             parsed = {
                 "topic": "Academic Assistance",
+                "socratic_question": f"What do you think is the core idea behind {message}?",
                 "explanation": raw_text,
                 "examples": [],
                 "practice_questions": [],
@@ -132,9 +133,14 @@ class TutorAgent:
                 "recommendations": ["Review course materials"],
             }
 
-        # Format full answer string for storage & primary view
+        socratic_question = parsed.get("socratic_question", "")
         explanation = parsed.get("explanation", raw_text)
-        formatted_answer = explanation
+
+        # Build full formatted answer string including Socratic opening question
+        if socratic_question:
+            formatted_answer = f"❓ **Socratic Thought Question:**\n_{socratic_question}_\n\n{explanation}"
+        else:
+            formatted_answer = explanation
 
         # Save to DB conversation history
         history.add_message(prompt_value.to_messages()[-1])  # HumanMessage
@@ -144,6 +150,7 @@ class TutorAgent:
             "answer": formatted_answer,
             "session_id": session_id,
             "topic": parsed.get("topic", "Tutor Session"),
+            "socratic_question": socratic_question,
             "explanation": explanation,
             "examples": parsed.get("examples", []),
             "practice_questions": parsed.get("practice_questions", []),
