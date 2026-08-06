@@ -31,10 +31,14 @@ export function StudyPlannerCard({ studentId, onAskTutor }: StudyPlannerProps) {
     }
   };
 
+  const [targetDays, setTargetDays] = useState(5);
+  const [availableHours, setAvailableHours] = useState(2.0);
+  const [customGoal, setCustomGoal] = useState("Physics Exam Preparation");
+
   const handleGenerate = async () => {
     setGenerating(true);
     try {
-      const newPlan = await generateStudyPlan(studentId, 7);
+      const newPlan = await generateStudyPlan(studentId, targetDays, customGoal, availableHours, "moderate");
       setPlans((prev) => [newPlan, ...prev]);
       setExpandedIndex(0);
     } catch (err) {
@@ -68,10 +72,10 @@ export function StudyPlannerCard({ studentId, onAskTutor }: StudyPlannerProps) {
         <div>
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <Calendar className="h-5 w-5 text-accent" />
-            AI Study Planner & Revision Schedule
+            AI Adaptive Study Planner & Timetable
           </CardTitle>
           <CardDescription className="text-xs text-muted-foreground mt-0.5">
-            Click any day to open full study objectives & AI tutoring session
+            Progresses from concept fundamentals ➔ numerical solving ➔ exam questions ➔ AI tutor session ➔ mock assessment
           </CardDescription>
         </div>
         <Button
@@ -82,11 +86,49 @@ export function StudyPlannerCard({ studentId, onAskTutor }: StudyPlannerProps) {
           disabled={generating}
         >
           {generating ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
-          <span>{generating ? "Planning..." : "Generate AI Plan"}</span>
+          <span>{generating ? "Planning..." : "Regenerate AI Plan"}</span>
         </Button>
       </CardHeader>
 
       <CardContent className="space-y-4 text-sm">
+        {/* Adaptive Parameters Selector Bar */}
+        <div className="p-2.5 rounded-xl bg-secondary/50 border border-border/50 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 font-medium">
+              <Clock className="h-3.5 w-3.5 text-accent" />
+              <span>Time:</span>
+              <select
+                value={availableHours}
+                onChange={(e) => setAvailableHours(parseFloat(e.target.value))}
+                className="bg-background border border-border rounded px-1.5 py-0.5 font-semibold text-foreground"
+              >
+                <option value={1.0}>1 hour/day</option>
+                <option value={2.0}>2 hours/day</option>
+                <option value={3.0}>3 hours/day</option>
+                <option value={4.0}>4 hours/day</option>
+              </select>
+            </div>
+
+            <div className="flex items-center gap-1.5 font-medium">
+              <Calendar className="h-3.5 w-3.5 text-indigo-500" />
+              <span>Days:</span>
+              <select
+                value={targetDays}
+                onChange={(e) => setTargetDays(parseInt(e.target.value))}
+                className="bg-background border border-border rounded px-1.5 py-0.5 font-semibold text-foreground"
+              >
+                <option value={3}>3 Days</option>
+                <option value={5}>5 Days (Exam Prep)</option>
+                <option value={7}>7 Days (Full Week)</option>
+              </select>
+            </div>
+          </div>
+
+          <Badge variant="secondary" className="bg-accent/10 text-accent font-medium text-[11px]">
+            Weaknesses Synced from Agent #2 ✓
+          </Badge>
+        </div>
+
         {/* Active Plan Header */}
         {activePlan ? (
           <div className="p-3 rounded-lg bg-secondary/40 border border-border/50 space-y-1">

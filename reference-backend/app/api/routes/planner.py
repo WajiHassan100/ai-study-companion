@@ -47,6 +47,8 @@ async def generate_study_plan(
             student_id=student_id,
             target_days=payload.target_days,
             custom_goals=payload.custom_goals,
+            available_hours=payload.available_hours,
+            learning_speed=payload.learning_speed,
         )
 
         schedule_blocks = [StudyBlock(**block) for block in result["schedule"]]

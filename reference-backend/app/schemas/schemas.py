@@ -141,8 +141,10 @@ class StudyBlock(BaseModel):
 
 class PlannerGenerateRequest(BaseModel):
     student_id: str = Field(min_length=1, description="ID of the student")
-    target_days: int = Field(default=7, description="Number of days to plan for")
+    target_days: int = Field(default=5, description="Number of days to plan for")
     custom_goals: str | None = Field(default=None, description="Optional custom target or exam deadline notes")
+    available_hours: float = Field(default=2.0, ge=0.5, le=8.0, description="Available study hours per day")
+    learning_speed: str = Field(default="moderate", description="fast, moderate, or thorough")
 
 
 class PlannerGenerateResponse(BaseModel):

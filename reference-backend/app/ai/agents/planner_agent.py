@@ -33,11 +33,14 @@ class PlannerAgent:
         self,
         db: DBSession,
         student_id: str,
-        target_days: int = 7,
+        target_days: int = 5,
         custom_goals: str | None = None,
+        available_hours: float = 2.0,
+        learning_speed: str = "moderate",
     ) -> dict[str, Any]:
         """
-        Generates a personalized study plan incorporating student memory intelligence.
+        Generates an adaptive personalized study plan incorporating student memory intelligence,
+        available study hours, exam target deadlines, and learning speed.
         """
         # Fetch deep student profile memory context
         p = student_memory_service.get_or_create_profile(db, student_id)
@@ -47,7 +50,7 @@ class PlannerAgent:
         topic_mastery = p.get("topic_mastery", {})
 
         # Fetch upcoming assignment deadlines
-        assignments = db.query(Assignment).limit(5).all()
+        assignments = db.query(Assignment).limit(5).all() if db else []
         if assignments:
             assignments_summary = "\n".join(
                 [f"• Assignment: {a.title} | Max Score: {a.max_score} | Due: {a.due_at or 'Flexible'}" for a in assignments]
@@ -61,8 +64,10 @@ class PlannerAgent:
             student_level=student_level,
             weaknesses=", ".join(weaknesses) if weaknesses else "None",
             topic_mastery=json.dumps(topic_mastery),
-            custom_goals=custom_goals or "Balanced study & weakness review",
+            custom_goals=custom_goals or "Targeted exam preparation & weakness review",
             target_days=target_days,
+            available_hours=available_hours,
+            learning_speed=learning_speed,
             assignments_summary=assignments_summary,
         )
 

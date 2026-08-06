@@ -93,8 +93,10 @@ export async function getStudentStudyPlans(studentId: string, token?: string): P
  */
 export async function generateStudyPlan(
   studentId: string,
-  targetDays = 7,
+  targetDays = 5,
   customGoals?: string,
+  availableHours = 2.0,
+  learningSpeed = "moderate",
   token?: string
 ): Promise<StudyPlan> {
   const headers: Record<string, string> = {
@@ -112,6 +114,8 @@ export async function generateStudyPlan(
         student_id: studentId || "demo_student",
         target_days: targetDays,
         custom_goals: customGoals || null,
+        available_hours: availableHours,
+        learning_speed: learningSpeed,
       }),
     });
 
