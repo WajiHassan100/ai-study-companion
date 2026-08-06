@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAgentsRouteImport } from './routes/_authenticated/agents'
 import { Route as AuthenticatedAssignmentsRouteImport } from './routes/_authenticated/assignments'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedSystemRouteImport } from './routes/_authenticated/system'
 import { Route as AuthenticatedTutorRouteImport } from './routes/_authenticated/tutor'
 import { Route as AuthenticatedAgentsIndexRouteImport } from './routes/_authenticated/agents.index'
 import { Route as AuthenticatedAgentsAgentIdRouteImport } from './routes/_authenticated/agents.$agentId'
@@ -52,6 +53,11 @@ const AuthenticatedAssignmentsRoute =
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSystemRoute = AuthenticatedSystemRouteImport.update({
+  id: '/system',
+  path: '/system',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedTutorRoute = AuthenticatedTutorRouteImport.update({
@@ -108,6 +114,7 @@ export interface FileRoutesByFullPath {
   '/agents': typeof AuthenticatedAgentsRouteWithChildren
   '/assignments': typeof AuthenticatedAssignmentsRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
+  '/system': typeof AuthenticatedSystemRoute
   '/tutor': typeof AuthenticatedTutorRoute
   '/agents/$agentId': typeof AuthenticatedAgentsAgentIdRoute
   '/courses/$courseId': typeof AuthenticatedCoursesCourseIdRoute
@@ -121,6 +128,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/assignments': typeof AuthenticatedAssignmentsRoute
+  '/system': typeof AuthenticatedSystemRoute
   '/tutor': typeof AuthenticatedTutorRoute
   '/agents/$agentId': typeof AuthenticatedAgentsAgentIdRoute
   '/courses/$courseId': typeof AuthenticatedCoursesCourseIdRoute
@@ -138,6 +146,7 @@ export interface FileRoutesById {
   '/_authenticated/agents': typeof AuthenticatedAgentsRouteWithChildren
   '/_authenticated/assignments': typeof AuthenticatedAssignmentsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
+  '/_authenticated/system': typeof AuthenticatedSystemRoute
   '/_authenticated/tutor': typeof AuthenticatedTutorRoute
   '/_authenticated/agents/$agentId': typeof AuthenticatedAgentsAgentIdRoute
   '/_authenticated/courses/$courseId': typeof AuthenticatedCoursesCourseIdRoute
@@ -155,6 +164,7 @@ export interface FileRouteTypes {
     | '/agents'
     | '/assignments'
     | '/dashboard'
+    | '/system'
     | '/tutor'
     | '/agents/$agentId'
     | '/courses/$courseId'
@@ -168,6 +178,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/assignments'
+    | '/system'
     | '/tutor'
     | '/agents/$agentId'
     | '/courses/$courseId'
@@ -184,6 +195,7 @@ export interface FileRouteTypes {
     | '/_authenticated/agents'
     | '/_authenticated/assignments'
     | '/_authenticated/dashboard'
+    | '/_authenticated/system'
     | '/_authenticated/tutor'
     | '/_authenticated/agents/$agentId'
     | '/_authenticated/courses/$courseId'
@@ -242,6 +254,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/system': {
+      id: '/_authenticated/system'
+      path: '/system'
+      fullPath: '/system'
+      preLoaderRoute: typeof AuthenticatedSystemRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/tutor': {
@@ -340,6 +359,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAgentsRoute: typeof AuthenticatedAgentsRouteWithChildren
   AuthenticatedAssignmentsRoute: typeof AuthenticatedAssignmentsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRouteWithChildren
+  AuthenticatedSystemRoute: typeof AuthenticatedSystemRoute
   AuthenticatedTutorRoute: typeof AuthenticatedTutorRoute
   AuthenticatedCoursesCourseIdRoute: typeof AuthenticatedCoursesCourseIdRoute
 }
@@ -348,6 +368,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAgentsRoute: AuthenticatedAgentsRouteWithChildren,
   AuthenticatedAssignmentsRoute: AuthenticatedAssignmentsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRouteWithChildren,
+  AuthenticatedSystemRoute: AuthenticatedSystemRoute,
   AuthenticatedTutorRoute: AuthenticatedTutorRoute,
   AuthenticatedCoursesCourseIdRoute: AuthenticatedCoursesCourseIdRoute,
 }
