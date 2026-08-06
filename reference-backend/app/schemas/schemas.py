@@ -300,6 +300,28 @@ class ExamEvaluateResponse(BaseModel):
     planner_recommendation: str
 
 
+# ── Agent #8: AI Assignment Feedback Agent Schemas ────────────────
+class AssignmentFeedbackRequest(BaseModel):
+    student_id: str = Field(default="demo_student")
+    assignment_title: str = Field(min_length=1, description="Title or prompt of assignment")
+    submission_text: str = Field(min_length=1, description="Code, math solution, or written answer")
+    submission_type: str = Field(default="code", description="code, math, essay, or general")
+    subject: str = Field(default="Computer Science / Mathematics")
+
+
+class AssignmentFeedbackResponse(BaseModel):
+    assignment_title: str
+    subject: str
+    overall_score: float
+    letter_grade: str
+    error_identification: list[str]
+    explanation_of_mistakes: str
+    suggestions_for_improvement: list[str]
+    learning_resources: list[str]
+    refactored_solution_snippet: str
+    planner_recommendation: str
+
+
 # ── Agent #6: Teacher Assistant Agent Schemas ─────────────────────
 class TeacherLessonPlanRequest(BaseModel):
     course_id: str = Field(default="biol_101", description="Course ID")
