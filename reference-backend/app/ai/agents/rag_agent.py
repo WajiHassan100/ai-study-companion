@@ -25,6 +25,30 @@ settings = get_settings()
 # In production, this connects to ChromaDB, FAISS, or PgVector
 COURSE_KNOWLEDGE_BASE: list[dict[str, Any]] = [
     {
+        "material_id": "slide_lec5",
+        "course_id": "biol_101",
+        "material_title": "Lecture 5: Cell Energy & Photosynthesis.pptx",
+        "chapter": "Lecture 5, Slide 13: Thylakoid Electron Transport",
+        "page_number": 13,
+        "content": (
+            "According to Lecture 5, Slide 13: Light-dependent reactions convert solar energy to chemical energy. Chlorophyll pigments "
+            "embedded within the thylakoid membrane absorb photons, exciting electrons in Photosystem II (P680) and Photosystem I (P700). "
+            "This initiates an electron transport chain across the thylakoid membrane, establishing a proton gradient that drives ATP Synthase "
+            "to phosphorylate ADP into ATP, while NADP+ reductase generates NADPH."
+        ),
+    },
+    {
+        "material_id": "slide_lec5",
+        "course_id": "biol_101",
+        "material_title": "Lecture 5: Cell Energy & Photosynthesis.pptx",
+        "chapter": "Lecture 5, Slide 18: Calvin Cycle Stroma",
+        "page_number": 18,
+        "content": (
+            "According to Lecture 5, Slide 18: The Calvin Cycle takes place in the stroma of chloroplasts and uses ATP and NADPH produced during "
+            "the light reactions to reduce carbon dioxide into 3-phosphoglycerate and G3P sugars. The enzyme RuBisCO catalyzes the initial carbon fixation."
+        ),
+    },
+    {
         "material_id": "mat1",
         "course_id": "biol_101",
         "material_title": "Campbell Biology - Chapter 10: Photosynthesis",
@@ -366,6 +390,35 @@ class RAGAgent:
             "confidence_score": 0.96,
             "topic": f"Assignment Solution: {chunks[0]['material_title']}",
         }
+
+    def execute_learning_action(
+        self,
+        course_id: str,
+        material_title: str | None = None,
+        action: str = "mcqs",  # "mcqs", "summary", "explain_simply"
+    ) -> dict[str, Any]:
+        """
+        Executes a targeted 1-Click RAG Learning Action on uploaded course material:
+        - "mcqs": Generates 5 grounded multiple choice questions with answer keys.
+        - "summary": Generates a structured executive summary with key definitions.
+        - "explain_simply": Provides an ELI5 simple breakdown with analogies.
+        """
+        query_map = {
+            "mcqs": f"Create 5 multiple choice questions with answers and explanations based on {material_title or 'this course material'}",
+            "summary": f"Provide an executive summary and key takeaways of {material_title or 'this course material'}",
+            "explain_simply": f"Explain the core topics of {material_title or 'this material'} simply as if I am 5 years old with clear analogies",
+        }
+        target_query = query_map.get(action, f"Explain {material_title or 'this course material'}")
+        res = self.query_course_knowledge(course_id=course_id, query=target_query, top_k=4)
+
+        # Prepend explicit slide / page citation if available
+        if res.get("cited_sources"):
+            first_citation = res["cited_sources"][0]
+            c_str = f"According to {first_citation.get('material_title', 'Course Document')}, {first_citation.get('chapter', 'Section 1')} (Page/Slide {first_citation.get('page_number', 1)}):\n\n"
+            if not res["answer"].startswith("According to"):
+                res["answer"] = c_str + res["answer"]
+
+        return res
 
 
 # Singleton instance

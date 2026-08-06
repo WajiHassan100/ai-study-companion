@@ -247,6 +247,12 @@ class RAGUploadResponse(BaseModel):
     message: str
 
 
+class RAGLearningActionRequest(BaseModel):
+    course_id: str = Field(default="biol_101")
+    material_title: str | None = Field(default=None, description="Optional target document title")
+    action: str = Field(default="mcqs", description="'mcqs', 'summary', or 'explain_simply'")
+
+
 # ── Agent #6: Teacher Assistant Agent Schemas ─────────────────────
 class TeacherLessonPlanRequest(BaseModel):
     course_id: str = Field(default="biol_101", description="Course ID")

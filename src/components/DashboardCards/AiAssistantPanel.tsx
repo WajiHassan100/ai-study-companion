@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { orchestrateMessage, type OrchestratorResponse, type ChatMessage } from "@/lib/api/ai";
-import { uploadFileObjectToRAG, queryRAGDocument, type RAGQueryResponse } from "@/lib/api/rag";
+import { uploadFileObjectToRAG, queryRAGDocument, executeRAGLearningAction, type RAGQueryResponse } from "@/lib/api/rag";
 
 export function AiAssistantPanel({
   title = "AI Orchestrated Study Assistant",
@@ -149,6 +149,46 @@ export function AiAssistantPanel({
     }
   };
 
+  const handleLearningAction = async (action: "mcqs" | "summary" | "explain_simply") => {
+    setLoading(true);
+    setError(null);
+    const actionLabel = action === "mcqs" ? "⚡ Create MCQs" : action === "summary" ? "📝 Summarize Lecture" : "💡 Explain Simply";
+    
+    const userMsg: ChatMessage = {
+      id: Date.now().toString(),
+      sender: "student",
+      text: `${actionLabel} from active course material`,
+      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    };
+    setMessages((prev) => [...prev, userMsg]);
+
+    try {
+      const ragRes: RAGQueryResponse = await executeRAGLearningAction(
+        "biol_101",
+        attachedDoc?.name || "Lecture 5: Cell Energy & Photosynthesis.pptx",
+        action
+      );
+
+      const tutorMsg: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        sender: "tutor",
+        text: ragRes.answer,
+        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        data: {
+          topic: `RAG Learning Action: ${actionLabel}`,
+          encouragement: `Grounded in ${attachedDoc?.name || "Lecture 5: Cell Energy & Photosynthesis.pptx"}`,
+          citations: ragRes.cited_sources || [],
+        } as any,
+      };
+      setMessages((prev) => [...prev, tutorMsg]);
+    } catch (err: any) {
+      console.error("Learning Action error:", err);
+      setError("Failed to execute RAG Learning Action.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Card className="border border-accent/40 bg-accent/5 shadow-sm flex flex-col h-auto transition-all duration-300">
       <CardHeader className="pb-3">
@@ -174,20 +214,53 @@ export function AiAssistantPanel({
 
         {/* Active Document Attachment Banner */}
         {attachedDoc && (
-          <div className="flex items-center justify-between p-2.5 rounded-xl bg-emerald-50/90 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200/80 text-xs">
-            <div className="flex items-center gap-2 font-bold truncate">
-              <FileText className="h-4 w-4 text-emerald-600 shrink-0" />
-              <span className="truncate">{attachedDoc.name}</span>
-              <Badge className="bg-emerald-700 text-white text-[10px]">RAG Indexed ✓</Badge>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between p-2.5 rounded-xl bg-emerald-50/90 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200/80 text-xs">
+              <div className="flex items-center gap-2 font-bold truncate">
+                <FileText className="h-4 w-4 text-emerald-600 shrink-0" />
+                <span className="truncate">{attachedDoc.name}</span>
+                <Badge className="bg-emerald-700 text-white text-[10px]">RAG Indexed ✓</Badge>
+              </div>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="h-6 w-6 text-emerald-700 hover:text-emerald-900"
+                onClick={() => setAttachedDoc(null)}
+              >
+                <X className="h-3.5 w-3.5" />
+              </Button>
             </div>
-            <Button
-              size="icon"
-              variant="ghost"
-              className="h-6 w-6 text-emerald-700 hover:text-emerald-900"
-              onClick={() => setAttachedDoc(null)}
-            >
-              <X className="h-3.5 w-3.5" />
-            </Button>
+
+            {/* 1-Click RAG Learning Action Toolbar */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={loading}
+                className="h-7 text-xs gap-1 border-emerald-400/50 text-emerald-800 dark:text-emerald-200 bg-emerald-50/50 hover:bg-emerald-100 font-semibold"
+                onClick={() => handleLearningAction("mcqs")}
+              >
+                ⚡ Create MCQs
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={loading}
+                className="h-7 text-xs gap-1 border-blue-400/50 text-blue-800 dark:text-blue-200 bg-blue-50/50 hover:bg-blue-100 font-semibold"
+                onClick={() => handleLearningAction("summary")}
+              >
+                📝 Summarize Lecture
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={loading}
+                className="h-7 text-xs gap-1 border-amber-400/50 text-amber-800 dark:text-amber-200 bg-amber-50/50 hover:bg-amber-100 font-semibold"
+                onClick={() => handleLearningAction("explain_simply")}
+              >
+                💡 Explain Simply
+              </Button>
+            </div>
           </div>
         )}
 

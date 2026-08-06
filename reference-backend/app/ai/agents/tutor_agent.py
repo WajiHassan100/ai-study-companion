@@ -49,6 +49,14 @@ class TutorAgent:
         # Retrieve deep student personalization & memory context
         student_memory_context = student_memory_service.retrieve_student_memory_context(db, student_id)
 
+        # Retrieve grounded course materials from Agent #5 RAG Agent
+        from app.ai.agents.rag_agent import rag_agent
+        rag_chunks = rag_agent.retrieve_relevant_chunks(course_id=course_id or "biol_101", query=message, top_k=2)
+        if rag_chunks:
+            c = rag_chunks[0]
+            rag_grounding_note = f"\n\n[OFFICIAL COURSE MATERIAL GROUNDING]:\nFrom '{c.get('material_title')}', {c.get('chapter')} (Page/Slide {c.get('page_number')}):\n\"{c.get('content')[:300]}\"\n"
+            student_memory_context += rag_grounding_note
+
         # Automatically pull student profile from DB if available
         if student_id and db:
             profile = db.query(StudentProfile).filter_by(student_id=student_id).first()

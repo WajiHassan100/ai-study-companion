@@ -8,6 +8,7 @@ from app.schemas.schemas import (
     RAGQueryResponse,
     RAGUploadRequest,
     RAGUploadResponse,
+    RAGLearningActionRequest,
 )
 
 router = APIRouter(prefix="/ai/rag", tags=["Agent #5: RAG Course Knowledge Agent"])
@@ -29,6 +30,27 @@ def query_course_knowledge(req: RAGQueryRequest) -> RAGQueryResponse:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to process RAG course knowledge query: {str(e)}",
+        )
+
+
+@router.post("/learning-action", response_model=RAGQueryResponse, status_code=status.HTTP_200_OK)
+def execute_rag_learning_action(
+    req: RAGLearningActionRequest,
+) -> RAGQueryResponse:
+    """
+    Executes a 1-Click RAG Learning Action (mcqs, summary, explain_simply) grounded in course materials.
+    """
+    try:
+        res = rag_agent.execute_learning_action(
+            course_id=req.course_id,
+            material_title=req.material_title,
+            action=req.action,
+        )
+        return RAGQueryResponse(**res)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to execute RAG learning action: {str(e)}",
         )
 
 
