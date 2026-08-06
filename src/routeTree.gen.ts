@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAgentsRouteImport } from './routes/_authenticated/agents'
 import { Route as AuthenticatedAssignmentsRouteImport } from './routes/_authenticated/assignments'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedSystemRouteImport } from './routes/_authenticated/system'
 import { Route as AuthenticatedTutorRouteImport } from './routes/_authenticated/tutor'
 import { Route as AuthenticatedAgentsIndexRouteImport } from './routes/_authenticated/agents.index'
@@ -53,6 +54,11 @@ const AuthenticatedAssignmentsRoute =
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedSystemRoute = AuthenticatedSystemRouteImport.update({
@@ -114,6 +120,7 @@ export interface FileRoutesByFullPath {
   '/agents': typeof AuthenticatedAgentsRouteWithChildren
   '/assignments': typeof AuthenticatedAssignmentsRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
+  '/profile': typeof AuthenticatedProfileRoute
   '/system': typeof AuthenticatedSystemRoute
   '/tutor': typeof AuthenticatedTutorRoute
   '/agents/$agentId': typeof AuthenticatedAgentsAgentIdRoute
@@ -128,6 +135,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/assignments': typeof AuthenticatedAssignmentsRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/system': typeof AuthenticatedSystemRoute
   '/tutor': typeof AuthenticatedTutorRoute
   '/agents/$agentId': typeof AuthenticatedAgentsAgentIdRoute
@@ -146,6 +154,7 @@ export interface FileRoutesById {
   '/_authenticated/agents': typeof AuthenticatedAgentsRouteWithChildren
   '/_authenticated/assignments': typeof AuthenticatedAssignmentsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/system': typeof AuthenticatedSystemRoute
   '/_authenticated/tutor': typeof AuthenticatedTutorRoute
   '/_authenticated/agents/$agentId': typeof AuthenticatedAgentsAgentIdRoute
@@ -164,6 +173,7 @@ export interface FileRouteTypes {
     | '/agents'
     | '/assignments'
     | '/dashboard'
+    | '/profile'
     | '/system'
     | '/tutor'
     | '/agents/$agentId'
@@ -178,6 +188,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/assignments'
+    | '/profile'
     | '/system'
     | '/tutor'
     | '/agents/$agentId'
@@ -195,6 +206,7 @@ export interface FileRouteTypes {
     | '/_authenticated/agents'
     | '/_authenticated/assignments'
     | '/_authenticated/dashboard'
+    | '/_authenticated/profile'
     | '/_authenticated/system'
     | '/_authenticated/tutor'
     | '/_authenticated/agents/$agentId'
@@ -254,6 +266,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/system': {
@@ -359,6 +378,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAgentsRoute: typeof AuthenticatedAgentsRouteWithChildren
   AuthenticatedAssignmentsRoute: typeof AuthenticatedAssignmentsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRouteWithChildren
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedSystemRoute: typeof AuthenticatedSystemRoute
   AuthenticatedTutorRoute: typeof AuthenticatedTutorRoute
   AuthenticatedCoursesCourseIdRoute: typeof AuthenticatedCoursesCourseIdRoute
@@ -368,6 +388,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAgentsRoute: AuthenticatedAgentsRouteWithChildren,
   AuthenticatedAssignmentsRoute: AuthenticatedAssignmentsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRouteWithChildren,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedSystemRoute: AuthenticatedSystemRoute,
   AuthenticatedTutorRoute: AuthenticatedTutorRoute,
   AuthenticatedCoursesCourseIdRoute: AuthenticatedCoursesCourseIdRoute,
