@@ -253,6 +253,53 @@ class RAGLearningActionRequest(BaseModel):
     action: str = Field(default="mcqs", description="'mcqs', 'summary', or 'explain_simply'")
 
 
+# ── Agent #7: AI Exam Generator Agent Schemas ─────────────────────
+class ExamQuestionItem(BaseModel):
+    id: str
+    type: str = Field(description="mcq, short, long, numerical, or conceptual")
+    question: str
+    difficulty: str = Field(default="medium")
+    options: dict[str, str] | None = Field(default=None)
+    correct_option: str | None = Field(default=None)
+    model_solution: str | None = Field(default=None)
+    max_marks: int = Field(default=20)
+
+
+class ExamGenerateRequest(BaseModel):
+    student_id: str = Field(default="demo_student")
+    topic: str | None = Field(default=None)
+    difficulty: str = Field(default="medium", description="easy, medium, or advanced")
+    num_questions: int = Field(default=5, ge=1, le=10)
+    course_id: str = Field(default="biol_101")
+
+
+class ExamGenerateResponse(BaseModel):
+    exam_id: str
+    title: str
+    topic: str
+    difficulty: str
+    total_marks: int
+    questions: list[ExamQuestionItem]
+    created_at: datetime
+
+
+class ExamEvaluateRequest(BaseModel):
+    exam_id: str = Field(min_length=1)
+    student_id: str = Field(min_length=1)
+    user_answers: dict[str, str] = Field(description="Map of question ID to student answer")
+
+
+class ExamEvaluateResponse(BaseModel):
+    attempt_id: str
+    exam_id: str
+    score_percentage: float
+    earned_marks: float
+    total_marks: float
+    updated_mastery: float
+    question_feedback: dict[str, dict]
+    planner_recommendation: str
+
+
 # ── Agent #6: Teacher Assistant Agent Schemas ─────────────────────
 class TeacherLessonPlanRequest(BaseModel):
     course_id: str = Field(default="biol_101", description="Course ID")

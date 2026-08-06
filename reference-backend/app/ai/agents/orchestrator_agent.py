@@ -20,6 +20,7 @@ from app.ai.agents.quiz_agent import QuizAgent
 from app.ai.agents.rag_agent import RAGAgent
 from app.ai.agents.teacher_agent import TeacherAgent
 from app.ai.agents.tutor_agent import TutorAgent
+from app.ai.agents.exam_agent import exam_agent
 from app.core.config import get_settings
 
 logger = logging.getLogger(__name__)
@@ -109,6 +110,12 @@ class OrchestratorAgent:
             "Teacher Assistant & Auto-Grader (Agent #6)",
             "Drafts minute-by-minute lesson plans and auto-grades student essay submissions.",
             teacher_agent.draft_lesson_plan,
+        )
+        self.registry.register(
+            "exam",
+            "AI Exam Generator Agent (Agent #7)",
+            "Creates multi-format practice assessments (MCQs, Short, Long, Numerical, Conceptual) with automatic evaluation.",
+            exam_agent.generate_exam,
         )
 
     def classify_intent(self, query: str) -> Dict[str, Any]:

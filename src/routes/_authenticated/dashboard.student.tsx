@@ -7,6 +7,7 @@ import { AiAssistantPanel } from "@/components/DashboardCards/AiAssistantPanel";
 import { WeaknessTrackerCard } from "@/components/DashboardCards/WeaknessTrackerCard";
 import { StudyPlannerCard } from "@/components/DashboardCards/StudyPlannerCard";
 import { QuizGeneratorCard } from "@/components/DashboardCards/QuizGeneratorCard";
+import { ExamGeneratorCard } from "@/components/DashboardCards/ExamGeneratorCard";
 import { ProgressChart } from "@/components/Charts/ProgressChart";
 import { DataTable, type Column } from "@/components/Tables/DataTable";
 import { Badge } from "@/components/ui/badge";
@@ -173,6 +174,10 @@ function StudentDashboard() {
           <QuizGeneratorCard
             studentId={user?.id || "demo_student"}
             onProfileUpdated={handleProfileUpdated}
+          />
+          <ExamGeneratorCard
+            studentId={user?.id || "demo_student"}
+            onAskTutor={(query) => setSelectedQuery(query)}
           />
           <StudyPlannerCard
             key={`planner_${refreshKey}`}
