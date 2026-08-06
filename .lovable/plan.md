@@ -1,48 +1,70 @@
-## Goal
+# Multi-Agent AI Platform — Frontend Redesign
 
-A running Personal AI School Assistant with email/password auth and Student / Teacher / Admin roles, plus a non-running FastAPI + PostgreSQL reference scaffold and setup guide you can open in VS Code and extend with LangChain later.
+## Where the frontend stands today
 
-## Part 1 — The working app (runs and previews here)
+- Working: auth + roles, student/teacher/admin dashboards, assignments page, course detail page, landing + auth pages, Emerald Prestige theme (Sora/Manrope).
+- Agent UIs exist as 8 stacked cards inside one long student dashboard column (`Tutor`, `Coach`, `Weakness`, `Quiz`, `Exam`, `Feedback`, `Planner`, `Teacher`). They work, but they are buried in a single scroll and invisible as a "team of agents".
+- API layer (`src/lib/api/*`) already wraps every agent endpoint — all of it will be reused unchanged.
+- Gaps: no agents hub, no orchestrator visualization, no student profile page, no mastery graph, no activity timeline, no notifications, no dark-mode toggle, no dedicated tutor workspace.
 
-Backend: Lovable Cloud (managed Postgres + auth).
+## What gets built
 
-Database
-- `profiles` — id (FK to auth users), full_name, email, created_at. Auto-created on signup via trigger.
-- `app_role` enum: `student` | `teacher` | `admin`.
-- `user_roles` — separate table (never on profiles), with a `has_role()` security-definer function used by all policies. Role defaults to `student` at signup; admins can change roles.
-- Row-level security on both tables: users read/update their own profile; admins read all.
+### A. Information architecture (new shell)
 
-Pages
-- `/` — landing page with product intro and sign-in CTA.
-- `/auth` — combined login + register (email/password, plus Google sign-in), with role selection at registration.
-- `/dashboard` — role-aware redirect into the right dashboard.
-- `/dashboard/student` — welcome card, placeholder cards for courses, assignments, grades, plus an "AI Study Assistant" placeholder panel.
-- `/dashboard/teacher` — class overview, roster and assignment placeholders, AI assistant placeholder.
-- `/dashboard/admin` — user list from `profiles` + `user_roles` with role management (real, working), system stat cards.
-- All dashboards behind the authenticated route gate; admin area additionally role-gated.
+Sidebar is regrouped so the platform reads as an AI ecosystem:
 
-Shared UI
-- Navbar with session-aware account menu and sign-out, collapsible Sidebar, dashboard stat cards, data table, and a chart component — mirroring the component folders you listed, in the framework's own conventions.
+```text
+Learn        Overview · Courses · Assignments
+AI Agents    Agents Hub · Tutor Workspace · System Overview
+You          Learning Profile · Mastery Map · Activity
+```
 
-The AI assistant is UI-only in this version: clearly labelled placeholder panels with the wiring points marked, ready for LangChain/LangGraph later.
+New routes (all under `_authenticated`, existing routes untouched):
 
-## Part 2 — Reference scaffold (source files only, do not run here)
+| Route | Purpose |
+| --- | --- |
+| `/agents` | AI Agents Hub — every agent as a launchable card |
+| `/agents/$agentId` | Agent workspace; renders the existing agent card full-screen |
+| `/tutor` | Educational AI tutor workspace |
+| `/system` | Orchestrator / multi-agent architecture visualization |
+| `/profile` | AI learning identity |
+| `/mastery` | Knowledge skill tree + topic map |
+| `/activity` | AI activity timeline |
 
-Created under `reference-backend/` in this repo, downloadable with the project:
-- `app/main.py`, `database/connection.py`, `database/database_models.py`
-- `models/` — user, student, teacher, course, assignment (SQLAlchemy)
-- `schemas/` — user, course, student (Pydantic)
-- `routes/` — auth, users, students, teachers, admin (FastAPI routers)
-- `services/` — authentication (JWT, bcrypt), user_service
-- `middleware/`, `ai/{agents,services,prompts,memory}` with placeholder modules and READMEs
-- `requirements.txt`, `.env.example`, `README.md`
-- `database/schema.sql` — Postgres DDL matching the models
-- `documentation/architecture.md` and `setup-guide.md` — VS Code setup, frontend/backend installs, PostgreSQL configuration, env vars, and run commands for both servers
+### B. Page-by-page
+
+1. **Student dashboard → AI command center.** Replaces the stacked-card wall with a bento grid: time-aware greeting, "AI Coach recommends…" hero recommendation, today's objectives, next deadlines, weak-topic chips, mini mastery ring, recent AI activity strip, and quick-launch tiles for the 9 agents. Heavy agent cards move to their own workspaces.
+2. **AI Agents Hub.** One card per agent: icon, description, live status pill (Active / Idle / Needs input), last activity line, capability bullets, Launch button. Grid, hover lift, filter by category.
+3. **AI System Overview.** Animated orchestrator diagram: Student Request → Orchestrator → fan-out to the 8 specialist agents, SVG connectors with flow animation, click a node for its role/inputs/outputs. Built for FYP demo.
+4. **Learning Profile.** Learning style, level, strengths/weaknesses, productive-hours heatmap, average session length, improvement trendline — styled as an AI-generated identity card.
+5. **Mastery Map.** SVG skill tree (subject → topic → subtopic) with green/amber/red state, plus a topic-map view and drill-down panel that can hand a weak topic straight to the Tutor.
+6. **Tutor Workspace.** Three panes: left = course material + current learning goal, center = conversation, right = AI suggestions + practice questions. Mode selector and action buttons: Explain Simply · Give Example · Test Me · Create Summary · Show Visualization.
+7. **Course page.** Tabbed: Overview · Materials · Chat with Course (RAG) · Practice Tests · Assignments · Progress · Weak Concepts — so each course owns an assistant.
+8. **Activity Timeline.** Day-grouped feed of agent events with agent icon, time, summary, and a jump-back link.
+9. **Notifications.** Bell in the navbar with an AI-insight popover (mastery changes, coach nudges, deadlines) plus unread badge.
+
+### C. Cross-cutting
+
+- **Dark mode:** full dark token set in `src/styles.css` + `next-themes`-style toggle in the navbar, persisted; every new surface verified in both themes.
+- **Design system:** shared `AgentCard`, `SectionHeader`, `InsightCard`, `StatTile`, `EmptyState` primitives; consistent radii, elevation, hover/lift and fade-in motion.
+- **Responsive:** grid → single column with `grid-cols-[minmax(0,1fr)_auto]` header pattern; sidebar collapses to icons on tablet, off-canvas on mobile; tutor panes stack into tabs on mobile.
 
 ## Technical notes
 
-This project runs TanStack Start (React + TypeScript, file-based routing, Tailwind v4 configured in `src/styles.css`). So the live app uses `.tsx` routes under `src/routes/` rather than `pages/*.jsx` + `tailwind.config.js`, and there is no `src/services/api.js` — data access goes through the Cloud client and typed server functions. The FastAPI scaffold is checked in as plain source; it is not built, imported, or executed by this environment. If you later run it locally, point the React frontend at it by swapping the data layer — the setup guide documents that path.
+- React + TanStack Start only; no backend or API changes. `src/lib/api/*` calls stay exactly as they are.
+- Existing agent card components are preserved and re-mounted inside the new workspaces rather than rewritten, so nothing currently working breaks.
+- New shared UI lives in `src/components/agents/`, `src/components/insights/`, `src/components/mastery/`.
+- Colors stay semantic tokens in `src/styles.css` — no hardcoded color utilities.
+- Adding a 10th agent later = one entry in the agent registry (`src/lib/agents.ts`) and it appears in the hub, sidebar, and orchestrator diagram automatically.
 
-## Scope check
+## Build order
 
-Courses, assignments, grades, and submissions are placeholders in this pass (per your answer), backed by real schema only in the reference `schema.sql`. Say the word and I'll add the live tables in a follow-up.
+1. Design tokens + dark mode + shared primitives + agent registry
+2. New shell: sidebar groups, navbar with theme toggle and notifications
+3. AI command-center dashboard
+4. Agents Hub + agent workspaces
+5. Tutor workspace
+6. System overview visualization
+7. Profile, Mastery Map, Activity Timeline
+8. Course page tabs
+9. Responsive + dark-mode pass across all pages
