@@ -14,6 +14,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { NotificationsBell } from "@/components/Navbar/NotificationsBell";
 
 export function Navbar({ withSidebarTrigger = false }: { withSidebarTrigger?: boolean }) {
   const { isAuthenticated, profile, role, user } = useAuth();
@@ -98,7 +100,9 @@ export function Navbar({ withSidebarTrigger = false }: { withSidebarTrigger?: bo
         </nav>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3">
+        <ThemeToggle />
+        {isAuthenticated ? <NotificationsBell /> : null}
         {isAuthenticated ? (
           <>
             <Button asChild size="sm" className="rounded-full px-5 text-xs font-bold bg-emerald-800 hover:bg-emerald-900 text-white shadow-xs">
