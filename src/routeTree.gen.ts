@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAgentsRouteImport } from './routes/_authenticated/agents'
 import { Route as AuthenticatedAssignmentsRouteImport } from './routes/_authenticated/assignments'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedMasteryRouteImport } from './routes/_authenticated/mastery'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedSystemRouteImport } from './routes/_authenticated/system'
 import { Route as AuthenticatedTutorRouteImport } from './routes/_authenticated/tutor'
@@ -54,6 +55,11 @@ const AuthenticatedAssignmentsRoute =
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMasteryRoute = AuthenticatedMasteryRouteImport.update({
+  id: '/mastery',
+  path: '/mastery',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
@@ -120,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/agents': typeof AuthenticatedAgentsRouteWithChildren
   '/assignments': typeof AuthenticatedAssignmentsRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
+  '/mastery': typeof AuthenticatedMasteryRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/system': typeof AuthenticatedSystemRoute
   '/tutor': typeof AuthenticatedTutorRoute
@@ -135,6 +142,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/assignments': typeof AuthenticatedAssignmentsRoute
+  '/mastery': typeof AuthenticatedMasteryRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/system': typeof AuthenticatedSystemRoute
   '/tutor': typeof AuthenticatedTutorRoute
@@ -154,6 +162,7 @@ export interface FileRoutesById {
   '/_authenticated/agents': typeof AuthenticatedAgentsRouteWithChildren
   '/_authenticated/assignments': typeof AuthenticatedAssignmentsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
+  '/_authenticated/mastery': typeof AuthenticatedMasteryRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/system': typeof AuthenticatedSystemRoute
   '/_authenticated/tutor': typeof AuthenticatedTutorRoute
@@ -173,6 +182,7 @@ export interface FileRouteTypes {
     | '/agents'
     | '/assignments'
     | '/dashboard'
+    | '/mastery'
     | '/profile'
     | '/system'
     | '/tutor'
@@ -188,6 +198,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/assignments'
+    | '/mastery'
     | '/profile'
     | '/system'
     | '/tutor'
@@ -206,6 +217,7 @@ export interface FileRouteTypes {
     | '/_authenticated/agents'
     | '/_authenticated/assignments'
     | '/_authenticated/dashboard'
+    | '/_authenticated/mastery'
     | '/_authenticated/profile'
     | '/_authenticated/system'
     | '/_authenticated/tutor'
@@ -266,6 +278,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/mastery': {
+      id: '/_authenticated/mastery'
+      path: '/mastery'
+      fullPath: '/mastery'
+      preLoaderRoute: typeof AuthenticatedMasteryRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/profile': {
@@ -378,6 +397,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAgentsRoute: typeof AuthenticatedAgentsRouteWithChildren
   AuthenticatedAssignmentsRoute: typeof AuthenticatedAssignmentsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRouteWithChildren
+  AuthenticatedMasteryRoute: typeof AuthenticatedMasteryRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedSystemRoute: typeof AuthenticatedSystemRoute
   AuthenticatedTutorRoute: typeof AuthenticatedTutorRoute
@@ -388,6 +408,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAgentsRoute: AuthenticatedAgentsRouteWithChildren,
   AuthenticatedAssignmentsRoute: AuthenticatedAssignmentsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRouteWithChildren,
+  AuthenticatedMasteryRoute: AuthenticatedMasteryRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedSystemRoute: AuthenticatedSystemRoute,
   AuthenticatedTutorRoute: AuthenticatedTutorRoute,
