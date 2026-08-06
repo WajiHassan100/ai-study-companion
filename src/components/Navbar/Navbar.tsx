@@ -91,7 +91,7 @@ export function Navbar({ withSidebarTrigger = false }: { withSidebarTrigger?: bo
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Link to="/courses/$courseId" params={{ courseId: "biol_101" }} className="hover:text-emerald-700 transition-colors">
+          <Link to="/courses" className="hover:text-emerald-700 transition-colors">
             Course RAG Studio
           </Link>
           <Link to="/assignments" className="hover:text-emerald-700 transition-colors">

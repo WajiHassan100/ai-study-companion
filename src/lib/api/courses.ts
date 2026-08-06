@@ -47,7 +47,119 @@ export interface CourseKnowledgeQueryResult {
   confidence_score: number;
 }
 
+export interface CourseListItem {
+  id: string;
+  code: string;
+  title: string;
+  department: string;
+  instructor_name: string;
+  description: string;
+  enrolled_count: number;
+  progress_percentage: number;
+  materials_count: number;
+  modules_count: number;
+}
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
+
+/**
+ * Fetches list of all enrolled courses for the student.
+ */
+export async function getAllCourses(token?: string): Promise<CourseListItem[]> {
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/courses`, {
+      method: "GET",
+      headers,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Status ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (err) {
+    console.warn("Using fallback course list mock data:", err);
+    return [
+      {
+        id: "biol_101",
+        code: "BIOL 101",
+        title: "Cell & Molecular Biology",
+        department: "Biological Sciences",
+        instructor_name: "Dr. Elizabeth Vance",
+        description: "Comprehensive study of cellular processes, photosynthesis reactions, genetics, and molecular biochemistry.",
+        enrolled_count: 34,
+        progress_percentage: 78,
+        materials_count: 5,
+        modules_count: 3,
+      },
+      {
+        id: "math_201",
+        code: "MATH 201",
+        title: "Multivariable Calculus",
+        department: "Mathematics",
+        instructor_name: "Prof. Alan Turing",
+        description: "Partial derivatives, multiple integrals, gradient vectors, and Green's Theorem applications.",
+        enrolled_count: 42,
+        progress_percentage: 85,
+        materials_count: 6,
+        modules_count: 4,
+      },
+      {
+        id: "phys_102",
+        code: "PHYS 102",
+        title: "University Physics II",
+        department: "Physics",
+        instructor_name: "Dr. Richard Feynman",
+        description: "Newtonian mechanics, inclined friction, electric fields, and magnetic force equations.",
+        enrolled_count: 28,
+        progress_percentage: 62,
+        materials_count: 4,
+        modules_count: 3,
+      },
+      {
+        id: "cs_101",
+        code: "CS 101",
+        title: "Data Structures & Algorithms",
+        department: "Computer Science",
+        instructor_name: "Prof. Donald Knuth",
+        description: "Big-O complexity analysis, hash tables, dynamic programming, and binary search trees.",
+        enrolled_count: 56,
+        progress_percentage: 92,
+        materials_count: 8,
+        modules_count: 5,
+      },
+      {
+        id: "chem_101",
+        code: "CHEM 101",
+        title: "Organic Chemistry Mechanisms",
+        department: "Chemistry",
+        instructor_name: "Dr. Linus Pauling",
+        description: "Reaction pathways, nucleophilic substitution, stereochemistry, and organic synthesis.",
+        enrolled_count: 22,
+        progress_percentage: 54,
+        materials_count: 4,
+        modules_count: 3,
+      },
+      {
+        id: "hist_105",
+        code: "HIST 105",
+        title: "Modern History & Economics",
+        department: "History",
+        instructor_name: "Prof. Adam Smith",
+        description: "Global industrial revolution, economic growth models, and modern geopolitical history.",
+        enrolled_count: 30,
+        progress_percentage: 70,
+        materials_count: 5,
+        modules_count: 4,
+      },
+    ];
+  }
+}
 
 /**
  * Fetches course details, syllabus modules, and materials for a given course ID.

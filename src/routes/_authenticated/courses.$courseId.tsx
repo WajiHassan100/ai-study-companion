@@ -107,11 +107,13 @@ function CourseDetailPage() {
     <div className="space-y-8">
       {/* ── BREADCRUMB ── */}
         <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-          <Link to="/dashboard" className="hover:text-emerald-700 transition-colors">
+          <Link to="/dashboard/student" className="hover:text-emerald-700 transition-colors">
             Dashboard
           </Link>
           <ChevronRight className="h-3.5 w-3.5" />
-          <span>Courses</span>
+          <Link to="/courses" className="hover:text-emerald-700 transition-colors">
+            Courses
+          </Link>
           <ChevronRight className="h-3.5 w-3.5" />
           <span className="text-foreground font-semibold">{course.code}</span>
         </div>

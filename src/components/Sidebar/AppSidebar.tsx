@@ -32,7 +32,7 @@ type Group = { label: string; items: Item[] };
 
 const learnStudent: Item[] = [
   { title: "Overview", url: "/dashboard/student", icon: GaugeCircle },
-  { title: "Courses", url: "/courses/$courseId", icon: BookOpen, courseId: "biol_101" },
+  { title: "Courses", url: "/courses", icon: BookOpen },
   { title: "Assignments", url: "/assignments", icon: ClipboardList },
 ];
 

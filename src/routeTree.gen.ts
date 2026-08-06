@@ -22,6 +22,7 @@ import { Route as AuthenticatedSystemRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedTutorRouteImport } from './routes/_authenticated/tutor'
 import { Route as AuthenticatedAgentsIndexRouteImport } from './routes/_authenticated/agents.index'
 import { Route as AuthenticatedAgentsAgentIdRouteImport } from './routes/_authenticated/agents.$agentId'
+import { Route as AuthenticatedCoursesIndexRouteImport } from './routes/_authenticated/courses.index'
 import { Route as AuthenticatedCoursesCourseIdRouteImport } from './routes/_authenticated/courses.$courseId'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated/dashboard.admin'
@@ -95,6 +96,12 @@ const AuthenticatedAgentsAgentIdRoute =
     path: '/$agentId',
     getParentRoute: () => AuthenticatedAgentsRoute,
   } as any)
+const AuthenticatedCoursesIndexRoute =
+  AuthenticatedCoursesIndexRouteImport.update({
+    id: '/courses/',
+    path: '/courses/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCoursesCourseIdRoute =
   AuthenticatedCoursesCourseIdRouteImport.update({
     id: '/courses/$courseId',
@@ -143,6 +150,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/student': typeof AuthenticatedDashboardStudentRoute
   '/dashboard/teacher': typeof AuthenticatedDashboardTeacherRoute
   '/agents/': typeof AuthenticatedAgentsIndexRoute
+  '/courses/': typeof AuthenticatedCoursesIndexRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
 }
 export interface FileRoutesByTo {
@@ -160,6 +168,7 @@ export interface FileRoutesByTo {
   '/dashboard/student': typeof AuthenticatedDashboardStudentRoute
   '/dashboard/teacher': typeof AuthenticatedDashboardTeacherRoute
   '/agents': typeof AuthenticatedAgentsIndexRoute
+  '/courses': typeof AuthenticatedCoursesIndexRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
 }
 export interface FileRoutesById {
@@ -181,6 +190,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/student': typeof AuthenticatedDashboardStudentRoute
   '/_authenticated/dashboard/teacher': typeof AuthenticatedDashboardTeacherRoute
   '/_authenticated/agents/': typeof AuthenticatedAgentsIndexRoute
+  '/_authenticated/courses/': typeof AuthenticatedCoursesIndexRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
 }
 export interface FileRouteTypes {
@@ -202,6 +212,7 @@ export interface FileRouteTypes {
     | '/dashboard/student'
     | '/dashboard/teacher'
     | '/agents/'
+    | '/courses/'
     | '/dashboard/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -219,6 +230,7 @@ export interface FileRouteTypes {
     | '/dashboard/student'
     | '/dashboard/teacher'
     | '/agents'
+    | '/courses'
     | '/dashboard'
   id:
     | '__root__'
@@ -239,6 +251,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/student'
     | '/_authenticated/dashboard/teacher'
     | '/_authenticated/agents/'
+    | '/_authenticated/courses/'
     | '/_authenticated/dashboard/'
   fileRoutesById: FileRoutesById
 }
@@ -341,6 +354,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAgentsAgentIdRouteImport
       parentRoute: typeof AuthenticatedAgentsRoute
     }
+    '/_authenticated/courses/': {
+      id: '/_authenticated/courses/'
+      path: '/courses'
+      fullPath: '/courses/'
+      preLoaderRoute: typeof AuthenticatedCoursesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/courses/$courseId': {
       id: '/_authenticated/courses/$courseId'
       path: '/courses/$courseId'
@@ -422,6 +442,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSystemRoute: typeof AuthenticatedSystemRoute
   AuthenticatedTutorRoute: typeof AuthenticatedTutorRoute
   AuthenticatedCoursesCourseIdRoute: typeof AuthenticatedCoursesCourseIdRoute
+  AuthenticatedCoursesIndexRoute: typeof AuthenticatedCoursesIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -434,6 +455,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSystemRoute: AuthenticatedSystemRoute,
   AuthenticatedTutorRoute: AuthenticatedTutorRoute,
   AuthenticatedCoursesCourseIdRoute: AuthenticatedCoursesCourseIdRoute,
+  AuthenticatedCoursesIndexRoute: AuthenticatedCoursesIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -447,3 +469,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
