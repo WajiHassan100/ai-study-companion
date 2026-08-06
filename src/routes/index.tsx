@@ -223,7 +223,7 @@ function Index() {
                     variant="outline"
                     className="rounded-full bg-card hover:bg-secondary text-foreground font-semibold px-8 py-3.5 h-auto border-emerald-600/30 text-emerald-800 dark:text-emerald-400"
                   >
-                    <Link to="/courses/biol_101" className="flex items-center gap-2">
+                    <Link to="/courses/$courseId" params={{ courseId: "biol_101" }} className="flex items-center gap-2">
                       <Layers className="h-4 w-4 text-emerald-600" /> Open PDF RAG Studio
                     </Link>
                   </Button>
@@ -488,7 +488,7 @@ function Index() {
           <div className="flex items-center gap-4">
             <Link to="/dashboard/student" className="hover:underline">Student Workspace</Link>
             <Link to="/assignments" className="hover:underline">Assignments Hub</Link>
-            <Link to="/courses/biol_101" className="hover:underline">RAG PDF Studio</Link>
+            <Link to="/courses/$courseId" params={{ courseId: "biol_101" }} className="hover:underline">RAG PDF Studio</Link>
           </div>
         </div>
       </footer>

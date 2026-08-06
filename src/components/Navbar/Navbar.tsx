@@ -56,7 +56,7 @@ export function Navbar({ withSidebarTrigger = false }: { withSidebarTrigger?: bo
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild className="rounded-xl cursor-pointer">
-                <Link to="/courses/biol_101" className="flex flex-col items-start gap-0.5">
+                <Link to="/courses/$courseId" params={{ courseId: "biol_101" }} className="flex flex-col items-start gap-0.5">
                   <span className="font-bold text-foreground text-xs">Agent #5: RAG PDF Studio</span>
                   <span className="text-[11px] text-muted-foreground">Vector search & page-cited answers</span>
                 </Link>
@@ -89,7 +89,7 @@ export function Navbar({ withSidebarTrigger = false }: { withSidebarTrigger?: bo
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Link to="/courses/biol_101" className="hover:text-emerald-700 transition-colors">
+          <Link to="/courses/$courseId" params={{ courseId: "biol_101" }} className="hover:text-emerald-700 transition-colors">
             Course RAG Studio
           </Link>
           <Link to="/assignments" className="hover:text-emerald-700 transition-colors">
