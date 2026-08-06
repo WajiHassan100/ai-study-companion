@@ -16,6 +16,7 @@ import { Route as AuthenticatedAgentsRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedAssignmentsRouteImport } from './routes/_authenticated/assignments'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAgentsIndexRouteImport } from './routes/_authenticated/agents.index'
+import { Route as AuthenticatedAgentsAgentIdRouteImport } from './routes/_authenticated/agents.$agentId'
 import { Route as AuthenticatedCoursesCourseIdRouteImport } from './routes/_authenticated/courses.$courseId'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated/dashboard.admin'
@@ -58,6 +59,12 @@ const AuthenticatedAgentsIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedAgentsRoute,
   } as any)
+const AuthenticatedAgentsAgentIdRoute =
+  AuthenticatedAgentsAgentIdRouteImport.update({
+    id: '/$agentId',
+    path: '/$agentId',
+    getParentRoute: () => AuthenticatedAgentsRoute,
+  } as any)
 const AuthenticatedCoursesCourseIdRoute =
   AuthenticatedCoursesCourseIdRouteImport.update({
     id: '/courses/$courseId',
@@ -95,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/agents': typeof AuthenticatedAgentsRouteWithChildren
   '/assignments': typeof AuthenticatedAssignmentsRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
+  '/agents/$agentId': typeof AuthenticatedAgentsAgentIdRoute
   '/courses/$courseId': typeof AuthenticatedCoursesCourseIdRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/dashboard/student': typeof AuthenticatedDashboardStudentRoute
@@ -106,6 +114,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/assignments': typeof AuthenticatedAssignmentsRoute
+  '/agents/$agentId': typeof AuthenticatedAgentsAgentIdRoute
   '/courses/$courseId': typeof AuthenticatedCoursesCourseIdRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/dashboard/student': typeof AuthenticatedDashboardStudentRoute
@@ -121,6 +130,7 @@ export interface FileRoutesById {
   '/_authenticated/agents': typeof AuthenticatedAgentsRouteWithChildren
   '/_authenticated/assignments': typeof AuthenticatedAssignmentsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
+  '/_authenticated/agents/$agentId': typeof AuthenticatedAgentsAgentIdRoute
   '/_authenticated/courses/$courseId': typeof AuthenticatedCoursesCourseIdRoute
   '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/_authenticated/dashboard/student': typeof AuthenticatedDashboardStudentRoute
@@ -136,6 +146,7 @@ export interface FileRouteTypes {
     | '/agents'
     | '/assignments'
     | '/dashboard'
+    | '/agents/$agentId'
     | '/courses/$courseId'
     | '/dashboard/admin'
     | '/dashboard/student'
@@ -147,6 +158,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/assignments'
+    | '/agents/$agentId'
     | '/courses/$courseId'
     | '/dashboard/admin'
     | '/dashboard/student'
@@ -161,6 +173,7 @@ export interface FileRouteTypes {
     | '/_authenticated/agents'
     | '/_authenticated/assignments'
     | '/_authenticated/dashboard'
+    | '/_authenticated/agents/$agentId'
     | '/_authenticated/courses/$courseId'
     | '/_authenticated/dashboard/admin'
     | '/_authenticated/dashboard/student'
@@ -226,6 +239,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAgentsIndexRouteImport
       parentRoute: typeof AuthenticatedAgentsRoute
     }
+    '/_authenticated/agents/$agentId': {
+      id: '/_authenticated/agents/$agentId'
+      path: '/$agentId'
+      fullPath: '/agents/$agentId'
+      preLoaderRoute: typeof AuthenticatedAgentsAgentIdRouteImport
+      parentRoute: typeof AuthenticatedAgentsRoute
+    }
     '/_authenticated/courses/$courseId': {
       id: '/_authenticated/courses/$courseId'
       path: '/courses/$courseId'
@@ -265,10 +285,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAgentsRouteChildren {
+  AuthenticatedAgentsAgentIdRoute: typeof AuthenticatedAgentsAgentIdRoute
   AuthenticatedAgentsIndexRoute: typeof AuthenticatedAgentsIndexRoute
 }
 
 const AuthenticatedAgentsRouteChildren: AuthenticatedAgentsRouteChildren = {
+  AuthenticatedAgentsAgentIdRoute: AuthenticatedAgentsAgentIdRoute,
   AuthenticatedAgentsIndexRoute: AuthenticatedAgentsIndexRoute,
 }
 
