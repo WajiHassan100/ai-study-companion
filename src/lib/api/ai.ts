@@ -22,7 +22,14 @@ export interface TutorChatResponse {
   practice_questions?: string[];
   encouragement?: string;
   recommendations?: string[];
+  citations?: Array<{
+    material_title?: string;
+    page_number?: number | string;
+    chapter?: string;
+    snippet?: string;
+  }>;
 }
+
 
 export interface OrchestratorPayload {
   student_id?: string;

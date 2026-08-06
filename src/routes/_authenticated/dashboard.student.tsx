@@ -74,7 +74,7 @@ function StudentDashboard() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Link to="/courses/biol_101" className="block hover:opacity-90 transition-opacity cursor-pointer">
+        <Link to="/courses/$courseId" params={{ courseId: "biol_101" }} className="block hover:opacity-90 transition-opacity cursor-pointer">
           <StatCard title="Enrolled courses" value="6" hint="Click to open course pages" icon={BookOpen} />
         </Link>
         <Link to="/assignments" className="block hover:opacity-90 transition-opacity cursor-pointer">
@@ -144,7 +144,8 @@ function StudentDashboard() {
           ].map((c) => (
             <Link
               key={c.id}
-              to={`/courses/${c.id}`}
+              to="/courses/$courseId"
+              params={{ courseId: c.id }}
               className="p-5 rounded-2xl border border-border/80 bg-card hover:bg-emerald-50/40 hover:border-emerald-300 transition-all shadow-xs space-y-3 block group"
             >
               <div className="flex items-center justify-between">

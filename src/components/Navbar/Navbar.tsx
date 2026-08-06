@@ -14,6 +14,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { NotificationsBell } from "@/components/Navbar/NotificationsBell";
 
 export function Navbar({ withSidebarTrigger = false }: { withSidebarTrigger?: boolean }) {
   const { isAuthenticated, profile, role, user } = useAuth();
@@ -56,7 +58,7 @@ export function Navbar({ withSidebarTrigger = false }: { withSidebarTrigger?: bo
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild className="rounded-xl cursor-pointer">
-                <Link to="/courses/biol_101" className="flex flex-col items-start gap-0.5">
+                <Link to="/courses/$courseId" params={{ courseId: "biol_101" }} className="flex flex-col items-start gap-0.5">
                   <span className="font-bold text-foreground text-xs">Agent #5: RAG PDF Studio</span>
                   <span className="text-[11px] text-muted-foreground">Vector search & page-cited answers</span>
                 </Link>
@@ -89,7 +91,7 @@ export function Navbar({ withSidebarTrigger = false }: { withSidebarTrigger?: bo
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Link to="/courses/biol_101" className="hover:text-emerald-700 transition-colors">
+          <Link to="/courses/$courseId" params={{ courseId: "biol_101" }} className="hover:text-emerald-700 transition-colors">
             Course RAG Studio
           </Link>
           <Link to="/assignments" className="hover:text-emerald-700 transition-colors">
@@ -98,7 +100,9 @@ export function Navbar({ withSidebarTrigger = false }: { withSidebarTrigger?: bo
         </nav>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3">
+        <ThemeToggle />
+        {isAuthenticated ? <NotificationsBell /> : null}
         {isAuthenticated ? (
           <>
             <Button asChild size="sm" className="rounded-full px-5 text-xs font-bold bg-emerald-800 hover:bg-emerald-900 text-white shadow-xs">
