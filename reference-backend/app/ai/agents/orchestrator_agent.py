@@ -22,6 +22,7 @@ from app.ai.agents.teacher_agent import TeacherAgent
 from app.ai.agents.tutor_agent import TutorAgent
 from app.ai.agents.exam_agent import exam_agent
 from app.ai.agents.feedback_agent import feedback_agent
+from app.ai.agents.coach_agent import coach_agent
 from app.core.config import get_settings
 
 logger = logging.getLogger(__name__)
@@ -123,6 +124,12 @@ class OrchestratorAgent:
             "AI Assignment Feedback Agent (Agent #8)",
             "Analyzes code, math, and written submissions to generate structured 4-part feedback and log mistake patterns.",
             feedback_agent.analyze_submission,
+        )
+        self.registry.register(
+            "coach",
+            "AI Learning Coach Agent (Agent #9)",
+            "Monitors study consistency, performance trends, missed sessions, and weak areas for long-term mentorship.",
+            coach_agent.generate_coaching_insights,
         )
 
     def classify_intent(self, query: str) -> Dict[str, Any]:

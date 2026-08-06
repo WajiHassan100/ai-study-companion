@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import ai, assessment, auth, courses, exam, feedback, planner, quiz, rag, teacher, users
+from app.api.routes import ai, assessment, auth, coach, courses, exam, feedback, planner, quiz, rag, teacher, users
 from app.core.config import get_settings
 from app.db.session import Base, engine
 from app.models import models  # noqa: F401  (ensures models are registered)
@@ -41,6 +41,7 @@ app.include_router(rag.router, prefix=settings.api_v1_prefix)
 app.include_router(teacher.router, prefix=settings.api_v1_prefix)
 app.include_router(exam.router, prefix=settings.api_v1_prefix)
 app.include_router(feedback.router, prefix=settings.api_v1_prefix)
+app.include_router(coach.router, prefix=settings.api_v1_prefix)
 
 
 

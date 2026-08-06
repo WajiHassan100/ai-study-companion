@@ -9,6 +9,7 @@ import { StudyPlannerCard } from "@/components/DashboardCards/StudyPlannerCard";
 import { QuizGeneratorCard } from "@/components/DashboardCards/QuizGeneratorCard";
 import { ExamGeneratorCard } from "@/components/DashboardCards/ExamGeneratorCard";
 import { AssignmentFeedbackCard } from "@/components/DashboardCards/AssignmentFeedbackCard";
+import { LearningCoachCard } from "@/components/DashboardCards/LearningCoachCard";
 import { ProgressChart } from "@/components/Charts/ProgressChart";
 import { DataTable, type Column } from "@/components/Tables/DataTable";
 import { Badge } from "@/components/ui/badge";
@@ -167,6 +168,11 @@ function StudentDashboard() {
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
+          <LearningCoachCard
+            studentId={user?.id || "demo_student"}
+            onAskTutor={(query) => setSelectedQuery(query)}
+            onRebalancePlan={handleProfileUpdated}
+          />
           <WeaknessTrackerCard
             key={`weakness_${refreshKey}`}
             studentId={user?.id || "demo_student"}

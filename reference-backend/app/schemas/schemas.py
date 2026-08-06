@@ -322,6 +322,23 @@ class AssignmentFeedbackResponse(BaseModel):
     planner_recommendation: str
 
 
+# ── Agent #9: AI Learning Coach Agent Schemas ─────────────────────
+class LearningCoachRequest(BaseModel):
+    student_id: str = Field(default="demo_student")
+    timeframe: str = Field(default="weekly", description="weekly, monthly, or term")
+
+
+class LearningCoachResponse(BaseModel):
+    coach_title: str
+    consistency_score: float
+    missed_sessions_count: int
+    performance_recommendations: list[str]
+    problem_detection: list[str]
+    strategic_improvements: list[str]
+    planner_rebalance_action: dict
+    socratic_tutor_prompts: list[str]
+
+
 # ── Agent #6: Teacher Assistant Agent Schemas ─────────────────────
 class TeacherLessonPlanRequest(BaseModel):
     course_id: str = Field(default="biol_101", description="Course ID")
