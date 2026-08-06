@@ -216,7 +216,7 @@ function StudentDashboard() {
           title="AI Study Assistant"
           description="Ask concepts, request study plans, or get homework help anytime."
           suggestions={["Explain photosynthesis simply", "Build a math revision plan", "Summarise key history notes"]}
-          studentId={user?.id}
+          studentId={user?.id || "demo_student"}
           externalPrompt={selectedQuery}
         />
       </div>

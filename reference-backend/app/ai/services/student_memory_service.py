@@ -58,22 +58,39 @@ class StudentMemoryService:
 
         profile = db.query(StudentProfile).filter_by(student_id=student_id).first()
         if not profile:
-            profile = StudentProfile(
-                student_id=student_id,
-                current_level="intermediate",
-                learning_style="visual",
-                preferred_explanation_method="Worked Examples & Conceptual Analogies",
-                weaknesses_json=json.dumps(["Partial Derivatives", "Thylakoid Electron Transport"]),
-                strong_topics_json=json.dumps(["Single Variable Integration", "Cell Membrane Transport"]),
-                previous_mistakes_json=json.dumps(["Struggled connecting partial derivatives with 3D slope directional vectors."]),
-                study_history_json=json.dumps(["Reviewed Calculus Chapter 14"]),
-                progress_trends_json=json.dumps({"Calculus": "+12% this week", "Biology": "+8% this week"}),
-                recent_queries_json=json.dumps([]),
-                topic_mastery_json=json.dumps({"BIOL 101": 78.0, "MATH 201": 62.0, "PHYS 101": 84.0}),
-            )
-            db.add(profile)
-            db.commit()
-            db.refresh(profile)
+            try:
+                user = db.query(User).filter_by(id=student_id).first()
+                if not user:
+                    user = User(
+                        id=student_id,
+                        email=f"{student_id}@student.edu",
+                        full_name="Student",
+                        hashed_password="demo_hashed_password",
+                        role="student",
+                    )
+                    db.add(user)
+                    db.commit()
+
+                profile = StudentProfile(
+                    student_id=student_id,
+                    current_level="intermediate",
+                    learning_style="visual",
+                    preferred_explanation_method="Worked Examples & Conceptual Analogies",
+                    weaknesses_json=json.dumps(["Partial Derivatives", "Thylakoid Electron Transport"]),
+                    strong_topics_json=json.dumps(["Single Variable Integration", "Cell Membrane Transport"]),
+                    previous_mistakes_json=json.dumps(["Struggled connecting partial derivatives with 3D slope directional vectors."]),
+                    study_history_json=json.dumps(["Reviewed Calculus Chapter 14"]),
+                    progress_trends_json=json.dumps({"Calculus": "+12% this week", "Biology": "+8% this week"}),
+                    recent_queries_json=json.dumps([]),
+                    topic_mastery_json=json.dumps({"BIOL 101": 78.0, "MATH 201": 62.0, "PHYS 101": 84.0}),
+                )
+                db.add(profile)
+                db.commit()
+                db.refresh(profile)
+            except Exception as err:
+                db.rollback()
+                logger.error("Error creating student profile/user: %s", err)
+                profile = db.query(StudentProfile).filter_by(student_id=student_id).first()
 
         def _safe_json_list(field_str: str) -> List[str]:
             try:
@@ -88,6 +105,21 @@ class StudentMemoryService:
                 return val if isinstance(val, dict) else {}
             except Exception:
                 return {}
+
+        if not profile:
+            return {
+                "student_id": student_id,
+                "current_level": "intermediate",
+                "learning_style": "visual",
+                "preferred_explanation_method": "Worked Examples & Conceptual Analogies",
+                "weaknesses": ["Partial Derivatives", "Thylakoid Electron Transport"],
+                "strong_topics": ["Single Variable Integration", "Cell Membrane Transport"],
+                "previous_mistakes": ["Struggled connecting partial derivatives with 3D slope directional vectors."],
+                "study_history": ["Reviewed Calculus Chapter 14", "Completed 5 Biology Practice Questions"],
+                "progress_trends": {"Calculus": "+12% this week", "Biology": "+8% this week"},
+                "recent_queries": ["What is a gradient vector?"],
+                "topic_mastery": {"BIOL 101": 78.0, "MATH 201": 62.0, "PHYS 101": 84.0},
+            }
 
         return {
             "student_id": profile.student_id,
