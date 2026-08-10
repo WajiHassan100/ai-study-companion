@@ -63,7 +63,7 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const { role } = useAuth();
-  const currentPath = useRouterState({ select: (r) => r.location.pathname });
+  const currentPath = useRouterState({ select: (r) => r?.location?.pathname || "" });
 
   const groups: Group[] =
     role === "admin"

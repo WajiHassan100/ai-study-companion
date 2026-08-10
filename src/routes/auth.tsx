@@ -44,8 +44,8 @@ export const Route = createFileRoute("/auth")({
 });
 
 function safePath(value?: string) {
-  if (!value) return "/dashboard";
-  return value.startsWith("/") && !value.startsWith("//") ? value : "/dashboard";
+  if (!value || value === "/dashboard") return "/dashboard/student";
+  return value.startsWith("/") && !value.startsWith("//") ? value : "/dashboard/student";
 }
 
 function AuthPage() {
