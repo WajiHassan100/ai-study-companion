@@ -17,6 +17,7 @@ from app.ai.services.llm_service import get_llm
 from app.ai.prompts.tutor_prompt import get_tutor_prompt_template
 from app.ai.memory.conversation_memory import DBChatMessageHistory
 from app.models.models import StudentProfile
+from app.ai.utils import clean_llm_json, robust_parse_json
 
 from app.ai.services.student_memory_service import student_memory_service
 
@@ -46,17 +47,6 @@ class TutorAgent:
         """
         Executes a tutor session query.
         """
-        # Retrieve deep student personalization & memory context
-        student_memory_context = student_memory_service.retrieve_student_memory_context(db, student_id)
-
-        # Retrieve grounded course materials from Agent #5 RAG Agent
-        from app.ai.agents.rag_agent import rag_agent
-        rag_chunks = rag_agent.retrieve_relevant_chunks(course_id=course_id or "biol_101", query=message, top_k=2)
-        if rag_chunks:
-            c = rag_chunks[0]
-            rag_grounding_note = f"\n\n[OFFICIAL COURSE MATERIAL GROUNDING]:\nFrom '{c.get('material_title')}', {c.get('chapter')} (Page/Slide {c.get('page_number')}):\n\"{c.get('content')[:300]}\"\n"
-            student_memory_context += rag_grounding_note
-
         # Automatically pull student profile from DB if available
         if student_id and db:
             profile = db.query(StudentProfile).filter_by(student_id=student_id).first()
@@ -65,6 +55,34 @@ class TutorAgent:
                     student_level = profile.current_level
                 if learning_style == "visual" and profile.learning_style:
                     learning_style = profile.learning_style
+
+        # ── CROSS-AGENT STUDENT INTELLIGENCE ──
+        try:
+            from app.ai.context.student_context import StudentContext
+            student_context = StudentContext.from_db(db, student_id)
+            student_context_summary = student_context.to_prompt_summary()
+        except Exception as e:
+            logger.warning("Failed to construct StudentContext: %s", e)
+            student_context_summary = "No cross-agent performance intelligence available."
+
+        # Retrieve deep student personalization & memory context
+        student_memory_context = student_memory_service.retrieve_student_memory_context(db, student_id)
+
+        # Retrieve grounded course materials from Agent #5 RAG Agent
+        course_materials_context = "No course-specific materials uploaded for this question."
+        try:
+            from app.ai.agents.rag_agent import rag_agent
+            rag_chunks = rag_agent.retrieve_relevant_chunks(course_id=course_id or "biol_101", query=message, top_k=2)
+            if rag_chunks:
+                chunks_list = []
+                for c in rag_chunks:
+                    chunks_list.append(
+                        f"From Grounded Document: '{c.get('material_title')}', {c.get('chapter')} (Page/Slide {c.get('page_number')}):\n"
+                        f"\"...{c.get('content')[:500]}...\""
+                    )
+                course_materials_context = "\n\n".join(chunks_list)
+        except Exception as e:
+            logger.warning("Failed to retrieve course materials from RAG Agent: %s", e)
 
         if not session_id:
             session_id = str(uuid.uuid4())
@@ -75,6 +93,12 @@ class TutorAgent:
             student_id=student_id,
             course_id=course_id,
         )
+
+        # Compress and summarize conversation history if it gets too long
+        try:
+            await history.summarize_if_needed(self.llm, max_messages=20)
+        except Exception as e:
+            logger.warning("Failed to summarize chat history: %s", e)
 
         chat_messages = history.messages
 
@@ -107,6 +131,8 @@ class TutorAgent:
             assistance_mode=assistance_mode,
             memory_context=memory_context,
             student_memory_context=student_memory_context,
+            student_context_summary=student_context_summary,
+            course_materials_context=course_materials_context,
             chat_history=chat_messages,
             message=message,
         )
@@ -117,21 +143,11 @@ class TutorAgent:
         response_msg = await self.llm.ainvoke(prompt_value.to_messages())
         raw_text = response_msg.content.strip()
 
-        # Clean JSON markdown fences if present
-        if raw_text.startswith("```json"):
-            raw_text = raw_text[7:]
-        if raw_text.startswith("```"):
-            raw_text = raw_text[3:]
-        if raw_text.endswith("```"):
-            raw_text = raw_text[:-3]
-        raw_text = raw_text.strip()
-
         # Parse JSON output
-        try:
-            parsed = json.loads(raw_text)
-        except Exception as e:
-            logger.warning("Failed to parse JSON output directly: %s. Using raw fallback.", e)
-            parsed = {
+        parsed = robust_parse_json(
+            raw_text,
+            llm=self.llm,
+            fallback={
                 "topic": "Academic Assistance",
                 "socratic_question": f"What do you think is the core idea behind {message}?",
                 "explanation": raw_text,
@@ -140,6 +156,7 @@ class TutorAgent:
                 "encouragement": "Keep going! Asking questions is the best way to learn.",
                 "recommendations": ["Review course materials"],
             }
+        )
 
         socratic_question = parsed.get("socratic_question", "")
         explanation = parsed.get("explanation", raw_text)

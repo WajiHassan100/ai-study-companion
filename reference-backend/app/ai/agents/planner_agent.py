@@ -16,6 +16,7 @@ from app.ai.services.llm_service import get_llm
 from app.ai.prompts.planner_prompt import get_planner_prompt_template
 from app.models.models import StudentProfile, Assignment, StudyPlan, Course
 from app.ai.services.student_memory_service import student_memory_service
+from app.ai.utils import clean_llm_json
 
 logger = logging.getLogger(__name__)
 
@@ -75,17 +76,10 @@ class PlannerAgent:
 
         response_msg = await self.llm.ainvoke(prompt_value.to_messages())
         raw_text = response_msg.content.strip()
-
-        if raw_text.startswith("```json"):
-            raw_text = raw_text[7:]
-        if raw_text.startswith("```"):
-            raw_text = raw_text[3:]
-        if raw_text.endswith("```"):
-            raw_text = raw_text[:-3]
-        raw_text = raw_text.strip()
+        cleaned_text = clean_llm_json(raw_text)
 
         try:
-            parsed = json.loads(raw_text)
+            parsed = json.loads(cleaned_text)
         except Exception as e:
             logger.warning("Failed to parse Planner JSON output: %s. Using fallback plan.", e)
             parsed = {

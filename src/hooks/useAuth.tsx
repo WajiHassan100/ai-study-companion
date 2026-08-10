@@ -29,13 +29,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [role, setRole] = useState<AppRole | null>(null);
   const [loading, setLoading] = useState(true);
 
-  async function loadUserData(userId: string) {
-    const [profileRes, roleRes] = await Promise.all([
-      supabase.from("profiles").select("id, full_name, email").eq("id", userId).maybeSingle(),
-      supabase.from("user_roles").select("role").eq("user_id", userId).limit(1).maybeSingle(),
-    ]);
-    setProfile((profileRes.data as Profile | null) ?? null);
-    setRole((roleRes.data?.role as AppRole | undefined) ?? null);
+  async function loadUserData(userId: string, userObj?: User | null) {
+    try {
+      const [profileRes, roleRes] = await Promise.all([
+        supabase.from("profiles").select("id, full_name, email").eq("id", userId).maybeSingle(),
+        supabase.from("user_roles").select("role").eq("user_id", userId).limit(1).maybeSingle(),
+      ]);
+
+      const fetchedProfile = profileRes.data as Profile | null;
+      const userMeta = userObj?.user_metadata;
+      
+      setProfile(
+        fetchedProfile ?? {
+          id: userId,
+          full_name: userMeta?.full_name || userMeta?.name || userObj?.email?.split("@")[0] || "Student",
+          email: userObj?.email || null,
+        }
+      );
+      setRole((roleRes.data?.role as AppRole | undefined) ?? "student");
+    } catch (err) {
+      setRole("student");
+    }
   }
 
   useEffect(() => {
@@ -45,20 +59,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!active) return;
       setSession(nextSession);
       if (nextSession?.user) {
-        // Never await Supabase calls inside the callback itself.
-        setTimeout(() => {
-          if (active) void loadUserData(nextSession.user.id);
+        setTimeout(async () => {
+          if (active) {
+            await loadUserData(nextSession.user.id, nextSession.user);
+            setLoading(false);
+          }
         }, 0);
       } else {
         setProfile(null);
         setRole(null);
+        setLoading(false);
       }
     });
 
     void supabase.auth.getSession().then(async ({ data }) => {
       if (!active) return;
       setSession(data.session);
-      if (data.session?.user) await loadUserData(data.session.user.id);
+      if (data.session?.user) {
+        await loadUserData(data.session.user.id, data.session.user);
+      }
       setLoading(false);
     });
 

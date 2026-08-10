@@ -10,28 +10,9 @@ import logging
 from typing import Any, Dict, List, Optional
 from sqlalchemy.orm import Session as DBSession
 
-from sqlalchemy import text
 from app.models.models import StudentProfile, User
 
 logger = logging.getLogger(__name__)
-
-
-def _ensure_sqlite_columns(db: DBSession):
-    """Dev convenience: Ensures new personalization memory columns exist on SQLite table."""
-    cols = [
-        ("preferred_explanation_method", "VARCHAR(50) DEFAULT 'worked_examples'"),
-        ("strong_topics_json", "TEXT DEFAULT '[]'"),
-        ("previous_mistakes_json", "TEXT DEFAULT '[]'"),
-        ("study_history_json", "TEXT DEFAULT '[]'"),
-        ("progress_trends_json", "TEXT DEFAULT '{}'"),
-        ("recent_queries_json", "TEXT DEFAULT '[]'"),
-    ]
-    for col_name, col_def in cols:
-        try:
-            db.execute(text(f"ALTER TABLE student_profiles ADD COLUMN {col_name} {col_def}"))
-            db.commit()
-        except Exception:
-            db.rollback()
 
 
 class StudentMemoryService:
@@ -53,8 +34,6 @@ class StudentMemoryService:
                 "recent_queries": ["What is a gradient vector?"],
                 "topic_mastery": {"BIOL 101": 78.0, "MATH 201": 62.0, "PHYS 101": 84.0},
             }
-
-        _ensure_sqlite_columns(db)
 
         profile = db.query(StudentProfile).filter_by(student_id=student_id).first()
         if not profile:

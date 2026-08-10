@@ -39,5 +39,23 @@ __pycache__/
 venv/
 ENV/
 *.db
+*.sqlite
 *.sqlite3
+
+# Environment & Secrets
+.env
+.env.*
+.env.local
+
+# Lovable & Cloudflare Build Artifacts
+.lovable/
+.output/
+.wrangler/
+build/
+
+# Reports & Document Binaries
+*.pdf
+*.docx
+reports/
+
 

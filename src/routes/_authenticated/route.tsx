@@ -7,6 +7,10 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
   beforeLoad: async ({ location }) => {
+    // If URL contains OAuth callback tokens, allow Supabase client to process them
+    if (typeof window !== "undefined" && (window.location.hash.includes("access_token") || window.location.search.includes("code="))) {
+      return;
+    }
     const { data } = await supabase.auth.getSession();
     if (!data.session) {
       throw redirect({ to: "/auth", search: { redirect: location.href } });

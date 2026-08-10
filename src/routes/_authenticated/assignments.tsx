@@ -19,6 +19,8 @@ export const Route = createFileRoute("/_authenticated/assignments")({
   component: AssignmentsPage,
 });
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
+
 interface AssignmentItem {
   id: string;
   courseCode: string;
@@ -85,7 +87,7 @@ export function AssignmentsPage() {
 
     try {
       // Call Teacher Assistant Agent /api/v1/ai/teacher/grade
-      const response = await fetch("http://localhost:8000/api/v1/ai/teacher/grade", {
+      const response = await fetch(`${API_BASE_URL}/ai/teacher/grade`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

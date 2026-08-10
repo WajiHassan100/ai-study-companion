@@ -30,71 +30,131 @@ class ProfilerAgent:
         self.llm = get_llm()
         self.prompt = get_profiler_prompt_template()
 
-    def get_knowledge_dependency_map(self, domain: str = "general") -> Dict[str, Any]:
-        """Returns standard course knowledge dependency hierarchy mapping."""
-        return {
-            "MATH 201: Multivariable Calculus": {
-                "nodes": [
-                    {"id": "derivatives", "label": "Derivatives", "score": 80, "status": "mastered"},
-                    {"id": "chain_rule", "label": "Chain Rule", "score": 45, "status": "review_needed"},
-                    {"id": "partial_deriv", "label": "Partial Derivatives", "score": 40, "status": "bottleneck"},
-                    {"id": "gradient_vectors", "label": "Gradient Vectors", "score": 35, "status": "weak"},
-                ],
-                "dependencies": [
-                    ("derivatives", "chain_rule"),
-                    ("chain_rule", "partial_deriv"),
-                    ("partial_deriv", "gradient_vectors"),
-                ],
-                "foundational_bottleneck": "Partial Derivatives",
-                "root_cause_explanation": "Gradient vector weakness (35%) is likely caused by incomplete understanding of prerequisite partial derivatives (40%).",
-            },
-            "BIOL 101: Cell Biology & Genetics": {
-                "nodes": [
-                    {"id": "cell_structure", "label": "Cell Structure", "score": 85, "status": "mastered"},
-                    {"id": "chloroplasts", "label": "Chloroplast Organelles", "score": 78, "status": "mastered"},
-                    {"id": "thylakoid_mem", "label": "Thylakoid Membrane Gradient", "score": 52, "status": "bottleneck"},
-                    {"id": "electron_transport", "label": "Light Reactions Transport", "score": 48, "status": "weak"},
-                ],
-                "dependencies": [
-                    ("cell_structure", "chloroplasts"),
-                    ("chloroplasts", "thylakoid_mem"),
-                    ("thylakoid_mem", "electron_transport"),
-                ],
-                "foundational_bottleneck": "Thylakoid Membrane Gradient",
-                "root_cause_explanation": "Light reaction transport weakness (48%) stems from prerequisite confusion regarding thylakoid membrane proton gradients (52%).",
-            },
-        }
+    def get_knowledge_dependency_map(self, db: Optional[DBSession] = None, student_id: str = "demo_student") -> Dict[str, Any]:
+        """Builds knowledge dependency graph dynamically from student profile data."""
+        if not db:
+            return {}
+
+        profile = db.query(StudentProfile).filter_by(student_id=student_id).first()
+        if not profile:
+            return {}
+
+        # Parse stored JSON fields
+        try:
+            topic_mastery: Dict[str, float] = json.loads(profile.topic_mastery_json or "{}")
+        except Exception:
+            topic_mastery = {}
+
+        try:
+            weaknesses: List[str] = json.loads(profile.weaknesses_json or "[]")
+        except Exception:
+            weaknesses = []
+
+        if not topic_mastery:
+            return {}
+
+        # Build dynamic dependency nodes from actual mastery data
+        dep_map: Dict[str, Any] = {}
+
+        for topic, score in topic_mastery.items():
+            score = float(score)
+            if score >= 80:
+                status = "mastered"
+            elif score >= 60:
+                status = "progressing"
+            elif score >= 40:
+                status = "review_needed"
+            else:
+                status = "weak"
+
+            # Group by course/subject (e.g. BIOL 101, MATH 201)
+            course_key = topic
+            if course_key not in dep_map:
+                dep_map[course_key] = {
+                    "nodes": [],
+                    "dependencies": [],
+                    "foundational_bottleneck": None,
+                    "root_cause_explanation": None,
+                }
+
+            dep_map[course_key]["nodes"].append({
+                "id": topic.lower().replace(" ", "_").replace(":", "_"),
+                "label": topic,
+                "score": round(score, 1),
+                "status": status,
+            })
+
+        # Mark weaknesses as bottlenecks
+        for topic_group in dep_map.values():
+            weak_nodes = [n for n in topic_group["nodes"] if n["status"] in ("weak", "review_needed")]
+            if weak_nodes:
+                bottleneck = min(weak_nodes, key=lambda n: n["score"])
+                topic_group["foundational_bottleneck"] = bottleneck["label"]
+                topic_group["root_cause_explanation"] = (
+                    f"{bottleneck['label']} has a mastery score of {bottleneck['score']}%. "
+                    f"Review of foundational prerequisites is recommended."
+                )
+
+        return dep_map
 
     def analyze_knowledge_depth(self, db: Optional[DBSession], student_id: str) -> Dict[str, Any]:
-        """Performs deep explainable analysis: sub-topic scores, root cause, and dependency maps."""
+        """Performs deep explainable analysis based on dynamic student profile & database memory."""
         memory_profile = student_memory_service.get_or_create_profile(db, student_id)
-        dep_map = self.get_knowledge_dependency_map()
+        dep_map = self.get_knowledge_dependency_map(db=db, student_id=student_id)
 
-        # Extract granular subtopic scores
-        subtopic_mastery = {
-            "Calculus - Derivatives": 80,
-            "Calculus - Chain Rule": 45,
-            "Calculus - Partial Derivatives": 40,
-            "Calculus - Gradient Vectors": 35,
-            "Biology - Cell Structure": 85,
-            "Biology - Chloroplast Organelles": 78,
-            "Biology - Thylakoid Membrane": 52,
-            "Biology - Light Reaction Transport": 48,
-        }
+        # Dynamically extract topic mastery scores from student memory
+        raw_mastery = memory_profile.get("topic_mastery", {})
+        weaknesses = memory_profile.get("weaknesses", [])
+        previous_mistakes = memory_profile.get("previous_mistakes", [])
 
-        root_causes = [
-            {
-                "topic": "Gradient Vectors (35%)",
-                "prerequisite": "Partial Derivatives (40%)",
-                "explanation": "Gradient vector weakness is likely caused by incomplete understanding of prerequisite partial derivatives.",
-                "action": "Review 15-minute Socratic lesson on Partial Derivatives with AI Tutor.",
-            },
-            {
-                "topic": "Light Reaction Transport (48%)",
-                "prerequisite": "Thylakoid Membrane Gradient (52%)",
-                "explanation": "Electron transport confusion stems from prerequisite gaps in thylakoid membrane proton gradients.",
-                "action": "Generate 5-question adaptive quiz on Thylakoid Gradients.",
-            },
+        # Build subtopic mastery dynamically from DB profile memory
+        subtopic_mastery = {}
+        if isinstance(raw_mastery, dict) and raw_mastery:
+            for topic, score in raw_mastery.items():
+                subtopic_mastery[topic] = float(score)
+        else:
+            subtopic_mastery = {
+                "Calculus - Derivatives": 80.0,
+                "Calculus - Chain Rule": 65.0,
+                "Calculus - Partial Derivatives": 40.0,
+                "Biology - Cell Structure": 85.0,
+            }
+
+        # Build dynamic root cause analysis from student weak topics & mistake history
+        root_causes = []
+        if weaknesses:
+            for w in weaknesses[:3]:
+                score = subtopic_mastery.get(w, 40.0)
+                root_causes.append({
+                    "topic": f"{w} ({score:.0f}%)",
+                    "prerequisite": "Foundational Concepts",
+                    "explanation": f"Performance data shows persistent weakness in '{w}'. Review of foundational concepts is recommended.",
+                    "action": f"Ask Socratic AI Tutor for a step-by-step breakdown on {w}.",
+                })
+
+        if previous_mistakes and not root_causes:
+            for m in previous_mistakes[:2]:
+                root_causes.append({
+                    "topic": "Recorded Concept Confusion",
+                    "prerequisite": "Core Application Logic",
+                    "explanation": m,
+                    "action": "Generate targeted adaptive practice quiz to reinforce learning.",
+                })
+
+        if not root_causes:
+            root_causes = [
+                {
+                    "topic": "Gradient Vectors & Partial Derivatives",
+                    "prerequisite": "Multi-variable derivatives",
+                    "explanation": "Calculus performance indicates prerequisite gaps in multivariable rate concepts.",
+                    "action": "Review 15-minute Socratic lesson on Partial Derivatives.",
+                }
+            ]
+
+        # Generate dynamic remediation actions
+        remediation_actions = [
+            f"Ask AI Tutor: Clarify {weaknesses[0]}" if weaknesses else "Ask AI Tutor to introduce a new topic",
+            f"Generate 5-Question Adaptive Quiz on {weaknesses[-1]}" if len(weaknesses) > 1 else "Complete recommended practice quiz",
         ]
 
         return {
@@ -102,12 +162,10 @@ class ProfilerAgent:
             "overall_level": memory_profile.get("current_level", "intermediate"),
             "learning_style": memory_profile.get("learning_style", "visual"),
             "subtopic_mastery": subtopic_mastery,
+            "weaknesses": weaknesses,
             "root_cause_analysis": root_causes,
             "dependency_trees": dep_map,
-            "remediation_actions": [
-                "1-Click Ask AI Tutor: Connect Partial Derivatives to Gradient Vectors",
-                "Generate Targeted 5-Question Quiz on Foundational Bottlenecks",
-            ],
+            "remediation_actions": remediation_actions,
         }
 
     async def evaluate_and_profile(
@@ -121,6 +179,8 @@ class ProfilerAgent:
         """
         Evaluates a student's answer and updates their profile in DB.
         """
+        from app.ai.utils import clean_llm_json
+
         # Fetch or create student profile in database
         profile = db.query(StudentProfile).filter_by(student_id=student_id).first()
         if not profile:
@@ -162,17 +222,10 @@ class ProfilerAgent:
 
         response_msg = await self.llm.ainvoke(prompt_value.to_messages())
         raw_text = response_msg.content.strip()
-
-        if raw_text.startswith("```json"):
-            raw_text = raw_text[7:]
-        if raw_text.startswith("```"):
-            raw_text = raw_text[3:]
-        if raw_text.endswith("```"):
-            raw_text = raw_text[:-3]
-        raw_text = raw_text.strip()
+        cleaned_text = clean_llm_json(raw_text)
 
         try:
-            parsed = json.loads(raw_text)
+            parsed = json.loads(cleaned_text)
         except Exception as e:
             logger.warning("Failed to parse Profiler JSON output: %s. Using fallback.", e)
             parsed = {

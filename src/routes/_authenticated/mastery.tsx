@@ -1,12 +1,15 @@
-import { useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Waypoints, ArrowRight } from "lucide-react";
+import { useState, useMemo } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { Waypoints, ArrowRight, Loader2 } from "lucide-react";
 import { SectionHeader } from "@/components/common/SectionHeader";
 import { StatTile } from "@/components/common/StatTile";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/hooks/useAuth";
+import { getStudentProfile } from "@/lib/api/assessment";
 
 export const Route = createFileRoute("/_authenticated/mastery")({
   head: () => ({
@@ -113,16 +116,70 @@ const levelStyles: Record<Level, { dot: string; chip: string; label: string; bar
 };
 
 function MasteryMap() {
-  const allTopics = subjects.flatMap((s) => s.topics);
-  const [selectedId, setSelectedId] = useState(allTopics[0].id);
-  const selected = allTopics.find((t) => t.id === selectedId)!;
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
-  const counts = {
-    strong: allTopics.filter((t) => t.level === "strong").length,
-    shaky: allTopics.filter((t) => t.level === "shaky").length,
-    weak: allTopics.filter((t) => t.level === "weak").length,
-  };
-  const overall = Math.round(allTopics.reduce((a, t) => a + t.score, 0) / allTopics.length);
+  const { data: profile, isLoading } = useQuery({
+    queryKey: ["student-profile", user?.id],
+    queryFn: () => getStudentProfile(user?.id || "demo_student"),
+    enabled: !!user?.id,
+  });
+
+  const liveSubjects = useMemo(() => {
+    if (!profile) return subjects;
+    const topicMastery = profile.topic_mastery || {};
+
+    return subjects.map((sub) => ({
+      ...sub,
+      topics: sub.topics.map((t) => {
+        const liveScore = Object.entries(topicMastery).find(
+          ([name]) => name.toLowerCase() === t.name.toLowerCase()
+        )?.[1] ?? t.score;
+
+        return {
+          ...t,
+          score: liveScore,
+          level: levelOf(liveScore),
+          subtopics: t.subtopics.map((st) => {
+            const subLiveScore = Object.entries(topicMastery).find(
+              ([name]) => name.toLowerCase() === st.name.toLowerCase()
+            )?.[1] ?? st.score;
+            return { ...st, score: subLiveScore };
+          }),
+        };
+      }),
+    }));
+  }, [profile]);
+
+  const allTopics = useMemo(() => liveSubjects.flatMap((s) => s.topics), [liveSubjects]);
+  const [selectedId, setSelectedId] = useState("b1");
+
+  // Keep selectedId synchronized if liveSubjects changes
+  const selected = useMemo(() => {
+    return allTopics.find((t) => t.id === selectedId) || allTopics[0];
+  }, [allTopics, selectedId]);
+
+  const counts = useMemo(() => {
+    return {
+      strong: allTopics.filter((t) => t.level === "strong").length,
+      shaky: allTopics.filter((t) => t.level === "shaky").length,
+      weak: allTopics.filter((t) => t.level === "weak").length,
+    };
+  }, [allTopics]);
+
+  const overall = useMemo(() => {
+    if (allTopics.length === 0) return 0;
+    return Math.round(allTopics.reduce((a, t) => a + t.score, 0) / allTopics.length);
+  }, [allTopics]);
+
+  if (isLoading) {
+    return (
+      <div className="flex h-[50vh] flex-col items-center justify-center space-y-4">
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+        <p className="text-sm font-semibold text-muted-foreground">Loading your mastery map...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
@@ -146,7 +203,7 @@ function MasteryMap() {
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="space-y-4">
-          {subjects.map((subject) => (
+          {liveSubjects.map((subject) => (
             <Card key={subject.id} className="border-border/70">
               <CardHeader className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 pb-3">
                 <div className="min-w-0">
@@ -183,46 +240,50 @@ function MasteryMap() {
           ))}
         </div>
 
-        <Card className="h-fit border-border/70 lg:sticky lg:top-24">
-          <CardHeader className="pb-3">
-            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
-              <CardTitle className="truncate text-sm font-bold">{selected.name}</CardTitle>
-              <Badge variant="outline" className={`shrink-0 text-[10px] font-bold ${levelStyles[selected.level].chip}`}>
-                {levelStyles[selected.level].label}
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <div className="flex items-baseline justify-between">
-                <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                  Topic mastery
-                </span>
-                <span className="font-display text-2xl font-bold">{selected.score}%</span>
+        {selected && (
+          <Card className="h-fit border-border/70 lg:sticky lg:top-24">
+            <CardHeader className="pb-3">
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+                <CardTitle className="truncate text-sm font-bold">{selected.name}</CardTitle>
+                <Badge variant="outline" className={`shrink-0 text-[10px] font-bold ${levelStyles[selected.level].chip}`}>
+                  {levelStyles[selected.level].label}
+                </Badge>
               </div>
-              <Progress value={selected.score} className={`mt-2 h-2 ${levelStyles[selected.level].bar}`} />
-            </div>
-
-            <div className="space-y-2">
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Subtopics</p>
-              {selected.subtopics.map((s) => (
-                <div key={s.name} className="space-y-1">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="truncate text-foreground/85">{s.name}</span>
-                    <span className="shrink-0 font-bold">{s.score}%</span>
-                  </div>
-                  <Progress value={s.score} className={`h-1.5 ${levelStyles[levelOf(s.score)].bar}`} />
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <div className="flex items-baseline justify-between">
+                  <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                    Topic mastery
+                  </span>
+                  <span className="font-display text-2xl font-bold">{selected.score}%</span>
                 </div>
-              ))}
-            </div>
+                <Progress value={selected.score} className={`mt-2 h-2 ${levelStyles[selected.level].bar}`} />
+              </div>
 
-            <Button asChild size="sm" className="w-full rounded-xl font-bold">
-              <Link to="/tutor">
+              <div className="space-y-2">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Subtopics</p>
+                {selected.subtopics.map((s) => (
+                  <div key={s.name} className="space-y-1">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="truncate text-foreground/85">{s.name}</span>
+                      <span className="shrink-0 font-bold">{s.score}%</span>
+                    </div>
+                    <Progress value={s.score} className={`h-1.5 ${levelStyles[levelOf(s.score)].bar}`} />
+                  </div>
+                ))}
+              </div>
+
+              <Button
+                onClick={() => navigate({ to: "/tutor", search: { topic: selected.name } })}
+                size="sm"
+                className="w-full rounded-xl font-bold"
+              >
                 Send to Tutor <ArrowRight className="ml-1 h-4 w-4" />
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
+              </Button>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );

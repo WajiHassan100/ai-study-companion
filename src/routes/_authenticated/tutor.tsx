@@ -9,16 +9,27 @@ import {
   FileText,
   ListChecks,
   Wand2,
+  CheckCircle2,
+  AlertCircle,
+  Loader2,
+  Award,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { AiAssistantPanel } from "@/components/DashboardCards/AiAssistantPanel";
 import { SectionHeader } from "@/components/common/SectionHeader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { evaluateAnswer } from "@/lib/api/assessment";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/tutor")({
+  validateSearch: (search: Record<string, unknown>) => {
+    return {
+      topic: (search.topic as string) || undefined,
+    };
+  },
   head: () => ({
     meta: [
       { title: "Tutor Workspace — Scholar" },
@@ -66,9 +77,40 @@ const practice = [
 
 function TutorWorkspace() {
   const { user } = useAuth();
-  const [focusTopic, setFocusTopic] = useState("Photosynthesis: light-dependent reactions");
+  const search = Route.useSearch();
+  const [focusTopic, setFocusTopic] = useState(search.topic || "Photosynthesis: light-dependent reactions");
   const [activeMaterial, setActiveMaterial] = useState(materials[0].id);
   const [prompt, setPrompt] = useState<string | undefined>(undefined);
+
+  // Practice Question Evaluation State
+  const [activeQuestion, setActiveQuestion] = useState<string | null>(null);
+  const [answerText, setAnswerText] = useState("");
+  const [evaluating, setEvaluating] = useState(false);
+  const [evalResult, setEvalResult] = useState<any | null>(null);
+
+  const handleEvaluate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!activeQuestion || !answerText.trim() || evaluating) return;
+
+    setEvaluating(true);
+    setEvalResult(null);
+
+    try {
+      const res = await evaluateAnswer({
+        student_id: user?.id || "demo_student",
+        topic: focusTopic,
+        question: activeQuestion,
+        student_answer: answerText,
+      });
+      setEvalResult(res);
+      toast.success("Answer evaluated by Profiler Agent!");
+    } catch (err: any) {
+      console.error(err);
+      toast.error("Failed to evaluate answer. Make sure backend is running.");
+    } finally {
+      setEvaluating(false);
+    }
+  };
 
   function runMode(template: string) {
     setPrompt(`${template}${focusTopic}`);
@@ -148,16 +190,114 @@ function TutorWorkspace() {
         </CardContent>
       </Card>
 
-      <Card className="border-border/70">
+      <Card className="border-border/70 bg-card">
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-bold">Practice questions</CardTitle>
+          <CardTitle className="text-sm font-bold flex items-center gap-2">
+            <Award className="h-4 w-4 text-primary" />
+            Practice questions
+          </CardTitle>
+          <CardDescription className="text-[10px]">
+            Write answers to submit to the Profiler Agent for grading.
+          </CardDescription>
         </CardHeader>
-        <CardContent>
-          <ol className="list-decimal space-y-2 pl-4 text-xs leading-relaxed text-muted-foreground">
-            {practice.map((p) => (
-              <li key={p}>{p}</li>
-            ))}
-          </ol>
+        <CardContent className="space-y-4">
+          {!activeQuestion ? (
+            <ol className="list-decimal space-y-2.5 pl-4 text-xs font-semibold leading-relaxed text-foreground/80">
+              {practice.map((p) => (
+                <li key={p}>
+                  <button
+                    onClick={() => {
+                      setActiveQuestion(p);
+                      setAnswerText("");
+                      setEvalResult(null);
+                    }}
+                    className="text-left hover:text-primary hover:underline transition-colors leading-relaxed"
+                  >
+                    {p}
+                  </button>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <div className="space-y-3">
+              <div className="rounded-lg bg-muted/50 p-2.5 text-xs border border-border/50">
+                <span className="font-bold text-[10px] text-muted-foreground uppercase tracking-wider block mb-1">
+                  Active Question:
+                </span>
+                <p className="font-medium text-foreground leading-relaxed">{activeQuestion}</p>
+              </div>
+
+              {evalResult ? (
+                <div className="space-y-3 rounded-lg border border-border/80 p-3 bg-muted/30">
+                  <div className="flex items-center gap-2">
+                    {evalResult.is_correct ? (
+                      <Badge className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] gap-1 flex items-center">
+                        <CheckCircle2 className="h-3 w-3" /> CORRECT ({evalResult.score}%)
+                      </Badge>
+                    ) : (
+                      <Badge variant="destructive" className="font-bold text-[10px] gap-1 flex items-center">
+                        <AlertCircle className="h-3 w-3" /> REVIEW ({evalResult.score}%)
+                      </Badge>
+                    )}
+                    <Badge variant="outline" className="text-[10px] font-bold">
+                      Mastery: {evalResult.updated_mastery}%
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground leading-relaxed font-medium">
+                    {evalResult.feedback}
+                  </p>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setActiveQuestion(null);
+                      setEvalResult(null);
+                    }}
+                    className="w-full text-xs font-bold h-8 rounded-xl"
+                  >
+                    Next Question
+                  </Button>
+                </div>
+              ) : (
+                <form onSubmit={handleEvaluate} className="space-y-3">
+                  <Textarea
+                    placeholder="Type your explanation or answer here..."
+                    value={answerText}
+                    onChange={(e) => setAnswerText(e.target.value)}
+                    disabled={evaluating}
+                    className="min-h-[100px] text-xs leading-relaxed rounded-xl resize-none"
+                  />
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setActiveQuestion(null)}
+                      disabled={evaluating}
+                      className="w-1/2 text-xs font-bold h-9 rounded-xl"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="submit"
+                      size="sm"
+                      disabled={!answerText.trim() || evaluating}
+                      className="w-1/2 text-xs font-bold h-9 rounded-xl"
+                    >
+                      {evaluating ? (
+                        <>
+                          <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                          Grading...
+                        </>
+                      ) : (
+                        "Submit Answer"
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

@@ -121,6 +121,7 @@ class StudentProfile(Base):
     progress_trends_json: Mapped[str] = mapped_column(Text, default="{}")
     recent_queries_json: Mapped[str] = mapped_column(Text, default="[]")
     topic_mastery_json: Mapped[str] = mapped_column(Text, default="{}")
+    spaced_repetition_json: Mapped[str] = mapped_column(Text, default="{}")
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, onupdate=_now)
 
     student: Mapped[User] = relationship("User")
@@ -170,4 +171,14 @@ class QuizAttempt(Base):
     student: Mapped[User] = relationship("User")
 
 
+class CourseDocument(Base):
+    __tablename__ = "course_documents"
 
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    course_id: Mapped[str] = mapped_column(String(36), index=True)
+    material_id: Mapped[str] = mapped_column(String(50), index=True)
+    material_title: Mapped[str] = mapped_column(String(500))
+    chapter: Mapped[str] = mapped_column(String(255), default="")
+    page_number: Mapped[int] = mapped_column(default=1)
+    content: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)

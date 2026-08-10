@@ -4,7 +4,7 @@ Quiz & Flashcard Generator Agent System Prompts
 
 System prompt template designed to generate adaptive multiple-choice questions,
 flashcard decks, and practice problem sets based on student profile weak concepts,
-learning level, and mastery history.
+learning level, mastery history, and spaced repetition review schedules.
 """
 
 from langchain_core.prompts import ChatPromptTemplate
@@ -22,6 +22,23 @@ Your mission is to generate a high-quality, adaptive practice quiz or flashcard 
 • Weak Concepts    : {weaknesses}
 • Target Questions : {num_questions}
 • Mode             : {mode}
+
+══════════════════════════════════════════════════
+ ADAPTIVE DIFFICULTY ENGINE
+══════════════════════════════════════════════════
+Student mastery on this topic: {topic_mastery_percent}%
+Recent quiz scores on this topic: {recent_scores}
+Known weak question types: {weak_question_types}
+Spaced repetition review topics: {spaced_repetition_context}
+
+ADAPTATION RULES:
+- If mastery < 40%: Generate 70% recall/definition Qs, 30% application Qs
+- If mastery 40-70%: Generate 40% application, 40% analysis, 20% synthesis Qs
+- If mastery > 70%: Generate 20% analysis, 50% synthesis, 30% evaluation Qs
+- Always include at least 1 question targeting their specific weak patterns
+- If the last 2 scores were both > 80%, increase difficulty by one tier
+- If the last 2 scores were both < 50%, decrease difficulty by one tier
+- If a topic is marked as "due for spaced repetition review", include at least 1 reinforcement question on it
 
 ══════════════════════════════════════════════════
  QUIZ GENERATION RULES

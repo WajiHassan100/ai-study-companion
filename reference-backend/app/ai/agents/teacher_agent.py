@@ -9,31 +9,25 @@ import json
 import logging
 from typing import Any
 
-from google import genai
-from google.genai import types
+from langchain_core.messages import HumanMessage
 
 from app.ai.prompts.teacher_prompt import (
     TEACHER_GRADING_PROMPT,
     TEACHER_LESSON_PLAN_PROMPT,
 )
-from app.core.config import get_settings
+from app.ai.services.llm_service import get_llm
+from app.ai.utils import clean_llm_json
 
 logger = logging.getLogger(__name__)
-settings = get_settings()
 
 
 class TeacherAgent:
     """Agent #6: Teacher Assistant Agent."""
 
-    def __init__(self, model_name: str = "gemini-2.0-flash"):
-        self.model_name = model_name
-        self.api_key = getattr(settings, "gemini_api_key", None)
-        if self.api_key:
-            self.client = genai.Client(api_key=self.api_key)
-        else:
-            self.client = None
+    def __init__(self):
+        self.llm = get_llm()
 
-    def draft_lesson_plan(
+    async def draft_lesson_plan(
         self,
         course_id: str,
         topic: str,
@@ -48,25 +42,16 @@ class TeacherAgent:
             duration_minutes=duration_minutes,
         )
 
-        if not self.client:
-            logger.warning("GEMINI_API_KEY missing. Using fallback lesson plan generator.")
-            return self._build_fallback_lesson_plan(topic, duration_minutes)
-
         try:
-            response = self.client.models.generate_content(
-                model=self.model_name,
-                contents=prompt,
-                config=types.GenerateContentConfig(
-                    temperature=0.4,
-                    response_mime_type="application/json",
-                ),
-            )
-            return json.loads(response.text or "{}")
+            response = await self.llm.ainvoke([HumanMessage(content=prompt)])
+            raw_text = response.content.strip()
+            cleaned_text = clean_llm_json(raw_text)
+            return json.loads(cleaned_text or "{}")
         except Exception as e:
-            logger.error(f"Gemini API call failed for TeacherAgent lesson plan: {e}")
+            logger.error(f"LLM call failed for TeacherAgent lesson plan: {e}")
             return self._build_fallback_lesson_plan(topic, duration_minutes)
 
-    def grade_submission(
+    async def grade_submission(
         self,
         assignment_title: str,
         submission_text: str,
@@ -79,22 +64,13 @@ class TeacherAgent:
             submission_text=submission_text,
         )
 
-        if not self.client:
-            logger.warning("GEMINI_API_KEY missing. Using fallback submission grader.")
-            return self._build_fallback_grading_result(assignment_title)
-
         try:
-            response = self.client.models.generate_content(
-                model=self.model_name,
-                contents=prompt,
-                config=types.GenerateContentConfig(
-                    temperature=0.3,
-                    response_mime_type="application/json",
-                ),
-            )
-            return json.loads(response.text or "{}")
+            response = await self.llm.ainvoke([HumanMessage(content=prompt)])
+            raw_text = response.content.strip()
+            cleaned_text = clean_llm_json(raw_text)
+            return json.loads(cleaned_text or "{}")
         except Exception as e:
-            logger.error(f"Gemini API call failed for TeacherAgent grading: {e}")
+            logger.error(f"LLM call failed for TeacherAgent grading: {e}")
             return self._build_fallback_grading_result(assignment_title)
 
     def _build_fallback_lesson_plan(self, topic: str, duration: int) -> dict[str, Any]:

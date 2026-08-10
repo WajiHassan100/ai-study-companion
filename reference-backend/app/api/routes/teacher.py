@@ -18,12 +18,12 @@ router = APIRouter(prefix="/ai/teacher", tags=["Agent #6: Teacher Assistant Agen
 
 
 @router.post("/lesson-plan", response_model=TeacherLessonPlanResponse, status_code=status.HTTP_200_OK)
-def draft_lesson_plan(req: TeacherLessonPlanRequest) -> TeacherLessonPlanResponse:
+async def draft_lesson_plan(req: TeacherLessonPlanRequest) -> TeacherLessonPlanResponse:
     """
     Drafts a pedagogically structured lesson plan for a given topic and grade level.
     """
     try:
-        res = teacher_agent.draft_lesson_plan(
+        res = await teacher_agent.draft_lesson_plan(
             course_id=req.course_id,
             topic=req.topic,
             target_grade=req.target_grade,
@@ -38,12 +38,12 @@ def draft_lesson_plan(req: TeacherLessonPlanRequest) -> TeacherLessonPlanRespons
 
 
 @router.post("/grade", response_model=TeacherGradeResponse, status_code=status.HTTP_200_OK)
-def grade_student_submission(req: TeacherGradeRequest) -> TeacherGradeResponse:
+async def grade_student_submission(req: TeacherGradeRequest) -> TeacherGradeResponse:
     """
     Evaluates a student assignment submission and generates score, feedback, and strengths.
     """
     try:
-        res = teacher_agent.grade_submission(
+        res = await teacher_agent.grade_submission(
             assignment_title=req.assignment_title,
             submission_text=req.submission_text,
             rubric=req.rubric,

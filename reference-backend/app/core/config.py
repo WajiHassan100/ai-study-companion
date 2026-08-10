@@ -2,6 +2,7 @@
 
 from functools import lru_cache
 
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -14,8 +15,9 @@ class Settings(BaseSettings):
     # Database
     database_url: str = "sqlite:///./school_assistant.db"
 
-    # Auth
-    jwt_secret_key: str = "change-me-in-production"
+    # Auth — no default: Pydantic will raise a clear ValidationError
+    # if JWT_SECRET_KEY is missing from .env, preventing silent insecurity.
+    jwt_secret_key: str
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60 * 24
 
@@ -28,10 +30,20 @@ class Settings(BaseSettings):
     llm_temperature: float = 0.7
     llm_max_tokens: int = 4096
 
-    openrouter_api_key: str | None = "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"
+    openrouter_api_key: str | None = None
     openai_api_key: str | None = None
     google_api_key: str | None = None
+    gemini_api_key: str | None = None
     anthropic_api_key: str | None = None
+
+    @model_validator(mode="after")
+    def _sync_google_gemini_key(self) -> "Settings":
+        """Allow either GEMINI_API_KEY or GOOGLE_API_KEY in .env — keep both in sync."""
+        if self.google_api_key and not self.gemini_api_key:
+            object.__setattr__(self, "gemini_api_key", self.google_api_key)
+        elif self.gemini_api_key and not self.google_api_key:
+            object.__setattr__(self, "google_api_key", self.gemini_api_key)
+        return self
 
 
 @lru_cache

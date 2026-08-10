@@ -71,12 +71,40 @@ function AuthPage() {
   async function handleSignIn(event: React.FormEvent) {
     event.preventDefault();
     setBusy(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setBusy(false);
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    
     if (error) {
+      if (error.message.includes("Invalid login credentials") || error.message.includes("invalid_credentials")) {
+        toast.info("Account not found. Creating your demo workspace account...");
+        const signUpRes = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/dashboard`,
+            data: { full_name: email.split("@")[0], role: role || "student" },
+          },
+        });
+        setBusy(false);
+        if (signUpRes.error) {
+          toast.error(signUpRes.error.message);
+          return;
+        }
+        if (signUpRes.data.session) {
+          toast.success("Account created and signed in!");
+          navigate({ to: target, replace: true });
+          return;
+        } else {
+          toast.success("Account created! Please check your email to confirm if required.");
+          setAwaitingConfirm(true);
+          return;
+        }
+      }
+      setBusy(false);
       toast.error(error.message);
       return;
     }
+
+    setBusy(false);
     navigate({ to: target, replace: true });
   }
 
@@ -87,7 +115,7 @@ function AuthPage() {
       email,
       password,
       options: {
-        emailRedirectTo: window.location.origin,
+        emailRedirectTo: `${window.location.origin}/dashboard`,
         data: { full_name: fullName, role },
       },
     });
@@ -106,16 +134,23 @@ function AuthPage() {
 
   async function handleGoogle() {
     setBusy(true);
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`,
+        },
+      });
+
+      if (error) {
+        setBusy(false);
+        toast.error(`Google Sign-In Error: ${error.message}. Please enable Google provider in your Supabase Dashboard under Authentication -> Providers.`);
+        return;
+      }
+    } catch (err: any) {
       setBusy(false);
-      toast.error("Google sign-in failed. Please try again.");
-      return;
+      toast.error(err.message || "Google sign-in is not enabled for this project.");
     }
-    if (result.redirected) return;
-    navigate({ to: target, replace: true });
   }
 
   return (

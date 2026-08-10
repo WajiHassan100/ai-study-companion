@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useAuth } from "@/hooks/useAuth";
 import {
   BookOpen,
   GraduationCap,
@@ -144,8 +145,16 @@ const agentFeatures = [
 ];
 
 function Index() {
+  const { isAuthenticated, loading } = useAuth();
+  const navigate = useNavigate();
   const [activeRole, setActiveRole] = useState<RoleType>("Students");
   const [activePromptIdx, setActivePromptIdx] = useState(0);
+
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      navigate({ to: "/dashboard/student", replace: true });
+    }
+  }, [loading, isAuthenticated, navigate]);
 
   const roleInfo = roleContentMap[activeRole];
   const activePrompt = heroPrompts[activePromptIdx];

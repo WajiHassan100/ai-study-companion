@@ -16,6 +16,7 @@ from sqlalchemy.orm import Session as DBSession
 from app.ai.services.llm_service import get_llm
 from app.ai.prompts.quiz_prompt import get_quiz_prompt_template
 from app.models.models import StudentProfile, Quiz, QuizAttempt
+from app.ai.utils import clean_llm_json, robust_parse_json
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +40,7 @@ class QuizAgent:
     ) -> dict[str, Any]:
         """
         Generates an adaptive quiz or flashcard set tailored to student weak concepts.
+        Uses mastery scores, recent quiz history, and spaced repetition data for difficulty adaptation.
         """
         # Query StudentProfile for weak topics & level
         profile = db.query(StudentProfile).filter_by(student_id=student_id).first()
@@ -53,6 +55,64 @@ class QuizAgent:
         if not topic:
             topic = weaknesses[0] if weaknesses else "General Science & Math"
 
+        # ── ADAPTIVE DIFFICULTY DATA ──────────────────────────────────────
+        # 1. Get topic mastery score
+        topic_mastery_percent = 50.0
+        try:
+            mastery_data = json.loads(profile.topic_mastery_json) if profile else {}
+            topic_mastery_percent = float(mastery_data.get(topic, 50.0))
+        except Exception:
+            pass
+
+        # 2. Get recent quiz scores for this topic
+        recent_scores_str = "No previous attempts"
+        try:
+            recent_attempts = (
+                db.query(QuizAttempt)
+                .join(Quiz, QuizAttempt.quiz_id == Quiz.id)
+                .filter(QuizAttempt.student_id == student_id)
+                .filter(Quiz.topic == topic)
+                .order_by(QuizAttempt.completed_at.desc())
+                .limit(3)
+                .all()
+            )
+            if recent_attempts:
+                scores = [f"{a.score_percentage:.0f}%" for a in reversed(recent_attempts)]
+                recent_scores_str = ", ".join(scores)
+        except Exception:
+            pass
+
+        # 3. Extract commonly wrong question types from past feedback
+        weak_question_types_str = "None identified"
+        try:
+            all_recent = (
+                db.query(QuizAttempt)
+                .filter(QuizAttempt.student_id == student_id)
+                .order_by(QuizAttempt.completed_at.desc())
+                .limit(5)
+                .all()
+            )
+            wrong_concepts = []
+            for attempt in all_recent:
+                feedback = json.loads(attempt.feedback_json or "{}")
+                for _qid, fb in feedback.items():
+                    if not fb.get("is_correct", True):
+                        concept = fb.get("target_concept", "")
+                        if concept and concept not in wrong_concepts:
+                            wrong_concepts.append(concept)
+            if wrong_concepts:
+                weak_question_types_str = ", ".join(wrong_concepts[:5])
+        except Exception:
+            pass
+
+        # 4. Get spaced repetition context
+        spaced_repetition_context = "No spaced repetition data available."
+        try:
+            from app.ai.services.spaced_repetition import spaced_repetition_service
+            spaced_repetition_context = spaced_repetition_service.get_review_summary_for_prompt(db, student_id)
+        except Exception:
+            pass
+
         prompt_value = self.prompt.format_prompt(
             student_id=student_id,
             topic=topic,
@@ -60,58 +120,51 @@ class QuizAgent:
             weaknesses=", ".join(weaknesses) if weaknesses else "None",
             num_questions=num_questions,
             mode=mode,
+            topic_mastery_percent=f"{topic_mastery_percent:.0f}",
+            recent_scores=recent_scores_str,
+            weak_question_types=weak_question_types_str,
+            spaced_repetition_context=spaced_repetition_context,
         )
 
         logger.info("Invoking Quiz Agent for student_id=%s topic='%s' mode=%s", student_id, topic, mode)
 
         response_msg = await self.llm.ainvoke(prompt_value.to_messages())
         raw_text = response_msg.content.strip()
-
-        if raw_text.startswith("```json"):
-            raw_text = raw_text[7:]
-        if raw_text.startswith("```"):
-            raw_text = raw_text[3:]
-        if raw_text.endswith("```"):
-            raw_text = raw_text[:-3]
-        raw_text = raw_text.strip()
-
-        try:
-            parsed = json.loads(raw_text)
-        except Exception as e:
-            logger.warning("Failed to parse Quiz JSON output: %s. Using fallback quiz.", e)
-            parsed = {
-                "title": f"{topic} Mastery Quiz",
-                "topic": topic,
-                "difficulty": student_level,
-                "questions": [
-                    {
-                        "id": "q1",
-                        "question": f"What is the primary function or definition of {topic}?",
-                        "options": {
-                            "A": f"It is a fundamental process in {topic}.",
-                            "B": "It is an unrelated chemical reaction.",
-                            "C": "It is a historical timeline event.",
-                            "D": "None of the above.",
-                        },
-                        "correct_option": "A",
-                        "explanation": f"Option A accurately describes {topic}.",
-                        "target_concept": topic,
+        fallback_quiz = {
+            "title": f"{topic} Mastery Quiz",
+            "topic": topic,
+            "difficulty": student_level,
+            "questions": [
+                {
+                    "id": "q1",
+                    "question": f"What is the primary function or definition of {topic}?",
+                    "options": {
+                        "A": f"It is a fundamental process in {topic}.",
+                        "B": "It is an unrelated chemical reaction.",
+                        "C": "It is a historical timeline event.",
+                        "D": "None of the above.",
                     },
-                    {
-                        "id": "q2",
-                        "question": f"Which component is essential for {topic} to occur effectively?",
-                        "options": {
-                            "A": "Optimal energy input & conditions",
-                            "B": "Absolute zero temperature",
-                            "C": "Zero molecular activity",
-                            "D": "Vacuum state",
-                        },
-                        "correct_option": "A",
-                        "explanation": "Optimal energy and conditions are required for biological and physical processes.",
-                        "target_concept": topic,
+                    "correct_option": "A",
+                    "explanation": f"Option A accurately describes {topic}.",
+                    "target_concept": topic,
+                },
+                {
+                    "id": "q2",
+                    "question": f"Which component is essential for {topic} to occur effectively?",
+                    "options": {
+                        "A": "Optimal energy input & conditions",
+                        "B": "Absolute zero temperature",
+                        "C": "Zero molecular activity",
+                        "D": "Vacuum state",
                     },
-                ],
-            }
+                    "correct_option": "A",
+                    "explanation": "Optimal energy and conditions are required for biological and physical processes.",
+                    "target_concept": topic,
+                },
+            ],
+        }
+
+        parsed = robust_parse_json(raw_text, llm=self.llm, fallback=fallback_quiz)
 
         title = parsed.get("title", f"{topic} Practice Quiz")
         questions = parsed.get("questions", [])
@@ -250,6 +303,15 @@ class QuizAgent:
             feedback_json=json.dumps(question_feedback),
         )
         db.add(attempt)
+
+        # Update spaced repetition status if applicable
+        try:
+            from app.ai.services.spaced_repetition import spaced_repetition_service
+            quality = spaced_repetition_service.score_to_quality(score_percentage)
+            spaced_repetition_service.record_review(db, student_id, topic, quality)
+        except Exception as e:
+            logger.warning("Failed to update spaced repetition review: %s", e)
+
         db.commit()
         db.refresh(attempt)
 

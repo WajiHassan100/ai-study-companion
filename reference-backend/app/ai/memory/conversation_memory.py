@@ -62,3 +62,63 @@ class DBChatMessageHistory(BaseChatMessageHistory):
     def clear(self) -> None:
         self.db.query(AIChatMessage).filter_by(session_id=self.session_id).delete()
         self.db.commit()
+
+    async def summarize_if_needed(self, llm, max_messages: int = 20) -> None:
+        """
+        If conversation history exceeds max_messages, summarize older messages
+        to save context window tokens while retaining key learning context.
+
+        Args:
+            llm: LangChain LLM instance for generating summaries.
+            max_messages: Threshold before summarization triggers.
+        """
+        all_msgs = self.messages
+        if len(all_msgs) <= max_messages:
+            return
+
+        # Keep last 6 messages intact for immediate context
+        older_msgs = all_msgs[:-6]
+        recent_msgs = all_msgs[-6:]
+
+        # Build summary from older messages
+        conversation_text = "\n".join(
+            f"{'Student' if isinstance(m, HumanMessage) else 'AI'}: {m.content[:200]}"
+            for m in older_msgs
+        )
+
+        summary_prompt = (
+            "Summarize this tutoring conversation concisely. "
+            "Focus on: topics covered, student's understanding level, key concepts explained, "
+            "unresolved questions, and any areas where the student struggled.\n\n"
+            f"Conversation:\n{conversation_text}"
+        )
+
+        try:
+            summary_response = await llm.ainvoke([HumanMessage(content=summary_prompt)])
+            summary_text = summary_response.content.strip()
+
+            # Delete ALL messages for this session
+            self.db.query(AIChatMessage).filter_by(session_id=self.session_id).delete()
+            self.db.commit()
+
+            # Insert summary as first message
+            self.add_message(AIMessage(
+                content=f"[Previous Session Summary: {summary_text}]"
+            ))
+
+            # Re-add recent messages
+            for msg in recent_msgs:
+                self.add_message(msg)
+
+            import logging
+            logging.getLogger(__name__).info(
+                "Summarized %d older messages into 1 summary for session %s",
+                len(older_msgs), self.session_id,
+            )
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).warning(
+                "Conversation summarization failed for session %s: %s",
+                self.session_id, e,
+            )
+

@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
+
 export function TeacherAssistantCard() {
   // Lesson Plan State
   const [topic, setTopic] = useState("Photosynthesis & Light Reactions");
@@ -34,7 +36,7 @@ export function TeacherAssistantCard() {
     if (!topic.trim()) return;
     setLoadingPlan(true);
     try {
-      const res = await fetch("http://localhost:8000/api/v1/ai/teacher/lesson-plan", {
+      const res = await fetch(`${API_BASE_URL}/ai/teacher/lesson-plan`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ course_id: "biol_101", topic, duration_minutes: duration }),
@@ -54,7 +56,7 @@ export function TeacherAssistantCard() {
     if (!submissionText.trim()) return;
     setLoadingGrade(true);
     try {
-      const res = await fetch("http://localhost:8000/api/v1/ai/teacher/grade", {
+      const res = await fetch(`${API_BASE_URL}/ai/teacher/grade`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ assignment_title: assignmentTitle, submission_text: submissionText }),
@@ -75,7 +77,7 @@ export function TeacherAssistantCard() {
     if (!quizTopic.trim()) return;
     setLoadingQuiz(true);
     try {
-      const res = await fetch("http://localhost:8000/api/v1/ai/quiz/generate", {
+      const res = await fetch(`${API_BASE_URL}/ai/quiz/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ topic: quizTopic, num_questions: quizNumQuestions, difficulty: "intermediate" }),
