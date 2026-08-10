@@ -13,6 +13,7 @@ import { LearningCoachCard } from "@/components/DashboardCards/LearningCoachCard
 import { ProgressChart } from "@/components/Charts/ProgressChart";
 import { DataTable, type Column } from "@/components/Tables/DataTable";
 import { Badge } from "@/components/ui/badge";
+import { ComponentErrorBoundary } from "@/components/common/ComponentErrorBoundary";
 
 export const Route = createFileRoute("/_authenticated/dashboard/student")({
   head: () => ({
@@ -146,7 +147,7 @@ function StudentDashboard() {
               key={c.id}
               to="/courses/$courseId"
               params={{ courseId: c.id }}
-              className="p-5 rounded-2xl border border-border/80 bg-card hover:bg-emerald-50/40 hover:border-emerald-300 transition-all shadow-xs space-y-3 block group"
+              className="group p-5 rounded-2xl border border-border/80 bg-card hover:border-emerald-600/50 hover:shadow-md transition-all space-y-3 block cursor-pointer"
             >
               <div className="flex items-center justify-between">
                 <Badge className="bg-emerald-700 text-white font-bold text-xs">{c.code}</Badge>
@@ -169,56 +170,78 @@ function StudentDashboard() {
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
-          <LearningCoachCard
-            studentId={user?.id || "demo_student"}
-            onAskTutor={(query) => setSelectedQuery(query)}
-            onRebalancePlan={handleProfileUpdated}
-          />
-          <WeaknessTrackerCard
-            key={`weakness_${refreshKey}`}
-            studentId={user?.id || "demo_student"}
-            onAskTutor={(query) => setSelectedQuery(query)}
-          />
-          <QuizGeneratorCard
-            studentId={user?.id || "demo_student"}
-            onProfileUpdated={handleProfileUpdated}
-          />
-          <ExamGeneratorCard
-            studentId={user?.id || "demo_student"}
-            onAskTutor={(query) => setSelectedQuery(query)}
-          />
-          <AssignmentFeedbackCard
-            studentId={user?.id || "demo_student"}
-            onAskTutor={(query) => setSelectedQuery(query)}
-          />
-          <StudyPlannerCard
-            key={`planner_${refreshKey}`}
-            studentId={user?.id || "demo_student"}
-            onAskTutor={(query) => setSelectedQuery(query)}
-          />
-          <ProgressChart
-            title="Weekly AI Study Progress"
-            description="Completed study blocks & AI Tutor practice sessions across active courses."
-            data={[
-              { label: "Mon", value: 4 },
-              { label: "Tue", value: 6 },
-              { label: "Wed", value: 5 },
-              { label: "Thu", value: 8 },
-              { label: "Fri", value: 7 },
-              { label: "Sat", value: 9 },
-              { label: "Sun", value: 6 },
-            ]}
-            seriesLabel="Tasks & Quizzes Completed"
-          />
+          <ComponentErrorBoundary fallbackTitle="Academic Mentor & Consistency Coach">
+            <LearningCoachCard
+              studentId={user?.id || "demo_student"}
+              onAskTutor={(query) => setSelectedQuery(query)}
+              onRebalancePlan={handleProfileUpdated}
+            />
+          </ComponentErrorBoundary>
+          
+          <ComponentErrorBoundary fallbackTitle="Mastery & Skill Diagnostics">
+            <WeaknessTrackerCard
+              key={`weakness_${refreshKey}`}
+              studentId={user?.id || "demo_student"}
+              onAskTutor={(query) => setSelectedQuery(query)}
+            />
+          </ComponentErrorBoundary>
+          
+          <ComponentErrorBoundary fallbackTitle="Adaptive Practice Quizzes & Flashcards">
+            <QuizGeneratorCard
+              studentId={user?.id || "demo_student"}
+              onProfileUpdated={handleProfileUpdated}
+            />
+          </ComponentErrorBoundary>
+          
+          <ComponentErrorBoundary fallbackTitle="Practice Exam Simulator">
+            <ExamGeneratorCard
+              studentId={user?.id || "demo_student"}
+              onAskTutor={(query) => setSelectedQuery(query)}
+            />
+          </ComponentErrorBoundary>
+          
+          <ComponentErrorBoundary fallbackTitle="Assignment Homework Coach">
+            <AssignmentFeedbackCard
+              studentId={user?.id || "demo_student"}
+              onAskTutor={(query) => setSelectedQuery(query)}
+            />
+          </ComponentErrorBoundary>
+          
+          <ComponentErrorBoundary fallbackTitle="7-Day Revision Planner">
+            <StudyPlannerCard
+              key={`planner_${refreshKey}`}
+              studentId={user?.id || "demo_student"}
+              onAskTutor={(query) => setSelectedQuery(query)}
+            />
+          </ComponentErrorBoundary>
+          
+          <ComponentErrorBoundary fallbackTitle="Weekly AI Study Progress">
+            <ProgressChart
+              title="Weekly AI Study Progress"
+              description="Completed study blocks & AI Tutor practice sessions across active courses."
+              data={[
+                { label: "Mon", value: 4 },
+                { label: "Tue", value: 6 },
+                { label: "Wed", value: 5 },
+                { label: "Thu", value: 8 },
+                { label: "Fri", value: 7 },
+                { label: "Sat", value: 9 },
+                { label: "Sun", value: 6 },
+              ]}
+              seriesLabel="Tasks & Quizzes Completed"
+            />
+          </ComponentErrorBoundary>
         </div>
 
-        <AiAssistantPanel
-          title="AI Study Assistant"
-          description="Ask concepts, request study plans, or get homework help anytime."
-          suggestions={["Explain photosynthesis simply", "Build a math revision plan", "Summarise key history notes"]}
-          studentId={user?.id || "demo_student"}
-          externalPrompt={selectedQuery}
-        />
+        <ComponentErrorBoundary fallbackTitle="AI Study Assistant">
+          <AiAssistantPanel
+            title="AI Study Assistant"
+            description="Ask concepts, request study plans, or get homework help anytime."
+            suggestions={["Explain photosynthesis simply", "Build a math revision plan", "Summarise key history notes"]}
+            studentId={user?.id || "demo_student"}
+            externalPrompt={selectedQuery}
+          />
+        </ComponentErrorBoundary>
       </div>
 
       <div className="space-y-3">
