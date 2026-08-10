@@ -3,6 +3,7 @@ import { FileCheck, Sparkles, RefreshCw, CheckCircle2, AlertCircle, Award, Brain
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { generatePracticeExam, evaluatePracticeExam, type PracticeExam, type ExamEvaluationResponse } from "@/lib/api/exam";
 
@@ -16,6 +17,7 @@ export function ExamGeneratorCard({ studentId, onAskTutor }: ExamGeneratorCardPr
   const [generating, setGenerating] = useState(false);
   const [evaluating, setEvaluating] = useState(false);
   const [difficulty, setDifficulty] = useState<"easy" | "medium" | "advanced">("medium");
+  const [course, setCourse] = useState("MATH 201");
   const [topic, setTopic] = useState("Gradient Vectors & Partial Derivatives");
   const [userAnswers, setUserAnswers] = useState<Record<string, string>>({});
   const [result, setResult] = useState<ExamEvaluationResponse | null>(null);
