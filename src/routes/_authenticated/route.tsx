@@ -7,9 +7,15 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
   beforeLoad: async ({ location }) => {
-    // If URL contains OAuth callback tokens, allow Supabase client to process them
+    // If URL contains OAuth callback tokens, give Supabase client time to parse & store the session
     if (typeof window !== "undefined" && (window.location.hash.includes("access_token") || window.location.search.includes("code="))) {
-      return;
+      let attempts = 0;
+      while (attempts < 10) {
+        const { data } = await supabase.auth.getSession();
+        if (data.session) return;
+        await new Promise((r) => setTimeout(r, 200));
+        attempts++;
+      }
     }
     const { data } = await supabase.auth.getSession();
     if (!data.session) {
