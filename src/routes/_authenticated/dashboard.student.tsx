@@ -15,6 +15,9 @@ import { DataTable, type Column } from "@/components/Tables/DataTable";
 import { Badge } from "@/components/ui/badge";
 import { ComponentErrorBoundary } from "@/components/common/ComponentErrorBoundary";
 
+import { AiDailyBriefing } from "@/components/DashboardCards/AiDailyBriefing";
+import { AiLearningIntelligence } from "@/components/DashboardCards/AiLearningIntelligence";
+
 export const Route = createFileRoute("/_authenticated/dashboard/student")({
   head: () => ({
     meta: [
@@ -67,23 +70,22 @@ function StudentDashboard() {
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
-      <div>
-        <h1 className="font-display text-3xl font-semibold tracking-tight">Welcome back, {name}</h1>
-        <p className="mt-1 text-muted-foreground">
-          Your personalized AI learning workspace. Tutoring, Diagnostics, Planner & Quizzes ready.
-        </p>
-      </div>
+      {/* ── 1. AI DAILY BRIEFING (Personalized Greeting, Streak, Issues, Recommended Actions) ── */}
+      <ComponentErrorBoundary fallbackTitle="AI Mentor Daily Briefing">
+        <AiDailyBriefing
+          userName={name}
+          onAskTutor={(query) => setSelectedQuery(query)}
+          onOpenPlanner={handleProfileUpdated}
+        />
+      </ComponentErrorBoundary>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Link to="/courses/$courseId" params={{ courseId: "biol_101" }} className="block hover:opacity-90 transition-opacity cursor-pointer">
-          <StatCard title="Enrolled courses" value="6" hint="Click to open course pages" icon={BookOpen} />
-        </Link>
-        <Link to="/assignments" className="block hover:opacity-90 transition-opacity cursor-pointer">
-          <StatCard title="Open assignments" value="4" hint="Click to view & grade coursework" icon={ClipboardList} />
-        </Link>
-        <StatCard title="Average grade" value="91%" hint="Current term mastery" icon={TrendingUp} />
-        <StatCard title="Next deadline" value="Tomorrow" hint="Photosynthesis Lab Due" icon={CalendarClock} />
-      </div>
+      {/* ── 2. AI LEARNING INTELLIGENCE (Consistency Score, Trend, Predictions, [Why?] Triggers) ── */}
+      <ComponentErrorBoundary fallbackTitle="AI Learning Intelligence">
+        <AiLearningIntelligence
+          studentId={user?.id || "demo_student"}
+          onAskTutor={(query) => setSelectedQuery(query)}
+        />
+      </ComponentErrorBoundary>
 
       {/* ── ENROLLED COURSES SECTION ── */}
       <div className="space-y-3">
