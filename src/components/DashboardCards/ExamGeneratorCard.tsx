@@ -165,7 +165,7 @@ export function ExamGeneratorCard({ studentId, onAskTutor }: ExamGeneratorCardPr
           </div>
         ) : exam?.questions && exam.questions.length > 0 ? (
           <div className="space-y-3">
-            {exam.questions.map((q, idx) => {
+            {exam.questions?.map((q, idx) => {
               const IconComp = typeIconMap[q.type] || HelpCircle;
               const feedback = result?.question_feedback?.[q.id];
 

@@ -133,7 +133,7 @@ export function AssignmentFeedbackCard({ studentId, onAskTutor }: AssignmentFeed
                 <span>1. Error Identification:</span>
               </div>
               <div className="space-y-1.5">
-                {feedback.error_identification.map((err, i) => (
+                {feedback.error_identification?.map((err, i) => (
                   <div key={i} className="p-2.5 rounded-lg bg-rose-50/80 dark:bg-rose-950/30 border border-rose-200 text-xs font-medium text-rose-900 dark:text-rose-200">
                     ⚠️ {err}
                   </div>
@@ -159,7 +159,7 @@ export function AssignmentFeedbackCard({ studentId, onAskTutor }: AssignmentFeed
                 <span>3. Actionable Suggestions for Improvement:</span>
               </div>
               <div className="space-y-1.5">
-                {feedback.suggestions_for_improvement.map((sug, i) => (
+                {feedback.suggestions_for_improvement?.map((sug, i) => (
                   <div key={i} className="p-2 rounded-lg bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200 text-xs text-foreground font-medium flex items-start gap-2">
                     <ArrowRight className="h-3.5 w-3.5 text-emerald-600 shrink-0 mt-0.5" />
                     <span>{sug}</span>
@@ -184,7 +184,7 @@ export function AssignmentFeedbackCard({ studentId, onAskTutor }: AssignmentFeed
                 <span>4. Recommended Learning Resources:</span>
               </div>
               <div className="flex flex-wrap gap-1.5">
-                {feedback.learning_resources.map((res, i) => (
+                {feedback.learning_resources?.map((res, i) => (
                   <Button
                     key={i}
                     size="sm"

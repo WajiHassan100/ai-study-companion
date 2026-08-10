@@ -157,7 +157,7 @@ export function StudyPlannerCard({ studentId, onAskTutor }: StudyPlannerProps) {
             </div>
           ) : activePlan?.schedule && activePlan.schedule.length > 0 ? (
             <div className="space-y-2">
-              {activePlan.schedule.map((block: StudyBlock, i: number) => {
+              {activePlan.schedule?.map((block: StudyBlock, i: number) => {
                 const isExpanded = expandedIndex === i;
                 return (
                   <div
@@ -251,7 +251,7 @@ export function StudyPlannerCard({ studentId, onAskTutor }: StudyPlannerProps) {
               Recommended Tasks for the Week
             </div>
             <div className="space-y-1.5">
-              {activePlan.action_items.map((item, idx) => {
+              {activePlan.action_items?.map((item, idx) => {
                 const isChecked = !!completedItems[idx];
                 return (
                   <button

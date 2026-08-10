@@ -110,7 +110,7 @@ export function LearningCoachCard({ studentId, onAskTutor, onRebalancePlan }: Le
                 <span>1. Weekly Progress Recommendations:</span>
               </div>
               <div className="space-y-1.5">
-                {coachData.performance_recommendations.map((rec, i) => (
+                {coachData.performance_recommendations?.map((rec, i) => (
                   <div key={i} className="p-2.5 rounded-lg bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200 text-xs font-medium text-emerald-950 dark:text-emerald-200 flex items-start gap-2">
                     <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0 mt-0.5" />
                     <span>{rec}</span>
@@ -126,7 +126,7 @@ export function LearningCoachCard({ studentId, onAskTutor, onRebalancePlan }: Le
                 <span>2. Detected Problems & Consistency Gaps:</span>
               </div>
               <div className="space-y-1.5">
-                {coachData.problem_detection.map((prob, i) => (
+                {coachData.problem_detection?.map((prob, i) => (
                   <div key={i} className="p-2.5 rounded-lg bg-rose-50/80 dark:bg-rose-950/30 border border-rose-200 text-xs font-medium text-rose-900 dark:text-rose-200 flex items-start gap-2">
                     <AlertTriangle className="h-3.5 w-3.5 text-rose-600 shrink-0 mt-0.5" />
                     <span>{prob}</span>
@@ -142,7 +142,7 @@ export function LearningCoachCard({ studentId, onAskTutor, onRebalancePlan }: Le
                 <span>3. Strategic Improvements & Study Rebalancing:</span>
               </div>
               <div className="space-y-1.5">
-                {coachData.strategic_improvements.map((imp, i) => (
+                {coachData.strategic_improvements?.map((imp, i) => (
                   <div key={i} className="p-2.5 rounded-lg bg-sky-50/70 dark:bg-sky-950/30 border border-sky-200 text-xs font-medium text-foreground flex items-start gap-2">
                     <ArrowUpRight className="h-3.5 w-3.5 text-sky-600 shrink-0 mt-0.5" />
                     <span>{imp}</span>

@@ -309,7 +309,7 @@ export function AiAssistantPanel({
                         <span>Official Page Citations:</span>
                       </div>
                       <div className="space-y-1.5">
-                        {msg.data.citations.map((c: any, i: number) => (
+                        {msg.data.citations?.map((c: any, i: number) => (
                           <div key={i} className="p-2.5 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/60 text-xs space-y-1">
                             <div className="font-bold text-emerald-900 dark:text-emerald-200 flex items-center justify-between gap-1">
                               <span className="truncate">{c.material_title}</span>
@@ -329,7 +329,7 @@ export function AiAssistantPanel({
                       <div className="font-semibold text-muted-foreground flex items-center gap-1">
                         <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" /> Worked Examples:
                       </div>
-                      {msg.data.examples.map((ex, idx) => (
+                      {msg.data.examples?.map((ex: string, idx: number) => (
                         <div key={idx} className="bg-accent/10 rounded-md p-2 text-xs text-foreground/90 font-mono">
                           {ex}
                         </div>
@@ -344,7 +344,7 @@ export function AiAssistantPanel({
                         <HelpCircle className="h-3.5 w-3.5 text-amber-500" /> Practice Questions:
                       </div>
                       <ul className="list-disc list-inside space-y-1 text-xs text-foreground/90 pl-1">
-                        {msg.data.practice_questions.map((q, idx) => (
+                        {msg.data.practice_questions?.map((q: string, idx: number) => (
                           <li key={idx}>{q}</li>
                         ))}
                       </ul>
