@@ -53,19 +53,19 @@ export function Navbar({ withSidebarTrigger = false }: { withSidebarTrigger?: bo
             <DropdownMenuContent align="start" className="w-64 p-2 space-y-1">
               <DropdownMenuItem asChild className="rounded-xl cursor-pointer">
                 <Link to="/dashboard/student" className="flex flex-col items-start gap-0.5">
-                  <span className="font-bold text-foreground text-xs">Agent #1: Socratic Tutor</span>
-                  <span className="text-[11px] text-muted-foreground">Adaptive hint scaling & LaTeX math</span>
+                  <span className="font-bold text-foreground text-xs">Personal Socratic Tutor</span>
+                  <span className="text-[11px] text-muted-foreground">Adaptive step-by-step math & concept guidance</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild className="rounded-xl cursor-pointer">
                 <Link to="/courses/$courseId" params={{ courseId: "biol_101" }} className="flex flex-col items-start gap-0.5">
-                  <span className="font-bold text-foreground text-xs">Agent #5: RAG PDF Studio</span>
-                  <span className="text-[11px] text-muted-foreground">Vector search & page-cited answers</span>
+                  <span className="font-bold text-foreground text-xs">Course Document Assistant</span>
+                  <span className="text-[11px] text-muted-foreground">Document search & page-cited answers</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild className="rounded-xl cursor-pointer">
                 <Link to="/assignments" className="flex flex-col items-start gap-0.5">
-                  <span className="font-bold text-foreground text-xs">Agent #6: Teacher Auto-Grader</span>
+                  <span className="font-bold text-foreground text-xs">Essay Evaluator & Auto-Grader</span>
                   <span className="text-[11px] text-muted-foreground">Rubric essay grading & feedback</span>
                 </Link>
               </DropdownMenuItem>

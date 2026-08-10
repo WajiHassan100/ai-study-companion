@@ -125,7 +125,7 @@ export function StudyPlannerCard({ studentId, onAskTutor }: StudyPlannerProps) {
           </div>
 
           <Badge variant="secondary" className="bg-accent/10 text-accent font-medium text-[11px]">
-            Weaknesses Synced from Agent #2 ✓
+            Weaknesses Synced from Skill Diagnostics ✓
           </Badge>
         </div>
 

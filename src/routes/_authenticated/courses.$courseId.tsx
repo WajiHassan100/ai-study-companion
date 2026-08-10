@@ -173,7 +173,7 @@ function CourseDetailPage() {
           <StatCard title="Course Modules" value={course.modules.length.toString()} hint="Active syllabus topics" icon={Layers} />
           <StatCard title="Course Materials" value={course.materials.length.toString()} hint="Textbooks & slides" icon={FileText} />
           <StatCard title="Enrolled Students" value={course.enrolled_count.toString()} hint="Active roster" icon={Users} />
-          <StatCard title="RAG AI Index Status" value="100% Grounded" hint="Indexed by Agent #5" icon={Sparkles} />
+          <StatCard title="Document Index Status" value="100% Grounded" hint="Indexed & ready" icon={Sparkles} />
         </div>
 
         {/* ── MAIN CONTENT TABS ── */}
@@ -186,7 +186,7 @@ function CourseDetailPage() {
               <FileText className="h-4 w-4 mr-2 text-emerald-600" /> Materials & PDFs ({course.materials.length})
             </TabsTrigger>
             <TabsTrigger value="knowledge" className="data-[state=active]:bg-background data-[state=active]:text-foreground font-semibold text-xs sm:text-sm rounded-lg px-4 py-2">
-              <Sparkles className="h-4 w-4 mr-2 text-amber-500" /> Course AI Assistant (Agent #5)
+              <Sparkles className="h-4 w-4 mr-2 text-amber-500" /> Course Document Assistant
             </TabsTrigger>
           </TabsList>
 
@@ -311,7 +311,7 @@ function CourseDetailPage() {
                   </div>
                   <div>
                     <CardTitle className="text-base font-bold font-display">
-                      Agent #5: Course RAG Knowledge Assistant
+                      Course Document Assistant
                     </CardTitle>
                     <CardDescription className="text-xs text-muted-foreground">
                       Ask any question — answers are 100% grounded in official course textbooks and slides with page citations
@@ -341,7 +341,7 @@ function CourseDetailPage() {
                     className="bg-emerald-800 hover:bg-emerald-900 text-white font-semibold text-xs px-5 rounded-xl"
                   >
                     {searching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4 mr-1.5" />}
-                    <span>{searching ? "Searching..." : "Ask Agent #5"}</span>
+                    <span>{searching ? "Searching..." : "Search Notes"}</span>
                   </Button>
                 </div>
 
@@ -372,7 +372,7 @@ function CourseDetailPage() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-                        <h4 className="font-bold text-sm text-foreground">Grounded Answer (Agent #5 RAG)</h4>
+                        <h4 className="font-bold text-sm text-foreground">Grounded Document Answer</h4>
                       </div>
                       <Badge variant="outline" className="bg-emerald-50 text-emerald-800 border-emerald-200 text-xs">
                         Confidence: {(searchResult.confidence_score * 100).toFixed(0)}%

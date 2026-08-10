@@ -70,8 +70,8 @@ function SystemOverview() {
               </div>
 
               <div className="rounded-2xl border border-primary/40 bg-primary/10 px-5 py-3 text-center shadow-xs">
-                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-primary">Central</p>
-                <p className="font-display text-base font-bold text-foreground">Orchestrator Agent</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-primary">Central System</p>
+                <p className="font-display text-base font-bold text-foreground">AI Intelligence Router</p>
                 <p className="mt-0.5 text-[11px] text-muted-foreground">Intent detection · routing · memory</p>
               </div>
 

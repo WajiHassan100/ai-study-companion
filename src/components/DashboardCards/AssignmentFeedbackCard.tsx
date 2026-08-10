@@ -45,7 +45,7 @@ export function AssignmentFeedbackCard({ studentId, onAskTutor }: AssignmentFeed
         <div>
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <MessageSquareText className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-            AI Assignment Feedback Agent (Agent #8)
+            Assignment Homework Coach
           </CardTitle>
           <CardDescription className="text-xs text-muted-foreground mt-0.5">
             Analyzes code & written work for 4-part feedback: Errors, Explanations, Suggestions & Learning Resources
@@ -60,7 +60,7 @@ export function AssignmentFeedbackCard({ studentId, onAskTutor }: AssignmentFeed
           disabled={analyzing || !submissionText.trim()}
         >
           {analyzing ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5 text-purple-600" />}
-          <span>{analyzing ? "Analyzing..." : "Analyze Submission"}</span>
+          <span>{analyzing ? "Analyzing..." : "Review Submission"}</span>
         </Button>
       </CardHeader>
 
@@ -111,7 +111,7 @@ export function AssignmentFeedbackCard({ studentId, onAskTutor }: AssignmentFeed
         {analyzing ? (
           <div className="py-8 text-center text-xs text-muted-foreground flex items-center justify-center gap-2">
             <RefreshCw className="h-4 w-4 animate-spin text-purple-600" />
-            <span>Agent #8 is evaluating code complexity, logical correctness & generating suggestions...</span>
+            <span>Evaluating submission for logical correctness & generating suggestions...</span>
           </div>
         ) : feedback ? (
           <div className="space-y-3 pt-1 border-t border-border/50">

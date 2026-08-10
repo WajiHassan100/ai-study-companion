@@ -58,7 +58,7 @@ function LearningProfile() {
       <SectionHeader
         eyebrow="You"
         title="Learning Profile"
-        description="Continuously rebuilt by the Profiler agent from your sessions, quizzes and submissions."
+        description="Continuously updated from your study sessions, quizzes, and practice submissions."
         action={
           <span className="grid h-11 w-11 place-items-center rounded-2xl bg-primary/10 text-primary">
             <UserCircle2 className="h-5 w-5" />
@@ -68,7 +68,7 @@ function LearningProfile() {
 
       <InsightCard icon={Sparkles} eyebrow="AI learning identity" title={`${name} — visual, intermediate learner`}>
         You retain concepts fastest through diagrams and worked examples, and your accuracy peaks in evening
-        sessions. Short, frequent revision beats long blocks for you — the Planner agent already schedules
+        sessions. Short, frequent revision beats long blocks for you — your personalized planner already schedules
         around that.
       </InsightCard>
 

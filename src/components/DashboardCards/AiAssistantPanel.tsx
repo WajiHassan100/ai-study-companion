@@ -8,8 +8,8 @@ import { orchestrateMessage, type OrchestratorResponse, type ChatMessage } from 
 import { uploadFileObjectToRAG, queryRAGDocument, executeRAGLearningAction, type RAGQueryResponse } from "@/lib/api/rag";
 
 export function AiAssistantPanel({
-  title = "AI Orchestrated Study Assistant",
-  description = "Central Orchestrator routes your requests across Tutor, RAG, Planner & Profiler agents.",
+  title = "Personal AI Study Assistant",
+  description = "Your interactive assistant for tutoring, document search, study schedules, and progress tracking.",
   suggestions = ["Explain thylakoid light reactions", "Create a 7-day study revision plan", "Check my biology mastery level"],
   studentId,
   studentLevel = "beginner",
@@ -269,7 +269,7 @@ export function AiAssistantPanel({
           {messages.length === 0 ? (
             <div className="rounded-xl border border-dashed border-border p-4 text-center text-xs text-muted-foreground bg-background/50 space-y-2">
               <Bot className="h-7 w-7 mx-auto text-emerald-600" />
-              <div>Ask me any question or click <strong className="text-emerald-700">📎 Attach Document</strong> to upload notes and chat with Agent #5!</div>
+              <div>Ask me any question or click <strong className="text-emerald-700">📎 Attach Document</strong> to upload notes and search your files!</div>
             </div>
           ) : (
             messages.map((msg) => (
@@ -373,7 +373,7 @@ export function AiAssistantPanel({
           {loading && (
             <div className="flex items-center gap-2 text-xs text-muted-foreground bg-background border border-border rounded-lg p-2.5 w-fit">
               <Loader2 className="h-4 w-4 animate-spin text-accent" />
-              <span>{attachedDoc ? "Agent #5 RAG is retrieving citations from document..." : "AI Tutor is thinking and structuring explanation..."}</span>
+              <span>{attachedDoc ? "Retrieving citations from document..." : "AI Tutor is thinking and structuring explanation..."}</span>
             </div>
           )}
 
@@ -445,7 +445,7 @@ export function AiAssistantPanel({
             </Button>
           </div>
           <p className="text-[11px] text-muted-foreground text-center sm:text-left">
-            {attachedDoc ? "📎 Active Document RAG Mode (Agent #5 Citations Enabled)" : "Connected to AI Tutor Agent & Agent #5 RAG via FastAPI."}
+            {attachedDoc ? "📎 Active Document Search Mode (Page Citations Enabled)" : "Connected to Personal AI Tutor & Course Document Search."}
           </p>
         </div>
       </CardContent>

@@ -109,10 +109,10 @@ export function QuizGeneratorCard({ studentId, onProfileUpdated }: QuizGenerator
             <Trophy className="h-8 w-8 mx-auto text-purple-500/60" />
             <p className="text-xs font-medium text-foreground">Ready to test your knowledge?</p>
             <p className="text-xs text-muted-foreground max-w-sm mx-auto">
-              Agent #4 will create a personalized quiz focusing on your weak concepts to boost your mastery score!
+              Generates a personalized practice quiz focusing on your target concepts to build topic mastery!
             </p>
             <Button size="sm" onClick={handleGenerate} className="mt-2 bg-purple-600 hover:bg-purple-700 text-white text-xs">
-              <Sparkles className="h-3.5 w-3.5 mr-1.5" /> Generate Quiz on Weak Topics
+              <Sparkles className="h-3.5 w-3.5 mr-1.5" /> Generate Practice Quiz
             </Button>
           </div>
         ) : null}
@@ -120,7 +120,7 @@ export function QuizGeneratorCard({ studentId, onProfileUpdated }: QuizGenerator
         {loading ? (
           <div className="py-10 text-center text-xs text-muted-foreground flex flex-col items-center justify-center gap-2">
             <RefreshCw className="h-5 w-5 animate-spin text-purple-500" />
-            <span>Agent #4 is building adaptive questions based on your profile weaknesses...</span>
+            <span>Building adaptive practice questions based on your learning profile...</span>
           </div>
         ) : null}
 

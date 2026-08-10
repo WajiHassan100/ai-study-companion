@@ -149,7 +149,7 @@ export function AssignmentsPage() {
         </div>
 
         <Badge variant="outline" className="text-xs py-1 px-3 border-emerald-600/30 text-emerald-700 bg-emerald-50 font-semibold gap-1.5">
-          <Sparkles className="h-3.5 w-3.5" /> Agent #6 Auto-Grader Ready
+          <Sparkles className="h-3.5 w-3.5" /> Essay Auto-Grader Ready
         </Badge>
       </div>
 
@@ -240,7 +240,7 @@ export function AssignmentsPage() {
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-xs text-emerald-800 flex items-center gap-1.5">
                       <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                      Assignment Graded by Agent #6 Teacher Assistant
+                      Assignment Evaluated by Educator Assistant
                     </span>
                     <Badge className="bg-emerald-700 text-white font-bold text-xs">
                       {activeAssignment.score} / {activeAssignment.maxScore} ({activeAssignment.grade})

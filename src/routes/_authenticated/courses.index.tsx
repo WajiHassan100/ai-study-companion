@@ -92,16 +92,16 @@ function CoursesCatalogPage() {
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-200 text-xs font-semibold py-1 px-3">
               <Sparkles className="h-3.5 w-3.5 text-amber-300" />
-              Agent #5 RAG Grounded
+              Document Search Active
             </span>
           </div>
 
           <h1 className="font-display text-3xl md:text-5xl font-extrabold tracking-tight leading-tight">
-            Enrolled Courses & Knowledge Bases
+            Enrolled Courses & Document Library
           </h1>
 
           <p className="max-w-3xl text-sm md:text-base text-emerald-100/90 leading-relaxed font-sans">
-            Access your course syllabi, lecture slides, uploaded textbooks, and interactive AI RAG assistants for all active courses.
+            Access your course syllabi, lecture slides, uploaded textbooks, and interactive AI study assistants for all active courses.
           </p>
 
           <div className="pt-4 flex flex-wrap items-center gap-6 border-t border-emerald-700/60 text-xs text-emerald-200">
@@ -124,9 +124,9 @@ function CoursesCatalogPage() {
       {/* ── STAT CARDS ROW ── */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard title="Active Courses" value={courses.length.toString()} hint="Enrolled in current term" icon={BookOpen} />
-        <StatCard title="Indexed Documents" value={totalIndexedDocs.toString()} hint="PDFs & Slides for RAG" icon={FileText} />
+        <StatCard title="Indexed Documents" value={totalIndexedDocs.toString()} hint="PDFs & Slides" icon={FileText} />
         <StatCard title="Total Modules" value={totalModules.toString()} hint="Structured syllabus topics" icon={Layers} />
-        <StatCard title="AI Knowledge Base" value="Agent #5 Ready" hint="Grounded citations active" icon={Sparkles} />
+        <StatCard title="Document Search" value="Search Ready" hint="Page citations active" icon={Sparkles} />
       </div>
 
       {/* ── SEARCH & FILTER CONTROLS ── */}

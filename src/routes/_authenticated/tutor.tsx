@@ -197,7 +197,7 @@ function TutorWorkspace() {
             Practice questions
           </CardTitle>
           <CardDescription className="text-[10px]">
-            Write answers to submit to the Profiler Agent for grading.
+            Write answers to submit to Skill Diagnostics for grading.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -332,8 +332,8 @@ function TutorWorkspace() {
   return (
     <div className="mx-auto max-w-7xl space-y-6">
       <SectionHeader
-        eyebrow="Agent #1"
-        title="Tutor Workspace"
+        eyebrow="AI Learning Suite"
+        title="Personal AI Socratic Tutor"
         description="Material, conversation and practice in one focused environment."
         action={
           <span className="grid h-11 w-11 place-items-center rounded-2xl bg-primary/10 text-primary">

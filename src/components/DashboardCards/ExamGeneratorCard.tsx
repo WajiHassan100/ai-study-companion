@@ -73,26 +73,45 @@ export function ExamGeneratorCard({ studentId, onAskTutor }: ExamGeneratorCardPr
         <div>
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <FileCheck className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-            AI Exam Generator Agent (Agent #7)
+            Practice Exam Simulator
           </CardTitle>
           <CardDescription className="text-xs text-muted-foreground mt-0.5">
             Generates 5 multi-format assessment questions (MCQs, Short, Long, Numerical, Conceptual)
           </CardDescription>
         </div>
-
-        <Button
-          variant="outline"
-          size="sm"
-          className="h-8 gap-1.5 text-xs font-semibold border-indigo-500/30 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950/40"
-          onClick={() => handleGenerate(difficulty)}
-          disabled={generating}
-        >
-          {generating ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5 text-indigo-600" />}
-          <span>{generating ? "Generating..." : "Generate AI Exam"}</span>
-        </Button>
       </CardHeader>
 
       <CardContent className="space-y-4 text-sm">
+        {/* Course & Topic Selection */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-muted-foreground">Course Subject:</label>
+            <Input
+              value={course}
+              onChange={(e) => setCourse(e.target.value)}
+              className="text-xs font-medium bg-background border-border/70"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-muted-foreground">Topic Focus:</label>
+            <Input
+              value={topic}
+              onChange={(e) => setTopic(e.target.value)}
+              className="text-xs font-medium bg-background border-border/70"
+            />
+          </div>
+        </div>
+
+        <Button
+          size="sm"
+          className="w-full text-xs font-bold gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white"
+          onClick={() => handleGenerate(difficulty)}
+          disabled={generating}
+        >
+          {generating ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+          {generating ? "Synthesizing Exam Paper..." : "Generate 5-Question Practice Exam"}
+        </Button>
+
         {/* Controls & Difficulty Level Selector */}
         <div className="p-2.5 rounded-xl bg-secondary/50 border border-border/50 flex flex-wrap items-center justify-between gap-2 text-xs">
           <div className="flex items-center gap-2">
@@ -142,7 +161,7 @@ export function ExamGeneratorCard({ studentId, onAskTutor }: ExamGeneratorCardPr
         {generating ? (
           <div className="py-8 text-center text-xs text-muted-foreground flex items-center justify-center gap-2">
             <RefreshCw className="h-4 w-4 animate-spin text-indigo-600" />
-            <span>Agent #7 is synthesizing MCQs, Numerical calculations & Conceptual questions from RAG...</span>
+            <span>Synthesizing MCQs, numerical calculations & conceptual questions from course notes...</span>
           </div>
         ) : exam?.questions && exam.questions.length > 0 ? (
           <div className="space-y-3">

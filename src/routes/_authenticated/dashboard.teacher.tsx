@@ -72,7 +72,7 @@ function TeacherDashboard() {
         <div className="space-y-2">
           <h2 className="font-display text-2xl font-bold text-foreground">Access Denied — Educator Authorization Required</h2>
           <p className="text-sm text-muted-foreground max-w-md mx-auto">
-            You are currently signed in with a <strong>Student Account</strong>. The Teacher Portal & Agent #6 Auto-Grader require an educator login.
+            You are currently signed in with a <strong>Student Account</strong>. The Teacher Portal requires an educator login.
           </p>
         </div>
         <Button asChild className="rounded-full bg-emerald-800 hover:bg-emerald-900 text-white font-bold px-8 py-2.5">
@@ -124,7 +124,7 @@ function TeacherDashboard() {
           className="h-8 text-xs bg-emerald-800 hover:bg-emerald-900 text-white font-semibold rounded-lg gap-1.5"
         >
           {gradingId === r.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
-          <span>Auto-Grade Agent #6</span>
+          <span>Auto-Grade Submission</span>
         </Button>
       ),
     },
@@ -135,7 +135,7 @@ function TeacherDashboard() {
       <div>
         <h1 className="font-display text-3xl font-bold tracking-tight">Good to see you, {name} 👋</h1>
         <p className="mt-1 text-muted-foreground text-sm">
-          Teaching workspace & Agent #6 Teacher Assistant active. Draft lesson plans & auto-grade submissions.
+          Teaching workspace active. Draft lesson plans & auto-grade submissions.
         </p>
       </div>
 
@@ -146,7 +146,7 @@ function TeacherDashboard() {
         <StatCard title="Next session" value="Tomorrow" hint="10:00 AM BIOL 101" icon={CalendarClock} />
       </div>
 
-      {/* Agent #6: Teacher Assistant Card Component */}
+      {/* Teacher Assistant Card Component */}
       <TeacherAssistantCard />
 
       {/* Pending Submissions Queue */}
@@ -166,7 +166,7 @@ function TeacherDashboard() {
       <Card className="border-border/80 shadow-xs rounded-2xl">
         <CardHeader className="pb-3">
           <CardTitle className="font-display text-lg font-bold flex items-center gap-2">
-            <AlertCircle className="h-5 w-5 text-red-500" /> Class Concept Weakness Matrix (Agent #2 Data)
+            <AlertCircle className="h-5 w-5 text-red-500" /> Class Concept Weakness Matrix
           </CardTitle>
           <CardDescription className="text-xs text-muted-foreground">
             Top concept areas where your enrolled students are struggling based on Socratic Q&A interactions

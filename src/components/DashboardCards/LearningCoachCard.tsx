@@ -60,7 +60,7 @@ export function LearningCoachCard({ studentId, onAskTutor, onRebalancePlan }: Le
         <div>
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <Compass className="h-5 w-5 text-sky-600 dark:text-sky-400 animate-pulse" />
-            AI Learning Coach Agent (Agent #9)
+            Academic Mentor & Consistency Coach
           </CardTitle>
           <CardDescription className="text-xs text-muted-foreground mt-0.5">
             Long-term AI mentor monitoring consistency, trends, missed sessions & strategic study plan rebalancing
@@ -80,29 +80,26 @@ export function LearningCoachCard({ studentId, onAskTutor, onRebalancePlan }: Le
       </CardHeader>
 
       <CardContent className="space-y-4 text-sm">
-        {/* Timeframe Controls & Consistency Score Bar */}
-        <div className="p-3 rounded-xl bg-secondary/50 border border-border/50 space-y-2 text-xs">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 font-semibold text-foreground">
-              <span>Study Consistency:</span>
-              <Badge className="bg-sky-600 text-white font-bold">{coachData?.consistency_score || 82}% Score</Badge>
-            </div>
-
-            {coachData?.missed_sessions_count ? (
-              <Badge variant="outline" className="bg-rose-500/10 text-rose-600 border-rose-500/20 font-bold flex items-center gap-1">
-                <AlertTriangle className="h-3 w-3 text-rose-600" />
-                <span>{coachData.missed_sessions_count} Missed Sessions</span>
-              </Badge>
-            ) : null}
+        {/* Metric Cards Banner */}
+        <div className="grid grid-cols-3 gap-2">
+          <div className="p-2.5 rounded-xl bg-background border border-border/60 text-center space-y-0.5">
+            <div className="text-[10px] uppercase font-bold text-muted-foreground">Consistency</div>
+            <div className="text-base font-bold text-sky-600">{coachData?.consistency_score || 85}%</div>
           </div>
-
-          <Progress value={coachData?.consistency_score || 82} className="h-2 bg-secondary" />
+          <div className="p-2.5 rounded-xl bg-background border border-border/60 text-center space-y-0.5">
+            <div className="text-[10px] uppercase font-bold text-muted-foreground">Streak</div>
+            <div className="text-base font-bold text-emerald-600">5 Days</div>
+          </div>
+          <div className="p-2.5 rounded-xl bg-background border border-border/60 text-center space-y-0.5">
+            <div className="text-[10px] uppercase font-bold text-muted-foreground">Risk Level</div>
+            <div className="text-base font-bold text-amber-600 capitalize">low</div>
+          </div>
         </div>
 
         {loading ? (
           <div className="py-8 text-center text-xs text-muted-foreground flex items-center justify-center gap-2">
             <RefreshCw className="h-4 w-4 animate-spin text-sky-600" />
-            <span>Agent #9 is analyzing performance trends, missed sessions & study balances...</span>
+            <span>Analyzing performance trends, missed sessions & study balances...</span>
           </div>
         ) : coachData ? (
           <div className="space-y-3">
@@ -168,7 +165,7 @@ export function LearningCoachCard({ studentId, onAskTutor, onRebalancePlan }: Le
                   className="bg-sky-600 hover:bg-sky-700 text-white font-semibold text-xs h-8 gap-1.5"
                 >
                   <Sliders className="h-3.5 w-3.5" />
-                  <span>Rebalance 5-Day Plan (Agent #3)</span>
+                  <span>Rebalance 7-Day Plan</span>
                 </Button>
 
                 {coachData.socratic_tutor_prompts?.slice(0, 1).map((prompt, idx) => (
