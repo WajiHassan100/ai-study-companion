@@ -7,8 +7,11 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
   beforeLoad: async ({ location }) => {
+    // Only perform client-side session checks in browser context
+    if (typeof window === "undefined") return;
+
     // If URL contains OAuth callback tokens, give Supabase client time to parse & store the session
-    if (typeof window !== "undefined" && (window.location.hash.includes("access_token") || window.location.search.includes("code="))) {
+    if (window.location.hash.includes("access_token") || window.location.search.includes("code=")) {
       let attempts = 0;
       while (attempts < 10) {
         const { data } = await supabase.auth.getSession();
@@ -19,7 +22,7 @@ export const Route = createFileRoute("/_authenticated")({
     }
     const { data } = await supabase.auth.getSession();
     if (!data.session) {
-      throw redirect({ to: "/auth", search: { redirect: location.href } });
+      throw redirect({ to: "/auth", search: { redirect: location.pathname } });
     }
   },
   component: AuthenticatedLayout,

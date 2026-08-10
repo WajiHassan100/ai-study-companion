@@ -76,7 +76,7 @@ function AgentWorkspace() {
           </span>
           <div className="min-w-0">
             <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
-              Agent #{agent.number} · {AGENT_CATEGORY_LABEL[agent.category]}
+              {AGENT_CATEGORY_LABEL[agent.category]} Module
             </p>
             <h1 className="truncate font-display text-xl font-bold tracking-tight sm:text-2xl">{agent.name}</h1>
             <p className="truncate text-sm text-muted-foreground">{agent.tagline}</p>
