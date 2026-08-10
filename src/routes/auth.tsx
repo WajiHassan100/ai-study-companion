@@ -68,6 +68,50 @@ function AuthPage() {
     }
   }, [loading, isAuthenticated, navigate, target]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const hasHash = window.location.hash.includes("access_token") || window.location.hash.includes("refresh_token");
+    const hasCode = window.location.search.includes("code=");
+
+    if (hasHash || hasCode) {
+      setBusy(true);
+      let isMounted = true;
+
+      const processOAuthReturn = async () => {
+        if (hasCode) {
+          const urlParams = new URLSearchParams(window.location.search);
+          const codeParam = urlParams.get("code");
+          if (codeParam) {
+            try {
+              await supabase.auth.exchangeCodeForSession(codeParam);
+            } catch (e) {
+              console.warn("OAuth code exchange notice:", e);
+            }
+          }
+        }
+
+        for (let i = 0; i < 15; i++) {
+          const { data } = await supabase.auth.getSession();
+          if (data.session && isMounted) {
+            toast.success("Successfully signed in with Google!");
+            navigate({ to: target || "/dashboard/student", replace: true });
+            return;
+          }
+          await new Promise((r) => setTimeout(r, 200));
+        }
+
+        if (isMounted) setBusy(false);
+      };
+
+      void processOAuthReturn();
+
+      return () => {
+        isMounted = false;
+      };
+    }
+  }, [navigate, target]);
+
   async function handleSignIn(event: React.FormEvent) {
     event.preventDefault();
     setBusy(true);

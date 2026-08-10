@@ -30,6 +30,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   async function loadUserData(userId: string, userObj?: User | null) {
+    const userMeta = userObj?.user_metadata;
+    const defaultProfile: Profile = {
+      id: userId,
+      full_name: userMeta?.full_name || userMeta?.name || userObj?.email?.split("@")[0] || "Student",
+      email: userObj?.email || null,
+    };
+
     try {
       const [profileRes, roleRes] = await Promise.all([
         supabase.from("profiles").select("id, full_name, email").eq("id", userId).maybeSingle(),
@@ -37,17 +44,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       ]);
 
       const fetchedProfile = profileRes.data as Profile | null;
-      const userMeta = userObj?.user_metadata;
-      
-      setProfile(
-        fetchedProfile ?? {
-          id: userId,
-          full_name: userMeta?.full_name || userMeta?.name || userObj?.email?.split("@")[0] || "Student",
-          email: userObj?.email || null,
-        }
-      );
+      setProfile(fetchedProfile ?? defaultProfile);
       setRole((roleRes.data?.role as AppRole | undefined) ?? "student");
     } catch (err) {
+      setProfile(defaultProfile);
       setRole("student");
     }
   }
