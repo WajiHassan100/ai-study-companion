@@ -17,6 +17,7 @@ import { ComponentErrorBoundary } from "@/components/common/ComponentErrorBounda
 
 import { AiDailyBriefing } from "@/components/DashboardCards/AiDailyBriefing";
 import { AiLearningIntelligence } from "@/components/DashboardCards/AiLearningIntelligence";
+import { AiAgentHub } from "@/components/DashboardCards/AiAgentHub";
 
 export const Route = createFileRoute("/_authenticated/dashboard/student")({
   head: () => ({
@@ -84,6 +85,15 @@ function StudentDashboard() {
         <AiLearningIntelligence
           studentId={user?.id || "demo_student"}
           onAskTutor={(query) => setSelectedQuery(query)}
+        />
+      </ComponentErrorBoundary>
+
+      {/* ── 3. DEDICATED AI AGENT HUB (Socratic Tutor, Learning Planner, Assessment & Diagnostics, Progress Analytics) ── */}
+      <ComponentErrorBoundary fallbackTitle="AI Agent Command Team">
+        <AiAgentHub
+          onAskTutor={(query) => setSelectedQuery(query)}
+          onOpenPlanner={handleProfileUpdated}
+          onOpenAssessment={handleProfileUpdated}
         />
       </ComponentErrorBoundary>
 
