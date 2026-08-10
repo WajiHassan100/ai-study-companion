@@ -103,7 +103,7 @@ function TutorWorkspace() {
         student_answer: answerText,
       });
       setEvalResult(res);
-      toast.success("Answer evaluated by Profiler Agent!");
+      toast.success("Answer evaluated by Skill Diagnostics!");
     } catch (err: any) {
       console.error(err);
       toast.error("Failed to evaluate answer. Make sure backend is running.");

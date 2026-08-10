@@ -37,14 +37,14 @@ const learnStudent: Item[] = [
 ];
 
 const aiItems: Item[] = [
-  { title: "Agents Hub", url: "/agents", icon: Bot },
-  { title: "Tutor Workspace", url: "/tutor", icon: Brain },
-  { title: "System Overview", url: "/system", icon: Network },
+  { title: "AI Learning Suite", url: "/agents", icon: Bot },
+  { title: "AI Tutor", url: "/tutor", icon: Brain },
+  { title: "System Architecture", url: "/system", icon: Network },
 ];
 
 const youItems: Item[] = [
   { title: "Learning Profile", url: "/profile", icon: UserCircle2 },
-  { title: "Mastery Map", url: "/mastery", icon: Waypoints },
+  { title: "Progress & Mastery", url: "/mastery", icon: Waypoints },
   { title: "Activity", url: "/activity", icon: History },
 ];
 

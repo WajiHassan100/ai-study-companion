@@ -43,10 +43,10 @@ export function WeaknessTrackerCard({ studentId, onAskTutor }: WeaknessTrackerPr
         <div>
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <Brain className="h-5 w-5 text-indigo-500" />
-            AI Assessment & Mastery Profiler
+            Mastery & Skill Diagnostics
           </CardTitle>
           <CardDescription className="text-xs text-muted-foreground mt-0.5">
-            Tracks topic mastery % and identifies weak concepts automatically
+            Tracks topic mastery percentage and identifies weak concepts automatically
           </CardDescription>
         </div>
         <Button
@@ -80,7 +80,7 @@ export function WeaknessTrackerCard({ studentId, onAskTutor }: WeaknessTrackerPr
         {/* Sub-Topic Granular Mastery Breakdown */}
         <div className="space-y-3">
           <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
-            <span>Granular Sub-Topic Mastery Breakdown</span>
+            <span>Sub-Topic Mastery Breakdown</span>
             <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
           </div>
 
@@ -113,12 +113,12 @@ export function WeaknessTrackerCard({ studentId, onAskTutor }: WeaknessTrackerPr
         <div className="pt-2 border-t border-border/50 space-y-2">
           <div className="text-xs font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
             <AlertCircle className="h-4 w-4" />
-            <span>Explainable Root Cause Analysis:</span>
+            <span>Learning Insight & Bottleneck Analysis:</span>
           </div>
 
           <div className="p-3 rounded-xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200/80 text-xs space-y-2">
             <div className="font-semibold text-amber-900 dark:text-amber-200 flex items-center justify-between">
-              <span>⚠️ Identified Foundational Bottleneck:</span>
+              <span>⚠️ Prerequisite Review Recommended:</span>
               <Badge className="bg-amber-600 text-white text-[10px]">Partial Derivatives</Badge>
             </div>
             <p className="text-foreground/90 leading-relaxed text-xs">
@@ -140,7 +140,7 @@ export function WeaknessTrackerCard({ studentId, onAskTutor }: WeaknessTrackerPr
         <div className="pt-2 border-t border-border/50 space-y-2">
           <div className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
             <Brain className="h-4 w-4" />
-            <span>Knowledge Dependency Mapping:</span>
+            <span>Prerequisite Skill Pathway:</span>
           </div>
 
           <div className="p-2.5 rounded-xl bg-secondary/60 border border-border/60 text-xs space-y-2">
@@ -160,7 +160,7 @@ export function WeaknessTrackerCard({ studentId, onAskTutor }: WeaknessTrackerPr
         <div className="pt-2 border-t border-border/50 space-y-2">
           <div className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
             <Sparkles className="h-3.5 w-3.5" />
-            <span>AI Personalization & Memory Context (Active):</span>
+            <span>Personalized Learning Profile (Active):</span>
           </div>
           <div className="p-2.5 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200/60 text-xs space-y-1.5">
             <div className="flex items-center justify-between text-[11px] font-medium text-indigo-900 dark:text-indigo-200">

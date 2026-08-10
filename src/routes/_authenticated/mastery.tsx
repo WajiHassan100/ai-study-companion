@@ -184,9 +184,9 @@ function MasteryMap() {
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <SectionHeader
-        eyebrow="You"
-        title="Mastery Map"
-        description="Every topic scored by the Profiler agent, drillable down to subtopic level."
+        eyebrow="Learning Diagnostics"
+        title="Progress & Mastery Diagnostics"
+        description="Real-time mastery tracking and topic scores across all your courses."
         action={
           <span className="grid h-11 w-11 place-items-center rounded-2xl bg-primary/10 text-primary">
             <Waypoints className="h-5 w-5" />

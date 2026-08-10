@@ -90,56 +90,56 @@ const heroPrompts = [
 const agentFeatures = [
   {
     id: "tutor",
-    badge: "Agent #1",
-    title: "Socratic AI Tutor",
+    badge: "Interactive Learning",
+    title: "Personal Socratic AI Tutor",
     icon: Bot,
-    description: "Personalized 1-on-1 tutoring with adaptive hint scaling, persistent vector memory, LaTeX formulas & Mermaid.js diagrams.",
-    highlights: ["Socratic hint scaling", "LaTeX Math (E=mc²)", "Automatic Mermaid flowcharts"],
+    description: "Step-by-step guidance tailored to your learning pace, using visual analogies, clear math notation, and interactive hints.",
+    highlights: ["Guided step-by-step hints", "Mathematical formulas", "Visual concept flowcharts"],
     color: "from-emerald-500/20 to-teal-500/10 border-emerald-500/30 text-emerald-700",
   },
   {
     id: "profiler",
-    badge: "Agent #2",
-    title: "Student Profiler & Evaluator",
+    badge: "Progress Diagnostics",
+    title: "Mastery & Skill Diagnostic Studio",
     icon: Brain,
-    description: "Tracks student concept weaknesses, overall mastery scores (0–100%), and tailors explanations to beginner or advanced levels.",
-    highlights: ["Weakness tracking radar", "Adaptive level adjustment", "Mastery scoring engine"],
+    description: "Tracks your learning progress across topics, pinpoints foundational concept gaps, and tailors explanations to your level.",
+    highlights: ["Real-time mastery tracking", "Prerequisite skill gaps", "Adaptive level tuning"],
     color: "from-blue-500/20 to-indigo-500/10 border-blue-500/30 text-blue-700",
   },
   {
     id: "planner",
-    badge: "Agent #3",
+    badge: "Personalized Timetables",
     title: "7-Day Revision Planner",
     icon: Zap,
-    description: "Generates custom daily study timetables based on exam deadlines, complete with direct 'Watch Video Lesson' buttons.",
-    highlights: ["Spaced Repetition schedules", "YouTube Video Lesson integration", "Daily task checklist"],
+    description: "Builds custom daily revision schedules based on upcoming exam dates, complete with recommended video lessons.",
+    highlights: ["Smart review scheduling", "Curated video lesson links", "Daily progress checklist"],
     color: "from-amber-500/20 to-orange-500/10 border-amber-500/30 text-amber-700",
   },
   {
     id: "quiz",
-    badge: "Agent #4",
-    title: "Adaptive Quiz & Flashcards",
+    badge: "Practice & Recall",
+    title: "Adaptive Practice Quizzes & Flashcards",
     icon: Sparkles,
-    description: "Creates dynamic MCQ quizzes and active recall flashcards on any topic, providing instant answer grading & explanations.",
-    highlights: ["Instant MCQ grading", "Active recall flashcards", "Detailed explanation feedback"],
+    description: "Generates custom multiple-choice quizzes and active recall flashcards on any subject, with instant grading and explanations.",
+    highlights: ["Instant answer grading", "Active recall flashcards", "Detailed explanation feedback"],
     color: "from-purple-500/20 to-pink-500/10 border-purple-500/30 text-purple-700",
   },
   {
     id: "rag",
-    badge: "Agent #5",
-    title: "RAG Course Knowledge Studio",
+    badge: "Document Search Studio",
+    title: "Course Document Assistant",
     icon: Layers,
-    description: "Upload PDFs, Word DOCX & lecture notes. Uses Gemini text-embedding-004 + BM25 hybrid search for page-cited answers.",
-    highlights: ["PDF & DOCX file uploads", "768-Dim Dense Vector Search", "Page-cited document sources"],
+    description: "Upload textbook PDFs, lecture slides, and notes. Ask questions and receive exact, page-cited answers from your course materials.",
+    highlights: ["PDF & slide document upload", "Exact page citations", "Instant lecture summaries"],
     color: "from-cyan-500/20 to-blue-500/10 border-cyan-500/30 text-cyan-700",
   },
   {
     id: "teacher",
-    badge: "Agent #6",
-    title: "Teacher Assistant & Auto-Grader",
+    badge: "Teacher Co-Pilot",
+    title: "Educator Assistant & Essay Evaluator",
     icon: GraduationCap,
-    description: "Empowers educators with automated lesson plan drafting, minute-by-minute timelines, and rubric-based essay grading.",
-    highlights: ["Minute-by-minute lesson plans", "Rubric essay auto-grading", "Constructive student feedback"],
+    description: "Empowers teachers with automated lesson plan drafting, structured timelines, and rubric-based homework evaluation.",
+    highlights: ["Structured lesson timelines", "Rubric essay grading", "Constructive feedback reports"],
     color: "from-rose-500/20 to-red-500/10 border-rose-500/30 text-rose-700",
   },
 ];
@@ -233,22 +233,22 @@ function Index() {
                     className="rounded-full bg-card hover:bg-secondary text-foreground font-semibold px-8 py-3.5 h-auto border-emerald-600/30 text-emerald-800 dark:text-emerald-400"
                   >
                     <Link to="/courses/$courseId" params={{ courseId: "biol_101" }} className="flex items-center gap-2">
-                      <Layers className="h-4 w-4 text-emerald-600" /> Open PDF RAG Studio
+                      <Layers className="h-4 w-4 text-emerald-600" /> Open Course Document Studio
                     </Link>
                   </Button>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-6 text-xs text-muted-foreground font-medium pt-4">
                   <span className="flex items-center gap-1.5 text-foreground font-semibold">
-                    <Star className="h-4 w-4 text-amber-500 fill-amber-500" /> 6 AI Agents Active
+                    <Star className="h-4 w-4 text-amber-500 fill-amber-500" /> Full AI Learning Suite
                   </span>
                   <span>•</span>
                   <span className="flex items-center gap-1.5">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-600" /> PostgreSQL & SQLite Live
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600" /> Real-Time Database Sync
                   </span>
                   <span>•</span>
                   <span className="flex items-center gap-1.5">
-                    <Award className="h-4 w-4 text-blue-600" /> Gemini 2.0 & text-embedding-004
+                    <Award className="h-4 w-4 text-blue-600" /> Advanced Reasoning & Search
                   </span>
                 </div>
               </div>
@@ -318,40 +318,40 @@ function Index() {
 
                   {/* Column 2 Track (Staggered) */}
                   <div className="space-y-3 pt-6">
-                    {/* Item 4: Agent #3 7-Day Revision Planner */}
+                    {/* Item 4: 7-Day Revision Planner */}
                     <div className="p-4 rounded-3xl bg-gradient-to-br from-purple-600 via-pink-600 to-purple-950 text-white space-y-3 shadow-md hover:scale-102 transition-transform">
                       <div className="h-10 w-10 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center font-bold text-xl">
                         ⚡
                       </div>
                       <div>
                         <span className="text-[10px] font-extrabold uppercase tracking-wider bg-black/30 px-2 py-0.5 rounded-md text-pink-200">
-                          Agent #3 Planner
+                          Study Planner
                         </span>
                         <h4 className="font-bold text-xs mt-1">7-Day Schedule & Video Lessons</h4>
                       </div>
                     </div>
 
-                    {/* Item 5: Agent #5 PDF RAG Studio */}
+                    {/* Item 5: Document Studio */}
                     <div className="p-4 rounded-3xl bg-gradient-to-br from-cyan-600 via-blue-600 to-cyan-950 text-white space-y-3 shadow-md hover:scale-102 transition-transform">
                       <div className="h-10 w-10 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center font-bold text-xl">
                         📄
                       </div>
                       <div>
                         <span className="text-[10px] font-extrabold uppercase tracking-wider bg-black/30 px-2 py-0.5 rounded-md text-cyan-200">
-                          Agent #5 RAG Studio
+                          Document Studio
                         </span>
                         <h4 className="font-bold text-xs mt-1">PDF & DOCX Page Citations</h4>
                       </div>
                     </div>
 
-                    {/* Item 6: Agent #6 Auto-Grader */}
+                    {/* Item 6: Teacher Assistant */}
                     <div className="p-4 rounded-3xl bg-gradient-to-br from-rose-600 via-red-600 to-rose-950 text-white space-y-3 shadow-md hover:scale-102 transition-transform">
                       <div className="h-10 w-10 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center font-bold text-xl">
                         📝
                       </div>
                       <div>
                         <span className="text-[10px] font-extrabold uppercase tracking-wider bg-black/30 px-2 py-0.5 rounded-md text-rose-200">
-                          Agent #6 Auto-Grader
+                          Essay Evaluator
                         </span>
                         <h4 className="font-bold text-xs mt-1">Rubric Essay Evaluation</h4>
                       </div>
@@ -364,7 +364,7 @@ function Index() {
                       </div>
                       <div>
                         <span className="text-[10px] font-extrabold uppercase tracking-wider bg-black/30 px-2 py-0.5 rounded-md text-pink-200">
-                          Agent #3 Planner
+                          Study Planner
                         </span>
                         <h4 className="font-bold text-xs mt-1">7-Day Schedule & Video Lessons</h4>
                       </div>
@@ -386,7 +386,7 @@ function Index() {
                   <span className="ml-2 text-xs font-bold text-foreground">Interactive AI Tutor Sandbox — Click a Subject to Try:</span>
                 </div>
                 <Badge variant="outline" className="text-[10px] uppercase font-bold border-emerald-500/40 text-emerald-700 bg-emerald-50">
-                  Live Agent #1 Demo
+                  Live Interactive Tutor
                 </Badge>
               </div>
 
@@ -423,7 +423,7 @@ function Index() {
                     <Bot className="h-4 w-4" />
                   </div>
                   <div className="p-4 rounded-xl bg-card border border-border/80 text-xs text-foreground leading-relaxed shadow-xs flex-1 space-y-2">
-                    <span className="font-bold text-emerald-700 block">Agent #1 Socratic Tutor:</span>
+                    <span className="font-bold text-emerald-700 block">Personal AI Tutor:</span>
                     <p>{activePrompt.response}</p>
                   </div>
                 </div>
@@ -444,13 +444,13 @@ function Index() {
         <section className="mx-auto max-w-7xl px-4 py-20 md:py-28 space-y-12">
           <div className="text-center max-w-3xl mx-auto space-y-3">
             <Badge variant="outline" className="text-xs uppercase font-bold text-emerald-700 border-emerald-300 bg-emerald-50">
-              Complete Multi-Agent Architecture
+              Complete Intelligent Education Platform
             </Badge>
             <h2 className="font-display text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl md:text-5xl">
-              Meet Your 6 Autonomous AI Study Agents
+              Explore Your Personal AI Learning Suite
             </h2>
             <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-              Each AI agent is purpose-built to automate a core dimension of learning, from Socratic concept explanations to hybrid vector RAG document queries.
+              Each tool is designed to support every step of your learning journey, from step-by-step tutoring to course document search.
             </p>
           </div>
 
@@ -493,11 +493,11 @@ function Index() {
 
       <footer className="border-t border-border/50 py-8 bg-card text-center text-xs text-muted-foreground font-medium">
         <div className="mx-auto max-w-6xl px-4 flex flex-wrap items-center justify-between gap-4">
-          <span>Personal AI School Assistant © 2026 • Powered by Gemini 2.0 & FastAPI</span>
+          <span>Personal AI School Assistant © 2026 • Intelligent Learning Platform</span>
           <div className="flex items-center gap-4">
             <Link to="/dashboard/student" className="hover:underline">Student Workspace</Link>
             <Link to="/assignments" className="hover:underline">Assignments Hub</Link>
-            <Link to="/courses/$courseId" params={{ courseId: "biol_101" }} className="hover:underline">RAG PDF Studio</Link>
+            <Link to="/courses/$courseId" params={{ courseId: "biol_101" }} className="hover:underline">Document Studio</Link>
           </div>
         </div>
       </footer>

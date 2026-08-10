@@ -69,7 +69,7 @@ function StudentDashboard() {
       <div>
         <h1 className="font-display text-3xl font-semibold tracking-tight">Welcome back, {name}</h1>
         <p className="mt-1 text-muted-foreground">
-          Your personalized AI study workspace. Tutor, Profiler, Planner & Quiz Agent active.
+          Your personalized AI learning workspace. Tutoring, Diagnostics, Planner & Quizzes ready.
         </p>
       </div>
 
@@ -87,8 +87,8 @@ function StudentDashboard() {
       {/* ── ENROLLED COURSES SECTION ── */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="font-display text-xl font-bold tracking-tight">Enrolled Courses & RAG Knowledge Bases</h2>
-          <span className="text-xs text-muted-foreground">Click any course to open syllabus, PDFs & Agent #5 Q&A</span>
+          <h2 className="font-display text-xl font-bold tracking-tight">Enrolled Courses & Document Library</h2>
+          <span className="text-xs text-muted-foreground">Click any course to view syllabus, notes, and ask document questions</span>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-3">
