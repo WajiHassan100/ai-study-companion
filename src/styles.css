@@ -7,15 +7,8 @@
 /*
  * Design system definition.
  *
- * The @theme inline block maps CSS custom properties to Tailwind utility
- * classes (e.g. --color-primary -> bg-primary, text-primary).
- *
- * The :root and .dark blocks define the actual color values using oklch.
- * All colors MUST use oklch format.
- *
- * To add a new semantic color:
- * 1. Add the variable to :root (light value) and .dark (dark value)
- * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ * Modern AI SaaS Theme (Linear / Raycast / Perplexity style)
+ * Clean high-contrast neutrals + vivid emerald & sky accents.
  */
 
 @theme inline {
@@ -65,74 +58,76 @@
 }
 
 :root {
-  --radius: 0.75rem;
-  --background: oklch(0.985 0.005 150);
-  --foreground: oklch(0.20 0.03 260);
-  --card: oklch(1.0 0 0);
-  --card-foreground: oklch(0.20 0.03 260);
-  --popover: oklch(1.0 0 0);
-  --popover-foreground: oklch(0.20 0.03 260);
-  --primary: oklch(0.48 0.16 155);
-  --primary-foreground: oklch(0.99 0.005 150);
-  --secondary: oklch(0.96 0.02 155);
-  --secondary-foreground: oklch(0.25 0.08 155);
-  --muted: oklch(0.96 0.015 150);
-  --muted-foreground: oklch(0.48 0.025 260);
-  --accent: oklch(0.52 0.17 155);
-  --accent-foreground: oklch(0.99 0.005 150);
-  --destructive: oklch(0.55 0.2 27);
-  --destructive-foreground: oklch(0.98 0.012 88);
-  --border: oklch(0.92 0.015 150);
-  --input: oklch(0.92 0.015 150);
-  --ring: oklch(0.48 0.16 155);
-  --chart-1: oklch(0.48 0.16 155);
-  --chart-2: oklch(0.72 0.15 75);
-  --chart-3: oklch(0.55 0.12 210);
-  --chart-4: oklch(0.65 0.14 140);
-  --chart-5: oklch(0.6 0.13 350);
-  --sidebar: oklch(0.975 0.01 150);
-  --sidebar-foreground: oklch(0.20 0.03 260);
-  --sidebar-primary: oklch(0.48 0.16 155);
-  --sidebar-primary-foreground: oklch(0.99 0.005 150);
-  --sidebar-accent: oklch(0.93 0.03 155);
-  --sidebar-accent-foreground: oklch(0.25 0.08 155);
-  --sidebar-border: oklch(0.91 0.015 150);
-  --sidebar-ring: oklch(0.48 0.16 155);
+  --radius: 0.875rem;
+  /* Crisp clean neutral light mode — pure crisp whites and deep graphite text */
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  --primary: #059669;
+  --primary-foreground: #ffffff;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #0f172a;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #059669;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #059669;
+  --chart-1: #059669;
+  --chart-2: #0284c7;
+  --chart-3: #8b5cf6;
+  --chart-4: #f59e0b;
+  --chart-5: #ec4899;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0f172a;
+  --sidebar-primary: #059669;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f1f5f9;
+  --sidebar-accent-foreground: #0f172a;
+  --sidebar-border: #e2e8f0;
+  --sidebar-ring: #059669;
 }
 
 .dark {
-  --background: oklch(0.14 0.025 155);
-  --foreground: oklch(0.96 0.01 150);
-  --card: oklch(0.18 0.03 155);
-  --card-foreground: oklch(0.96 0.01 150);
-  --popover: oklch(0.18 0.03 155);
-  --popover-foreground: oklch(0.96 0.01 150);
-  --primary: oklch(0.65 0.17 155);
-  --primary-foreground: oklch(0.12 0.03 155);
-  --secondary: oklch(0.24 0.035 155);
-  --secondary-foreground: oklch(0.96 0.01 150);
-  --muted: oklch(0.22 0.03 155);
-  --muted-foreground: oklch(0.70 0.02 150);
-  --accent: oklch(0.65 0.17 155);
-  --accent-foreground: oklch(0.12 0.03 155);
-  --destructive: oklch(0.65 0.19 25);
-  --destructive-foreground: oklch(0.98 0.01 88);
-  --border: oklch(0.28 0.03 155);
-  --input: oklch(0.28 0.03 155);
-  --ring: oklch(0.65 0.17 155);
-  --chart-1: oklch(0.65 0.17 155);
-  --chart-2: oklch(0.75 0.15 75);
-  --chart-3: oklch(0.65 0.12 210);
-  --chart-4: oklch(0.7 0.14 140);
-  --chart-5: oklch(0.75 0.13 350);
-  --sidebar: oklch(0.16 0.028 155);
-  --sidebar-foreground: oklch(0.96 0.01 150);
-  --sidebar-primary: oklch(0.65 0.17 155);
-  --sidebar-primary-foreground: oklch(0.12 0.03 155);
-  --sidebar-accent: oklch(0.24 0.035 155);
-  --sidebar-accent-foreground: oklch(0.96 0.01 150);
-  --sidebar-border: oklch(0.26 0.03 155);
-  --sidebar-ring: oklch(0.65 0.17 155);
+  /* Deep sleek Obsidian dark mode — high contrast, crisp dark zinc */
+  --background: #090a0f;
+  --foreground: #f8fafc;
+  --card: #11131a;
+  --card-foreground: #f8fafc;
+  --popover: #11131a;
+  --popover-foreground: #f8fafc;
+  --primary: #10b981;
+  --primary-foreground: #022c22;
+  --secondary: #1a1d27;
+  --secondary-foreground: #f8fafc;
+  --muted: #1a1d27;
+  --muted-foreground: #94a3b8;
+  --accent: #10b981;
+  --accent-foreground: #022c22;
+  --destructive: #f87171;
+  --destructive-foreground: #022c22;
+  --border: #222634;
+  --input: #222634;
+  --ring: #10b981;
+  --chart-1: #10b981;
+  --chart-2: #38bdf8;
+  --chart-3: #a78bfa;
+  --chart-4: #fbbf24;
+  --chart-5: #f472b6;
+  --sidebar: #0c0e14;
+  --sidebar-foreground: #f8fafc;
+  --sidebar-primary: #10b981;
+  --sidebar-primary-foreground: #022c22;
+  --sidebar-accent: #1a1d27;
+  --sidebar-accent-foreground: #f8fafc;
+  --sidebar-border: #1e2230;
+  --sidebar-ring: #10b981;
 }
 
 @layer base {
@@ -144,46 +139,42 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
+    letter-spacing: -0.01em;
   }
 
   h1,
   h2,
   h3,
-  h4 {
+  h4,
+  h5,
+  h6 {
     font-family: var(--font-display);
-    font-optical-sizing: auto;
+    letter-spacing: -0.025em;
   }
 }
 
-/* ── Infinite Slow Vertical Marquee Animations ── */
-@keyframes marqueeUp {
-  0% {
-    transform: translateY(0%);
-  }
-  100% {
-    transform: translateY(-50%);
-  }
+/* Glassmorphic card styling utilities */
+.glass-panel {
+  background: rgba(var(--color-card), 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border);
 }
 
-@keyframes marqueeDown {
-  0% {
-    transform: translateY(-50%);
-  }
-  100% {
-    transform: translateY(0%);
-  }
+/* Custom sleek scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
 
-.animate-marquee-up {
-  animation: marqueeUp 24s linear infinite;
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-.animate-marquee-down {
-  animation: marqueeDown 30s linear infinite;
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 9999px;
 }
 
-.animate-marquee-up:hover,
-.animate-marquee-down:hover {
-  animation-play-state: paused;
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted-foreground);
 }
-

@@ -11,7 +11,6 @@ import {
   ShieldCheck,
   Zap,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { AgentStatus } from "@/lib/api/analytics";
@@ -33,13 +32,11 @@ export function AiAgentHub({
     {
       id: "tutor",
       name: "AI Socratic Tutor",
-      role: "Concept Explanation & Q&A",
+      role: "Concept Guidance & Math Q&A",
       status: agentStatuses?.tutor?.status || "Online",
-      statusVariant: "emerald",
       icon: MessageSquare,
       iconBg: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
-      description: "Explains complex concepts, breaks down step-by-step math problems, and provides socratic guidance on demand.",
-      recentActivity: agentStatuses?.tutor?.last_activity || "Ready for Socratic Q&A sessions",
+      description: "Explains complex concepts, breaks down math derivations, and provides socratic guidance.",
       buttonText: "Chat with Tutor",
       buttonAction: () => onAskTutor?.("Can you explain a concept step-by-step with an example?"),
       secondaryLink: "/tutor",
@@ -47,28 +44,24 @@ export function AiAgentHub({
     {
       id: "planner",
       name: "Learning Planner",
-      role: "Schedule & Workload Rebalancer",
+      role: "7-Day Revision Schedules",
       status: agentStatuses?.planner?.status || "Active",
-      statusVariant: "sky",
       icon: Calendar,
       iconBg: "bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20",
-      description: "Creates personalized 7-day study schedules, balances daily revision blocks, and adjusts to your focus hours.",
-      recentActivity: agentStatuses?.planner?.last_activity || "Ready to build personalized revision plans",
-      buttonText: "Generate Study Plan",
+      description: "Creates personalized study timetables and balances daily revision blocks.",
+      buttonText: "Generate Plan",
       buttonAction: () => onOpenPlanner?.(),
       secondaryLink: "/profile",
     },
     {
       id: "assessment",
-      name: "Assessment & Diagnostics",
-      role: "Adaptive Quizzes & Exam Simulator",
+      name: "Assessment Agent",
+      role: "Adaptive Quizzes & Diagnostics",
       status: agentStatuses?.assessment?.status || "Online",
-      statusVariant: "purple",
       icon: FileCheck,
       iconBg: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20",
-      description: "Generates multi-format practice tests (MCQs, Numerical, Conceptual), grades homework, and pinpoints skill bottlenecks.",
-      recentActivity: agentStatuses?.assessment?.last_activity || "Ready to generate adaptive quizzes",
-      buttonText: "Create Practice Test",
+      description: "Generates multi-format practice tests and pinpoints foundational skill gaps.",
+      buttonText: "Practice Test",
       buttonAction: () => onOpenAssessment?.(),
       secondaryLink: "/mastery",
     },
@@ -77,144 +70,104 @@ export function AiAgentHub({
       name: "Progress Analytics",
       role: "Behavior & Risk Forecasting",
       status: agentStatuses?.analytics?.status || "Active",
-      statusVariant: "blue",
       icon: TrendingUp,
       iconBg: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
-      description: "Tracks consistency scores, monitors mastery growth trends, and forecasts exam readiness with AI risk models.",
-      recentActivity: agentStatuses?.analytics?.last_activity || "Monitoring active learning patterns",
-      buttonText: "View Learning Insights",
+      description: "Tracks consistency scores, mastery growth trends, and forecasts exam readiness.",
+      buttonText: "View Insights",
       buttonAction: () => onAskTutor?.("Show me a detailed breakdown of my learning progress and risk forecast"),
       secondaryLink: "/mastery",
     },
   ];
 
   return (
-    <Card className="border border-emerald-600/30 bg-card shadow-sm relative overflow-hidden">
-      {/* Background Accent Lines */}
-      <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
-        <Bot className="w-48 h-48 text-primary" />
+    <div className="rounded-3xl border border-border/80 bg-card p-5 sm:p-6 shadow-xs space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border/40">
+        <div className="space-y-0.5">
+          <div className="flex items-center gap-2">
+            <Badge className="bg-emerald-800 text-white font-bold text-[10px] gap-1 px-2.5">
+              <Bot className="h-3 w-3" />
+              <span>AI Command Team</span>
+            </Badge>
+            <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">4 Agents Operational</span>
+          </div>
+          <h3 className="font-display text-base font-bold text-foreground">Your Personal AI Assistants</h3>
+        </div>
+
+        <Link to="/system">
+          <Button variant="outline" size="sm" className="h-8 text-xs font-semibold gap-1 border-border">
+            <Zap className="h-3 w-3 text-amber-500" />
+            <span>Architecture Map →</span>
+          </Button>
+        </Link>
       </div>
 
-      <CardHeader className="pb-4 border-b border-border/40">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <Badge className="bg-emerald-800 text-white font-bold text-[11px] gap-1 px-2.5 py-0.5">
-                <Bot className="h-3.5 w-3.5" />
-                <span>AI Agent Command Team</span>
-              </Badge>
-              <Badge variant="outline" className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 border-emerald-500/30">
-                4 Agents Active
-              </Badge>
-            </div>
-            <CardTitle className="font-display text-xl font-bold tracking-tight text-foreground flex items-center gap-2 pt-0.5">
-              Your Personal AI Assistant Team
-            </CardTitle>
-            <CardDescription className="text-xs text-muted-foreground">
-              A dedicated team of specialized AI agents continuously analyzing, planning, tutoring, and assessing your education.
-            </CardDescription>
-          </div>
+      {/* 4 Agent Cards Grid */}
+      <div className="grid gap-3 sm:grid-cols-2">
+        {agents.map((agent) => {
+          const IconComp = agent.icon;
+          const isOnline = agent.status === "Online" || agent.status === "Active";
 
-          <Link to="/system">
-            <Button variant="outline" size="sm" className="text-xs font-semibold gap-1.5 border-border hover:bg-accent shrink-0">
-              <Zap className="h-3.5 w-3.5 text-amber-500" />
-              <span>View System Architecture →</span>
-            </Button>
-          </Link>
-        </div>
-      </CardHeader>
-
-      <CardContent className="pt-5 space-y-4">
-        {/* Banner Tagline */}
-        <div className="p-3 rounded-xl bg-secondary/40 border border-border/60 flex items-center justify-between text-xs">
-          <div className="flex items-center gap-2 text-foreground font-medium">
-            <ShieldCheck className="h-4 w-4 text-emerald-600 shrink-0" />
-            <span>"You have an autonomous team of AI assistants working for your academic success."</span>
-          </div>
-          <span className="text-[11px] text-muted-foreground font-semibold shrink-0 hidden md:inline">
-            🟢 Real-time Agent Synchronization
-          </span>
-        </div>
-
-        {/* 4 Agent Cards Grid */}
-        <div className="grid gap-4 sm:grid-cols-2">
-          {agents.map((agent) => {
-            const IconComp = agent.icon;
-            const isOnline = agent.status === "Online" || agent.status === "Active";
-
-            return (
-              <div
-                key={agent.id}
-                className="p-4 rounded-2xl border border-border/70 bg-card hover:border-emerald-600/40 hover:shadow-md transition-all flex flex-col justify-between space-y-3 group"
-              >
-                {/* Header: Icon, Name, Role & Status */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <div className={`p-2.5 rounded-xl border ${agent.iconBg}`}>
-                        <IconComp className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <h3 className="font-display font-bold text-sm text-foreground group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
-                          {agent.name}
-                        </h3>
-                        <span className="text-[11px] font-semibold text-muted-foreground">
-                          {agent.role}
-                        </span>
-                      </div>
+          return (
+            <div
+              key={agent.id}
+              className="p-4 rounded-2xl border border-border/80 bg-card hover:border-emerald-600/40 hover:shadow-xs transition-all flex flex-col justify-between space-y-3 group"
+            >
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className={`p-2 rounded-xl border ${agent.iconBg}`}>
+                      <IconComp className="h-4 w-4" />
                     </div>
-
-                    <Badge
-                      className={`text-[10px] font-bold gap-1 px-2 border ${
-                        isOnline
-                          ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
-                          : "bg-secondary text-muted-foreground border-border"
-                      }`}
-                    >
-                      {isOnline && <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />}
-                      {agent.status}
-                    </Badge>
+                    <div>
+                      <h4 className="font-display font-bold text-xs text-foreground group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
+                        {agent.name}
+                      </h4>
+                      <span className="text-[10px] font-semibold text-muted-foreground">{agent.role}</span>
+                    </div>
                   </div>
 
-                  <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
-                    {agent.description}
-                  </p>
+                  <Badge
+                    className={`text-[9px] font-bold gap-1 px-1.5 py-0 border ${
+                      isOnline
+                        ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
+                        : "bg-secondary text-muted-foreground border-border"
+                    }`}
+                  >
+                    {isOnline && <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />}
+                    {agent.status}
+                  </Badge>
                 </div>
 
-                {/* Footer: Recent Activity & Action Button */}
-                <div className="space-y-2.5 pt-2 border-t border-border/40">
-                  <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                    <Activity className="h-3 w-3 text-emerald-600 shrink-0" />
-                    <span className="truncate">{agent.recentActivity}</span>
-                  </div>
-
-                  <div className="flex items-center gap-2 pt-0.5">
-                    <Button
-                      size="sm"
-                      onClick={agent.buttonAction}
-                      className="flex-1 bg-emerald-800 hover:bg-emerald-900 text-white font-semibold text-xs h-8 gap-1.5 shadow-xs"
-                    >
-                      <Sparkles className="h-3.5 w-3.5" />
-                      <span>{agent.buttonText}</span>
-                    </Button>
-
-                    <Link to={agent.secondaryLink}>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="h-8 px-2.5 text-xs text-muted-foreground hover:text-foreground border-border"
-                        title={`Open ${agent.name} Workspace`}
-                      >
-                        <ArrowRight className="h-3.5 w-3.5" />
-                      </Button>
-                    </Link>
-                  </div>
-                </div>
+                <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2">
+                  {agent.description}
+                </p>
               </div>
-            );
-          })}
-        </div>
-      </CardContent>
-    </Card>
+
+              <div className="flex items-center gap-2 pt-2 border-t border-border/40">
+                <Button
+                  size="sm"
+                  onClick={agent.buttonAction}
+                  className="flex-1 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs h-7 gap-1 shadow-xs"
+                >
+                  <Sparkles className="h-3 w-3" />
+                  <span>{agent.buttonText}</span>
+                </Button>
+
+                <Link to={agent.secondaryLink}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 px-2 text-xs border-border"
+                    title={`Open ${agent.name}`}
+                  >
+                    <ArrowRight className="h-3 w-3" />
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 }

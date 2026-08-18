@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Sparkles, Flame, BookOpen, Target, ArrowRight, HelpCircle, CheckCircle2, Loader2 } from "lucide-react";
+import { Sparkles, Flame, BookOpen, Target, ArrowRight, HelpCircle, CheckCircle2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,6 @@ export function AiDailyBriefing({ userName, analytics, isLoading, onAskTutor, on
     setModalOpen(true);
   };
 
-  // Derive values from analytics (or fallback to zero/empty)
   const streakDays = analytics?.streak_days ?? 0;
   const streakSummary = analytics?.streak_summary ?? "Loading...";
   const weakTopics = analytics?.weak_topics ?? [];
@@ -77,62 +76,60 @@ export function AiDailyBriefing({ userName, analytics, isLoading, onAskTutor, on
     actionPrompt: actions[0]?.prompt || "Analyze my current study progress",
   };
 
-  // Skeleton shimmer component
   const Skeleton = ({ className = "" }: { className?: string }) => (
-    <div className={`animate-pulse bg-muted rounded-xl ${className}`} />
+    <div className={`animate-pulse bg-muted rounded-2xl ${className}`} />
   );
 
   return (
     <>
-      <Card className="border border-emerald-600/30 bg-linear-to-r from-emerald-950/10 via-background to-sky-950/10 dark:from-emerald-950/30 dark:via-card dark:to-sky-950/30 shadow-md relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-3xl border border-border/80 bg-card p-6 sm:p-7 shadow-xs">
+        {/* Subtle decorative glow */}
+        <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
 
-        <CardContent className="p-6 space-y-5 relative">
-          {/* Header & Personalized Greeting */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border/50 pb-4">
+        <div className="space-y-5 relative">
+          {/* Header & Greeting */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border/40">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <Badge className="bg-emerald-700 text-white font-bold text-[11px] gap-1 px-2.5 py-0.5">
+                <Badge className="bg-emerald-800 text-white font-bold text-[10px] gap-1 px-2.5 py-0.5">
                   <Sparkles className="h-3 w-3" />
-                  <span>AI Mentor Daily Briefing</span>
+                  <span>AI Daily Briefing</span>
                 </Badge>
                 <span className="text-xs text-muted-foreground font-medium">
                   {new Date().toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" })}
                 </span>
               </div>
-              <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-foreground">
+              <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
                 {greetingTime}, {userName} 👋
               </h1>
-              <p className="text-xs md:text-sm text-muted-foreground">
+              <p className="text-xs sm:text-sm text-muted-foreground font-medium">
                 {isLoading
-                  ? "Your AI Mentor is analyzing your learning activity..."
-                  : "Your AI Mentor analyzed your learning activity across your courses:"}
+                  ? "AI Mentor is analyzing your active course progress..."
+                  : "Your AI Mentor analyzed your learning patterns across your active courses:"}
               </p>
             </div>
 
-            <div className="flex items-center gap-2 shrink-0">
-              <Button
-                size="sm"
-                onClick={() => onAskTutor?.("Analyze my current study progress and give me today's top 3 priorities")}
-                className="bg-emerald-800 hover:bg-emerald-900 text-white font-semibold text-xs gap-1.5 shadow-xs"
-              >
-                <Sparkles className="h-3.5 w-3.5" />
-                <span>Ask AI Mentor Briefing</span>
-              </Button>
-            </div>
+            <Button
+              size="sm"
+              onClick={() => onAskTutor?.("Analyze my current study progress and give me today's top 3 priorities")}
+              className="bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs gap-1.5 h-9 px-4 rounded-xl shadow-xs shrink-0"
+            >
+              <Sparkles className="h-3.5 w-3.5" />
+              <span>Ask AI Briefing</span>
+            </Button>
           </div>
 
           {/* 3 Metric Cards Row */}
           {isLoading ? (
             <div className="grid gap-3 sm:grid-cols-3">
-              <Skeleton className="h-28" />
-              <Skeleton className="h-28" />
-              <Skeleton className="h-28" />
+              <Skeleton className="h-24" />
+              <Skeleton className="h-24" />
+              <Skeleton className="h-24" />
             </div>
           ) : (
             <div className="grid gap-3 sm:grid-cols-3">
               {/* Metric 1: Learning Streak */}
-              <div className="p-3.5 rounded-2xl bg-card border border-amber-500/30 hover:border-amber-500/50 transition-all space-y-2 shadow-xs group">
+              <div className="p-4 rounded-2xl bg-secondary/50 hover:bg-secondary/70 transition-colors border border-border/60 space-y-1.5">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
                     <Flame className="h-4 w-4" />
@@ -149,8 +146,8 @@ export function AiDailyBriefing({ userName, analytics, isLoading, onAskTutor, on
                   <span className="font-display text-2xl font-bold text-foreground">
                     🔥 {streakDays} Day{streakDays !== 1 ? "s" : ""}
                   </span>
-                  <Badge variant="outline" className="text-[10px] bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/20 font-bold">
-                    {streakDays > 0 ? "Active Pace" : "Start Today"}
+                  <Badge variant="outline" className="text-[10px] font-bold text-amber-700 dark:text-amber-300 border-amber-500/30">
+                    {streakDays > 0 ? "Active" : "Start Today"}
                   </Badge>
                 </div>
                 <p className="text-[11px] text-muted-foreground line-clamp-1">
@@ -158,8 +155,8 @@ export function AiDailyBriefing({ userName, analytics, isLoading, onAskTutor, on
                 </p>
               </div>
 
-              {/* Metric 2: Concepts Need Revision */}
-              <div className="p-3.5 rounded-2xl bg-card border border-rose-500/30 hover:border-rose-500/50 transition-all space-y-2 shadow-xs group">
+              {/* Metric 2: Revision Needed */}
+              <div className="p-4 rounded-2xl bg-secondary/50 hover:bg-secondary/70 transition-colors border border-border/60 space-y-1.5">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-rose-600 dark:text-rose-400 flex items-center gap-1.5">
                     <BookOpen className="h-4 w-4" />
@@ -176,8 +173,8 @@ export function AiDailyBriefing({ userName, analytics, isLoading, onAskTutor, on
                   <span className="font-display text-2xl font-bold text-foreground">
                     📚 {weakTopics.length} Concept{weakTopics.length !== 1 ? "s" : ""}
                   </span>
-                  <Badge variant="outline" className="text-[10px] bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-500/20 font-bold">
-                    {weakTopics.length > 0 ? "Attention Required" : "All Good ✓"}
+                  <Badge variant="outline" className="text-[10px] font-bold text-rose-700 dark:text-rose-300 border-rose-500/30">
+                    {weakTopics.length > 0 ? "Needs Review" : "All Good ✓"}
                   </Badge>
                 </div>
                 <p className="text-[11px] text-muted-foreground line-clamp-1">
@@ -187,12 +184,12 @@ export function AiDailyBriefing({ userName, analytics, isLoading, onAskTutor, on
                 </p>
               </div>
 
-              {/* Metric 3: AI Recommended Actions */}
-              <div className="p-3.5 rounded-2xl bg-card border border-emerald-500/30 hover:border-emerald-500/50 transition-all space-y-2 shadow-xs group">
+              {/* Metric 3: AI Actions */}
+              <div className="p-4 rounded-2xl bg-secondary/50 hover:bg-secondary/70 transition-colors border border-border/60 space-y-1.5">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
                     <Target className="h-4 w-4" />
-                    <span>AI Actions</span>
+                    <span>AI Recommended</span>
                   </span>
                   <button
                     onClick={() => openExplanation(actionsExplanation)}
@@ -205,38 +202,37 @@ export function AiDailyBriefing({ userName, analytics, isLoading, onAskTutor, on
                   <span className="font-display text-2xl font-bold text-foreground">
                     🎯 {actions.length} Task{actions.length !== 1 ? "s" : ""}
                   </span>
-                  <Badge variant="outline" className="text-[10px] bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20 font-bold">
-                    Ready to Execute
+                  <Badge variant="outline" className="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 border-emerald-500/30">
+                    Ready
                   </Badge>
                 </div>
                 <p className="text-[11px] text-muted-foreground line-clamp-1">
-                  {actions.map((a) => a.title).join(", ") || "No actions needed right now."}
+                  {actions.map((a) => a.title).join(", ") || "No urgent tasks."}
                 </p>
               </div>
             </div>
           )}
 
-          {/* AI Guidance Action Items */}
+          {/* AI Guided Pathway Action Chips */}
           {!isLoading && actions.length > 0 && (
-            <div className="p-4 rounded-2xl bg-card border border-border/80 space-y-2.5">
+            <div className="space-y-2 pt-1">
               <div className="flex items-center justify-between text-xs font-bold text-foreground">
                 <span className="flex items-center gap-1.5">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                  <span>Today's AI Guided Learning Pathway:</span>
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+                  <span>Today's Recommended Pathway:</span>
                 </span>
-                <span className="text-[11px] text-muted-foreground font-semibold">Priority Order</span>
               </div>
 
-              <div className="grid gap-2 sm:grid-cols-3 text-xs">
+              <div className="grid gap-2 sm:grid-cols-3">
                 {actions.map((action, idx) => (
                   <button
                     key={action.title}
-                    onClick={() => action.prompt ? onAskTutor?.(action.prompt) : onOpenPlanner?.()}
-                    className="p-3 rounded-xl bg-secondary/40 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 border border-border/60 text-left transition-colors space-y-1 group"
+                    onClick={() => (action.prompt ? onAskTutor?.(action.prompt) : onOpenPlanner?.())}
+                    className="p-3 rounded-2xl bg-card hover:bg-emerald-500/10 border border-border/80 hover:border-emerald-600/40 text-left transition-all space-y-1 group cursor-pointer"
                   >
-                    <div className="font-semibold text-foreground group-hover:text-emerald-700 dark:group-hover:text-emerald-400 flex items-center justify-between">
+                    <div className="font-bold text-xs text-foreground group-hover:text-emerald-700 dark:group-hover:text-emerald-400 flex items-center justify-between">
                       <span>{idx + 1}. {action.title}</span>
-                      <ArrowRight className="h-3.5 w-3.5 text-muted-foreground group-hover:translate-x-0.5 transition-transform" />
+                      <ArrowRight className="h-3 w-3 text-muted-foreground group-hover:translate-x-0.5 transition-transform" />
                     </div>
                     <p className="text-[11px] text-muted-foreground line-clamp-2">
                       {action.detail}
@@ -246,16 +242,8 @@ export function AiDailyBriefing({ userName, analytics, isLoading, onAskTutor, on
               </div>
             </div>
           )}
-
-          {/* Empty state when no actions and not loading */}
-          {!isLoading && actions.length === 0 && (
-            <div className="p-4 rounded-2xl bg-card border border-dashed border-border/60 text-center text-xs text-muted-foreground space-y-1">
-              <p className="font-semibold text-foreground">No action items yet</p>
-              <p>Complete your first study session or quiz to get personalized AI recommendations.</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       <AiReasoningModal
         open={modalOpen}
