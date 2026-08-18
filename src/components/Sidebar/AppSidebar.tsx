@@ -12,6 +12,8 @@ import {
   UserCircle2,
   Waypoints,
   History,
+  CalendarClock,
+  FileCheck,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -36,16 +38,16 @@ const learnStudent: Item[] = [
   { title: "Assignments", url: "/assignments", icon: ClipboardList },
 ];
 
-const aiItems: Item[] = [
-  { title: "AI Learning Suite", url: "/agents", icon: Bot },
-  { title: "AI Tutor", url: "/tutor", icon: Brain },
-  { title: "System Architecture", url: "/system", icon: Network },
+const studyToolsItems: Item[] = [
+  { title: "Socratic Tutor", url: "/tutor", icon: Brain },
+  { title: "Study Planner", url: "/profile", icon: CalendarClock },
+  { title: "Mastery Diagnostics", url: "/mastery", icon: FileCheck },
+  { title: "Architecture Map", url: "/system", icon: Network },
 ];
 
 const youItems: Item[] = [
   { title: "Learning Profile", url: "/profile", icon: UserCircle2 },
-  { title: "Progress & Mastery", url: "/mastery", icon: Waypoints },
-  { title: "Activity", url: "/activity", icon: History },
+  { title: "Activity Log", url: "/activity", icon: History },
 ];
 
 const teacherItems: Item[] = [
@@ -67,17 +69,17 @@ export function AppSidebar() {
 
   const groups: Group[] =
     role === "admin"
-      ? [{ label: "Administration", items: adminItems }, { label: "AI Agents", items: aiItems }]
+      ? [{ label: "Administration", items: adminItems }, { label: "Study Tools", items: studyToolsItems }]
       : role === "teacher"
         ? [
             { label: "Teach", items: teacherItems },
-            { label: "AI Agents", items: aiItems },
-            { label: "You", items: youItems },
+            { label: "Study Tools", items: studyToolsItems },
+            { label: "Account", items: youItems },
           ]
         : [
             { label: "Learn", items: learnStudent },
-            { label: "AI Agents", items: aiItems },
-            { label: "You", items: youItems },
+            { label: "Study Tools", items: studyToolsItems },
+            { label: "Account", items: youItems },
           ];
 
   return (
@@ -99,22 +101,12 @@ export function AppSidebar() {
                           ? currentPath.startsWith("/courses/")
                           : currentPath === item.url || currentPath.startsWith(`${item.url}/`)
                       }
+                      tooltip={collapsed ? item.title : undefined}
                     >
-                      {item.courseId ? (
-                        <Link
-                          to="/courses/$courseId"
-                          params={{ courseId: item.courseId }}
-                          className="flex items-center gap-2"
-                        >
-                          <item.icon className="h-4 w-4" />
-                          {!collapsed && <span>{item.title}</span>}
-                        </Link>
-                      ) : (
-                        <Link to={item.url} className="flex items-center gap-2">
-                          <item.icon className="h-4 w-4" />
-                          {!collapsed && <span>{item.title}</span>}
-                        </Link>
-                      )}
+                      <Link to={item.url}>
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.title}</span>
+                      </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}

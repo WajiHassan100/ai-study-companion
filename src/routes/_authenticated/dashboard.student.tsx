@@ -4,21 +4,13 @@ import {
   BookOpen,
   CalendarClock,
   ClipboardList,
-  TrendingUp,
-  Sparkles,
   Target,
-  Brain,
-  Zap,
-  GraduationCap,
-  Layers,
-  FileCheck,
-  CheckCircle2,
-  Clock,
+  Sparkles,
   ArrowRight,
-  Flame,
   Bot,
+  FileCheck,
   Compass,
-  ArrowUpRight,
+  CheckCircle2,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useDashboardAnalytics } from "@/hooks/useDashboardAnalytics";
@@ -33,21 +25,19 @@ import { ProgressChart } from "@/components/Charts/ProgressChart";
 import { DataTable, type Column } from "@/components/Tables/DataTable";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ComponentErrorBoundary } from "@/components/common/ComponentErrorBoundary";
 
 import { AiDailyBriefing } from "@/components/DashboardCards/AiDailyBriefing";
-import { AiLearningIntelligence } from "@/components/DashboardCards/AiLearningIntelligence";
 import { AiAgentHub } from "@/components/DashboardCards/AiAgentHub";
 
 export const Route = createFileRoute("/_authenticated/dashboard/student")({
   head: () => ({
     meta: [
-      { title: "Student Spaces & Mission Control — Scholar AI" },
+      { title: "Student Study Workspace — Scholar AI" },
       {
         name: "description",
-        content: "SchoolAI-inspired student workspace with interactive Course Spaces, real-time Socratic AI tutoring, and adaptive mastery analytics.",
+        content: "Student workspace with interactive Course Spaces, real-time Socratic tutoring, and adaptive mastery analytics.",
       },
     ],
   }),
@@ -63,15 +53,15 @@ interface UpcomingRow {
 }
 
 const upcoming: UpcomingRow[] = [
-  { id: "1", title: "Class Space Mission: Cellular Energy & ATP", course: "BIOL 101", due: "Tomorrow at 11:59 PM", status: "Pending Submission" },
-  { id: "2", title: "Problem Set #3: Gradient Vectors & Tangent Planes", course: "MATH 201", due: "In 3 Days", status: "In Progress" },
-  { id: "3", title: "Lab Space: Newton's Laws & Friction", course: "PHYS 102", due: "Completed", status: "Graded (94/100)" },
-  { id: "4", title: "Coding Mission: Big-O Time Complexity", course: "CS 101", due: "In 5 Days", status: "Pending" },
+  { id: "1", title: "Problem Set: Cellular Energy & ATP", course: "BIOL 101", due: "Tomorrow at 11:59 PM", status: "Pending Submission" },
+  { id: "2", title: "Assignment #3: Gradient Vectors & Planes", course: "MATH 201", due: "In 3 Days", status: "In Progress" },
+  { id: "3", title: "Physics Lab: Newton's Laws & Friction", course: "PHYS 102", due: "Completed", status: "Graded (94/100)" },
+  { id: "4", title: "Coding Exercise: Big-O Time Complexity", course: "CS 101", due: "In 5 Days", status: "Pending" },
 ];
 
 const columns: Column<UpcomingRow>[] = [
-  { key: "title", header: "Mission / Task", render: (r) => <span className="font-semibold text-xs text-foreground">{r.title}</span> },
-  { key: "course", header: "Space", render: (r) => <Badge variant="outline" className="text-[10px] font-bold uppercase">{r.course}</Badge> },
+  { key: "title", header: "Task / Assignment", render: (r) => <span className="font-semibold text-xs text-foreground">{r.title}</span> },
+  { key: "course", header: "Course", render: (r) => <Badge variant="outline" className="text-[10px] font-bold uppercase">{r.course}</Badge> },
   { key: "due", header: "Due Date", render: (r) => <span className="text-xs text-muted-foreground">{r.due}</span> },
   {
     key: "status",
@@ -84,50 +74,50 @@ const columns: Column<UpcomingRow>[] = [
   },
 ];
 
-const schoolAiSpaces = [
+const courseSpaces = [
   {
     id: "biol_101",
     code: "BIOL 101",
-    title: "Cell & Molecular Biology Space",
+    title: "Cell & Molecular Biology",
     instructor: "Dr. Elizabeth Vance",
     materials: 5,
     progress: 78,
     badgeColor: "bg-emerald-600 text-white",
     bannerGradient: "from-emerald-600/15 via-emerald-500/5 to-transparent",
-    dotTopic: "Photosynthesis & Light Reactions",
+    currentTopic: "Photosynthesis & Light Reactions",
   },
   {
     id: "math_201",
     code: "MATH 201",
-    title: "Multivariable Calculus Space",
+    title: "Multivariable Calculus",
     instructor: "Prof. Alan Turing",
     materials: 6,
     progress: 85,
     badgeColor: "bg-sky-600 text-white",
     bannerGradient: "from-sky-600/15 via-sky-500/5 to-transparent",
-    dotTopic: "Partial Derivatives & Chain Rule",
+    currentTopic: "Partial Derivatives & Chain Rule",
   },
   {
     id: "phys_102",
     code: "PHYS 102",
-    title: "University Physics II Space",
+    title: "University Physics II",
     instructor: "Dr. Richard Feynman",
     materials: 4,
     progress: 62,
     badgeColor: "bg-purple-600 text-white",
     bannerGradient: "from-purple-600/15 via-purple-500/5 to-transparent",
-    dotTopic: "Newtonian Mechanics & Vectors",
+    currentTopic: "Newtonian Mechanics & Friction",
   },
   {
     id: "cs_101",
     code: "CS 101",
-    title: "Data Structures & Algorithms Space",
+    title: "Data Structures & Algorithms",
     instructor: "Prof. Donald Knuth",
     materials: 8,
     progress: 92,
     badgeColor: "bg-amber-600 text-white",
     bannerGradient: "from-amber-600/15 via-amber-500/5 to-transparent",
-    dotTopic: "Asymptotic Complexity & Trees",
+    currentTopic: "Asymptotic Complexity & Trees",
   },
 ];
 
@@ -148,8 +138,8 @@ function StudentDashboard() {
 
   return (
     <div className="mx-auto max-w-7xl space-y-6 pb-16">
-      {/* ── 1. SCHOOLAI-STYLE MISSION CONTROL HERO BRIEFING ── */}
-      <ComponentErrorBoundary fallbackTitle="Mission Control Briefing">
+      {/* ── 1. DAILY FOCUS & PRIORITY NEXT STEP ── */}
+      <ComponentErrorBoundary fallbackTitle="Daily Focus Overview">
         <AiDailyBriefing
           userName={name}
           analytics={analytics}
@@ -159,24 +149,15 @@ function StudentDashboard() {
         />
       </ComponentErrorBoundary>
 
-      <ComponentErrorBoundary fallbackTitle="Learning Intelligence">
-        <AiLearningIntelligence
-          studentId={user?.id || "demo_student"}
-          analytics={analytics}
-          isLoading={analyticsLoading}
-          onAskTutor={(query) => setSelectedQuery(query)}
-        />
-      </ComponentErrorBoundary>
-
-      {/* ── 2. MAIN WORKSPACE WITH TABS & STICKY DOT AI ASSISTANT ── */}
+      {/* ── 2. MAIN WORKSPACE WITH TABS & STICKY SOCRATIC TUTOR ── */}
       <div className="grid gap-6 lg:grid-cols-12 items-start">
-        {/* Left Side: SchoolAI Spaces & Tooling Tabs (7 Cols) */}
+        {/* Left Side: Course Spaces & Study Tabs (7 Cols) */}
         <div className="space-y-6 lg:col-span-7">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-5">
             <TabsList className="w-full grid grid-cols-4 p-1.5 rounded-full bg-secondary/80 border border-border/70 h-auto shadow-xs">
               <TabsTrigger value="spaces" className="rounded-full py-2 font-bold text-xs gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm">
                 <BookOpen className="h-3.5 w-3.5 text-sky-600" />
-                <span>My Spaces</span>
+                <span>Course Spaces</span>
               </TabsTrigger>
               <TabsTrigger value="practice" className="rounded-full py-2 font-bold text-xs gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm">
                 <Target className="h-3.5 w-3.5 text-purple-600" />
@@ -188,20 +169,20 @@ function StudentDashboard() {
               </TabsTrigger>
               <TabsTrigger value="assignments" className="rounded-full py-2 font-bold text-xs gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm">
                 <ClipboardList className="h-3.5 w-3.5 text-amber-600" />
-                <span>Missions</span>
+                <span>Assignments</span>
               </TabsTrigger>
             </TabsList>
 
-            {/* TAB 1: SCHOOLAI SPACES & AI AGENTS */}
+            {/* TAB 1: COURSE SPACES & STUDY TEAM */}
             <TabsContent value="spaces" className="space-y-6 mt-0">
               {/* Spaces Grid */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <h3 className="font-display text-lg font-bold tracking-tight text-foreground flex items-center gap-2">
-                      <span>Interactive Learning Spaces</span>
+                    <h3 className="font-display text-lg font-bold tracking-tight text-foreground">
+                      Study Spaces
                     </h3>
-                    <p className="text-xs text-muted-foreground">Each space contains course notes, RAG documents, and a dedicated Socratic Dot AI.</p>
+                    <p className="text-xs text-muted-foreground">Each space contains course notes, lecture slides, and targeted practice.</p>
                   </div>
                   <Link to="/courses" className="text-xs font-bold text-sky-600 hover:underline flex items-center gap-1">
                     <span>All Spaces</span>
@@ -210,7 +191,7 @@ function StudentDashboard() {
                 </div>
 
                 <div className="grid gap-3.5 sm:grid-cols-2">
-                  {schoolAiSpaces.map((space) => (
+                  {courseSpaces.map((space) => (
                     <Link
                       key={space.id}
                       to="/courses/$courseId"
@@ -222,7 +203,7 @@ function StudentDashboard() {
                           {space.code}
                         </Badge>
                         <span className="text-[11px] font-bold text-sky-600 dark:text-sky-400 group-hover:translate-x-0.5 transition-transform flex items-center gap-1">
-                          <span>Enter Space</span>
+                          <span>Open Space</span>
                           <ArrowRight className="h-3 w-3" />
                         </span>
                       </div>
@@ -232,29 +213,28 @@ function StudentDashboard() {
                         <p className="text-[11px] text-muted-foreground mt-0.5">{space.instructor}</p>
                       </div>
 
-                      <div className="p-2 rounded-2xl bg-card/80 border border-border/60 text-xs space-y-1">
+                      <div className="p-2.5 rounded-2xl bg-card/80 border border-border/60 text-xs space-y-1.5">
                         <div className="flex items-center justify-between text-[10px] text-muted-foreground font-semibold">
-                          <span className="flex items-center gap-1 text-foreground font-bold">
-                            <Bot className="h-3 w-3 text-sky-600" /> Dot AI Topic:
-                          </span>
-                          <span>{space.progress}% Mastery</span>
+                          <span className="text-foreground font-bold">Focus: {space.currentTopic}</span>
+                          <span className="text-sky-600 dark:text-sky-400 font-bold">{space.progress}%</span>
                         </div>
-                        <p className="text-[11px] text-sky-700 dark:text-sky-300 font-semibold line-clamp-1">
-                          {space.dotTopic}
-                        </p>
+                        {/* Clean Progress Bar */}
+                        <div className="w-full h-1.5 bg-secondary rounded-full overflow-hidden">
+                          <div className="h-full bg-sky-600 rounded-full" style={{ width: `${space.progress}%` }} />
+                        </div>
                       </div>
 
                       <div className="pt-1 flex items-center justify-between text-[11px] text-muted-foreground border-t border-border/40">
                         <span>{space.materials} Documents Indexed</span>
-                        <span className="font-bold text-emerald-600 dark:text-emerald-400">🟢 Active Dot AI</span>
+                        <span className="text-xs font-semibold text-foreground">Active</span>
                       </div>
                     </Link>
                   ))}
                 </div>
               </div>
 
-              {/* AI Agent Command Team */}
-              <ComponentErrorBoundary fallbackTitle="AI Agent Command Team">
+              {/* Study Assistants Team */}
+              <ComponentErrorBoundary fallbackTitle="Study Assistants Team">
                 <AiAgentHub
                   agentStatuses={analytics?.agent_statuses}
                   onAskTutor={(query) => setSelectedQuery(query)}
@@ -264,10 +244,10 @@ function StudentDashboard() {
               </ComponentErrorBoundary>
 
               {/* Weekly Study Progress Chart */}
-              <ComponentErrorBoundary fallbackTitle="Weekly AI Study Progress">
+              <ComponentErrorBoundary fallbackTitle="Weekly Study Progress">
                 <ProgressChart
-                  title="Weekly Learning Space Engagement"
-                  description="Completed study blocks, AI dialogues, and quiz submissions across active spaces."
+                  title="Weekly Study Engagement"
+                  description="Completed study sessions, tutor dialogues, and quiz submissions across your courses."
                   data={[
                     { label: "Mon", value: 4 },
                     { label: "Tue", value: 6 },
@@ -277,7 +257,7 @@ function StudentDashboard() {
                     { label: "Sat", value: 9 },
                     { label: "Sun", value: 6 },
                   ]}
-                  seriesLabel="Space Missions Completed"
+                  seriesLabel="Study Blocks Completed"
                 />
               </ComponentErrorBoundary>
             </TabsContent>
@@ -325,7 +305,7 @@ function StudentDashboard() {
               </ComponentErrorBoundary>
             </TabsContent>
 
-            {/* TAB 4: MISSIONS & ASSIGNMENTS */}
+            {/* TAB 4: ASSIGNMENTS & HOMEWORK */}
             <TabsContent value="assignments" className="space-y-6 mt-0">
               <ComponentErrorBoundary fallbackTitle="Assignment Homework Coach">
                 <AssignmentFeedbackCard
@@ -336,7 +316,7 @@ function StudentDashboard() {
 
               <div className="p-5 rounded-3xl bg-card border border-border/80 shadow-xs space-y-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-display text-base font-bold tracking-tight">Active Classroom Missions</h3>
+                  <h3 className="font-display text-base font-bold tracking-tight">Active Assignments</h3>
                   <Badge variant="outline" className="text-[10px] font-bold">4 Active</Badge>
                 </div>
                 <DataTable columns={columns} rows={upcoming} getRowId={(r) => r.id} />
@@ -345,12 +325,12 @@ function StudentDashboard() {
           </Tabs>
         </div>
 
-        {/* Right Sticky Column: SchoolAI-Style Socratic Dot AI Companion (5 Cols) */}
+        {/* Right Sticky Column: Socratic Tutor (5 Cols) */}
         <div className="lg:col-span-5 lg:sticky lg:top-20 space-y-4">
-          <ComponentErrorBoundary fallbackTitle="AI Study Companion">
+          <ComponentErrorBoundary fallbackTitle="Socratic Tutor">
             <AiAssistantPanel
-              title="Dot AI Socratic Companion"
-              description="Ask questions, request worked derivations, or search uploaded lecture notes."
+              title="Socratic Tutor"
+              description="Interactive concept guidance, step-by-step math derivations, and course note citations."
               studentId={user?.id || "demo_student"}
               externalPrompt={selectedQuery}
               recentChatsData={analytics?.recent_conversations}

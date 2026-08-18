@@ -68,8 +68,8 @@ export function AiAssistantPanel({
   studentId = "demo_student",
   studentLevel = "beginner",
   learningStyle = "visual",
-  title = "AI Socratic Assistant",
-  description = "Real-time concept explanations, step-by-step math derivations, and document citations.",
+  title = "Socratic Tutor",
+  description = "Interactive concept guidance, step-by-step math derivations, and course note citations.",
   suggestions = [
     "Explain this topic simply",
     "Create practice questions",
@@ -354,15 +354,15 @@ export function AiAssistantPanel({
 
           <div className="flex items-center gap-1.5">
             {connectionOk === false ? (
-              <Badge className="bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/30 text-[10px] font-bold gap-1 px-2 py-0.5">
+              <span className="text-[10px] font-semibold text-rose-600 dark:text-rose-400 flex items-center gap-1">
                 <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
-                Backend Offline
-              </Badge>
+                Offline
+              </span>
             ) : (
-              <Badge className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 text-[10px] font-bold gap-1 px-2 py-0.5">
+              <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                Live Agent Online
-              </Badge>
+                Ready
+              </span>
             )}
           </div>
         </div>
@@ -457,9 +457,9 @@ export function AiAssistantPanel({
                     <Bot className="h-6 w-6" />
                   </div>
                   <div className="space-y-1">
-                    <p className="font-bold text-sm text-foreground">AI Socratic Assistant Ready</p>
-                    <p className="text-[11px] text-muted-foreground max-w-xs mx-auto">
-                      Ask any question, pick a suggested prompt below, or attach lecture notes (📎) for grounded answers.
+                    <p className="font-bold text-sm text-foreground">Socratic Tutor Ready</p>
+                    <p className="max-w-xs mx-auto text-muted-foreground text-xs leading-relaxed">
+                      Ask any question, pick a suggested prompt below, or attach lecture notes for grounded answers.
                     </p>
                   </div>
                 </div>
@@ -633,7 +633,7 @@ export function AiAssistantPanel({
           <div className="space-y-1.5">
             <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
               <Lightbulb className="h-3 w-3 text-amber-500" />
-              Suggested AI Prompts:
+              Quick Prompts:
             </span>
             <div className="flex flex-wrap gap-1.5">
               {suggestions.map((s) => (
@@ -646,7 +646,7 @@ export function AiAssistantPanel({
                   }}
                   className="rounded-full border border-emerald-600/30 bg-emerald-500/10 hover:bg-emerald-500/20 hover:border-emerald-500/50 px-3 py-1 text-xs font-bold text-emerald-800 dark:text-emerald-300 transition-colors cursor-pointer disabled:opacity-50"
                 >
-                  ✨ "{s}"
+                  "{s}"
                 </button>
               ))}
             </div>
@@ -657,7 +657,7 @@ export function AiAssistantPanel({
               type="button"
               variant="outline"
               size="icon"
-              title="Attach PDF or Document for RAG AI Chat"
+              title="Attach PDF or lecture notes"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploadingDoc || loading}
               className="h-10 w-10 shrink-0 text-emerald-700 border-emerald-500/40 hover:bg-emerald-500/10 rounded-2xl"
@@ -676,7 +676,7 @@ export function AiAssistantPanel({
                 }
               }}
               disabled={loading}
-              placeholder={attachedDoc ? `Ask a question about '${attachedDoc.name}'...` : "Ask your AI Tutor or type a prompt (📎)..."}
+              placeholder={attachedDoc ? `Ask a question about '${attachedDoc.name}'...` : "Ask a question or request step-by-step guidance..."}
               rows={2}
               className="resize-none text-xs sm:text-sm min-h-[50px] bg-secondary/40 border-border/80 rounded-2xl"
             />

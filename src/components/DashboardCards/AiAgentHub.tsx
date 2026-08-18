@@ -1,14 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import {
-  Bot,
-  Sparkles,
-  Calendar,
+  MessageSquare,
+  CalendarClock,
   FileCheck,
   TrendingUp,
-  MessageSquare,
-  Activity,
   ArrowRight,
-  ShieldCheck,
+  Sparkles,
   Zap,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -31,51 +28,55 @@ export function AiAgentHub({
   const agents = [
     {
       id: "tutor",
-      name: "AI Socratic Tutor",
-      role: "Concept Guidance & Math Q&A",
-      status: agentStatuses?.tutor?.status || "Online",
+      name: "Socratic Tutor",
+      role: "Concept Guidance & Hints",
       icon: MessageSquare,
-      iconBg: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
-      description: "Explains complex concepts, breaks down math derivations, and provides socratic guidance.",
-      buttonText: "Chat with Tutor",
-      buttonAction: () => onAskTutor?.("Can you explain a concept step-by-step with an example?"),
-      secondaryLink: "/tutor",
+      themeColor: "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
+      accentBorder: "hover:border-emerald-500/40",
+      description: "Guides you through challenging formulas, homework questions, and proofs step-by-step.",
+      buttonText: "Ask Tutor",
+      buttonAction: () => onAskTutor?.("Can you guide me through a concept step-by-step with an example?"),
+      buttonClass: "bg-emerald-700 hover:bg-emerald-800 text-white",
+      status: "Available",
     },
     {
       id: "planner",
-      name: "Learning Planner",
-      role: "7-Day Revision Schedules",
-      status: agentStatuses?.planner?.status || "Active",
-      icon: Calendar,
-      iconBg: "bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20",
-      description: "Creates personalized study timetables and balances daily revision blocks.",
+      name: "Study Planner",
+      role: "7-Day Revision Timetables",
+      icon: CalendarClock,
+      themeColor: "text-sky-600 dark:text-sky-400 bg-sky-500/10 border-sky-500/20",
+      accentBorder: "hover:border-sky-500/40",
+      description: "Creates customized 7-day study timetables tailored to your assignment deadlines and exam dates.",
       buttonText: "Generate Plan",
       buttonAction: () => onOpenPlanner?.(),
-      secondaryLink: "/profile",
+      buttonClass: "bg-sky-600 hover:bg-sky-700 text-white",
+      status: "Available",
     },
     {
       id: "assessment",
-      name: "Assessment Agent",
-      role: "Adaptive Quizzes & Diagnostics",
-      status: agentStatuses?.assessment?.status || "Online",
+      name: "Quiz & Exam Coach",
+      role: "Adaptive Practice Tests",
       icon: FileCheck,
-      iconBg: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20",
-      description: "Generates multi-format practice tests and pinpoints foundational skill gaps.",
-      buttonText: "Practice Test",
+      themeColor: "text-purple-600 dark:text-purple-400 bg-purple-500/10 border-purple-500/20",
+      accentBorder: "hover:border-purple-500/40",
+      description: "Generates targeted practice quizzes and mock exams to identify exact knowledge gaps.",
+      buttonText: "Start Practice",
       buttonAction: () => onOpenAssessment?.(),
-      secondaryLink: "/mastery",
+      buttonClass: "bg-purple-700 hover:bg-purple-800 text-white",
+      status: "Available",
     },
     {
       id: "analytics",
-      name: "Progress Analytics",
-      role: "Behavior & Risk Forecasting",
-      status: agentStatuses?.analytics?.status || "Active",
+      name: "Mastery Analytics",
+      role: "Retention & Readiness Tracking",
       icon: TrendingUp,
-      iconBg: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
-      description: "Tracks consistency scores, mastery growth trends, and forecasts exam readiness.",
-      buttonText: "View Insights",
-      buttonAction: () => onAskTutor?.("Show me a detailed breakdown of my learning progress and risk forecast"),
-      secondaryLink: "/mastery",
+      themeColor: "text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/20",
+      accentBorder: "hover:border-amber-500/40",
+      description: "Monitors topic mastery, memory decay curves, and forecasts exam readiness.",
+      buttonText: "View Mastery",
+      buttonAction: () => onAskTutor?.("Show me a detailed breakdown of my topic mastery and revision priorities"),
+      buttonClass: "bg-amber-700 hover:bg-amber-800 text-white",
+      status: "Available",
     },
   ];
 
@@ -84,13 +85,12 @@ export function AiAgentHub({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border/40">
         <div className="space-y-0.5">
           <div className="flex items-center gap-2">
-            <Badge className="bg-emerald-800 text-white font-bold text-[10px] gap-1 px-2.5">
-              <Bot className="h-3 w-3" />
-              <span>AI Command Team</span>
-            </Badge>
-            <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">4 Agents Operational</span>
+            <h3 className="font-display text-base font-bold text-foreground">Study Assistants</h3>
+            <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">4 Active</span>
           </div>
-          <h3 className="font-display text-base font-bold text-foreground">Your Personal AI Assistants</h3>
+          <p className="text-xs text-muted-foreground">
+            Specialized learning assistants tailored to each part of your academic study cycle.
+          </p>
         </div>
 
         <Link to="/system">
@@ -102,67 +102,41 @@ export function AiAgentHub({
       </div>
 
       {/* 4 Agent Cards Grid */}
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-3.5 sm:grid-cols-2">
         {agents.map((agent) => {
           const IconComp = agent.icon;
-          const isOnline = agent.status === "Online" || agent.status === "Active";
 
           return (
             <div
               key={agent.id}
-              className="p-4 rounded-2xl border border-border/80 bg-card hover:border-emerald-600/40 hover:shadow-xs transition-all flex flex-col justify-between space-y-3 group"
+              className={`p-4 rounded-2xl border border-border/80 bg-card ${agent.accentBorder} hover:shadow-xs transition-all flex flex-col justify-between space-y-3.5 group`}
             >
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
-                    <div className={`p-2 rounded-xl border ${agent.iconBg}`}>
+                    <div className={`p-2 rounded-xl border ${agent.themeColor}`}>
                       <IconComp className="h-4 w-4" />
                     </div>
                     <div>
-                      <h4 className="font-display font-bold text-xs text-foreground group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
-                        {agent.name}
-                      </h4>
-                      <span className="text-[10px] font-semibold text-muted-foreground">{agent.role}</span>
+                      <h4 className="font-display text-sm font-bold text-foreground">{agent.name}</h4>
+                      <p className="text-[11px] text-muted-foreground">{agent.role}</p>
                     </div>
                   </div>
-
-                  <Badge
-                    className={`text-[9px] font-bold gap-1 px-1.5 py-0 border ${
-                      isOnline
-                        ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
-                        : "bg-secondary text-muted-foreground border-border"
-                    }`}
-                  >
-                    {isOnline && <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />}
-                    {agent.status}
-                  </Badge>
+                  <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">● Ready</span>
                 </div>
 
-                <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2">
-                  {agent.description}
-                </p>
+                <p className="text-xs text-muted-foreground leading-relaxed">{agent.description}</p>
               </div>
 
-              <div className="flex items-center gap-2 pt-2 border-t border-border/40">
+              <div className="pt-2 border-t border-border/40">
                 <Button
                   size="sm"
                   onClick={agent.buttonAction}
-                  className="flex-1 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs h-7 gap-1 shadow-xs"
+                  className={`w-full h-8 text-xs font-bold rounded-full ${agent.buttonClass} shadow-xs justify-between px-3.5`}
                 >
-                  <Sparkles className="h-3 w-3" />
                   <span>{agent.buttonText}</span>
+                  <ArrowRight className="h-3 w-3" />
                 </Button>
-
-                <Link to={agent.secondaryLink}>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-7 px-2 text-xs border-border"
-                    title={`Open ${agent.name}`}
-                  >
-                    <ArrowRight className="h-3 w-3" />
-                  </Button>
-                </Link>
               </div>
             </div>
           );
