@@ -5,20 +5,25 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Advanced AI SaaS Design System (Linear + Vercel + Raycast aesthetic)
- * Rich layered gradients, high-contrast surfaces, luminous badges & glassmorphism.
+ * SchoolAI-Inspired Modern Education Design System
+ * ═════════════════════════════════════════════════════════════════
+ * • Warm Midnight Navy (#0b0f19, #0f172a)
+ * • Electric Ocean Blue (#0284c7, #2563eb)
+ * • Sun Gold / Honey Amber (#f59e0b, #fbbf24)
+ * • Sage Meadow Green (#059669, #10b981)
+ * • Soft rounded-full pill buttons, smooth card radii, & micro-borders
  */
 
 @theme inline {
   --font-display: "Sora", system-ui, sans-serif;
   --font-sans: "Manrope", system-ui, sans-serif;
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 6px);
+  --radius-md: calc(var(--radius) - 4px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
-  --radius-4xl: calc(var(--radius) + 16px);
+  --radius-3xl: calc(var(--radius) + 16px);
+  --radius-4xl: calc(var(--radius) + 24px);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -56,76 +61,76 @@
 }
 
 :root {
-  --radius: 1rem;
-  /* Light mode: Rich frosted slate backdrop with subtle emerald/indigo tint */
-  --background: #f1f5f9;
-  --foreground: #090d16;
+  --radius: 1.25rem;
+  /* Light Mode: Clean SchoolAI Slate Canvas + Ocean Blue & Sun Gold */
+  --background: #f8fafc;
+  --foreground: #0f172a;
   --card: #ffffff;
-  --card-foreground: #090d16;
+  --card-foreground: #0f172a;
   --popover: #ffffff;
-  --popover-foreground: #090d16;
-  --primary: #047857;
+  --popover-foreground: #0f172a;
+  --primary: #0284c7; /* SchoolAI Ocean Blue */
   --primary-foreground: #ffffff;
-  --secondary: #e2e8f0;
+  --secondary: #f1f5f9;
   --secondary-foreground: #0f172a;
-  --muted: #e2e8f0;
+  --muted: #f1f5f9;
   --muted-foreground: #475569;
-  --accent: #047857;
+  --accent: #0284c7;
   --accent-foreground: #ffffff;
-  --destructive: #dc2626;
+  --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-  --border: #cbd5e1;
-  --input: #cbd5e1;
-  --ring: #047857;
-  --chart-1: #047857;
-  --chart-2: #0284c7;
-  --chart-3: #7c3aed;
-  --chart-4: #d97706;
-  --chart-5: #db2777;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #0284c7;
+  --chart-1: #0284c7; /* Ocean Blue */
+  --chart-2: #10b981; /* Meadow Green */
+  --chart-3: #f59e0b; /* Sun Gold */
+  --chart-4: #8b5cf6; /* Royal Purple */
+  --chart-5: #ec4899; /* Coral Pink */
   --sidebar: #ffffff;
-  --sidebar-foreground: #090d16;
-  --sidebar-primary: #047857;
+  --sidebar-foreground: #0f172a;
+  --sidebar-primary: #0284c7;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #e2e8f0;
-  --sidebar-accent-foreground: #090d16;
-  --sidebar-border: #cbd5e1;
-  --sidebar-ring: #047857;
+  --sidebar-accent: #f1f5f9;
+  --sidebar-accent-foreground: #0f172a;
+  --sidebar-border: #e2e8f0;
+  --sidebar-ring: #0284c7;
 }
 
 .dark {
-  /* Dark mode: Deep Obsidian Space with subtle indigo/cyan luminescence */
-  --background: #07090e;
+  /* Dark Mode: Deep Midnight Navy + Luminous Ocean & Sun Gold */
+  --background: #090d16;
   --foreground: #f8fafc;
-  --card: #0f121d;
+  --card: #0f1422;
   --card-foreground: #f8fafc;
-  --popover: #0f121d;
+  --popover: #0f1422;
   --popover-foreground: #f8fafc;
-  --primary: #10b981;
-  --primary-foreground: #022c22;
-  --secondary: #181d2e;
+  --primary: #38bdf8; /* Luminous Ocean */
+  --primary-foreground: #082f49;
+  --secondary: #182032;
   --secondary-foreground: #f8fafc;
-  --muted: #181d2e;
+  --muted: #182032;
   --muted-foreground: #94a3b8;
-  --accent: #10b981;
-  --accent-foreground: #022c22;
+  --accent: #38bdf8;
+  --accent-foreground: #082f49;
   --destructive: #f87171;
-  --destructive-foreground: #022c22;
-  --border: #22293f;
-  --input: #22293f;
-  --ring: #10b981;
-  --chart-1: #10b981;
-  --chart-2: #38bdf8;
-  --chart-3: #a78bfa;
-  --chart-4: #fbbf24;
+  --destructive-foreground: #082f49;
+  --border: #222c44;
+  --input: #222c44;
+  --ring: #38bdf8;
+  --chart-1: #38bdf8;
+  --chart-2: #34d399;
+  --chart-3: #fbbf24;
+  --chart-4: #a78bfa;
   --chart-5: #f472b6;
-  --sidebar: #0a0d14;
+  --sidebar: #0b0f19;
   --sidebar-foreground: #f8fafc;
-  --sidebar-primary: #10b981;
-  --sidebar-primary-foreground: #022c22;
-  --sidebar-accent: #181d2e;
+  --sidebar-primary: #38bdf8;
+  --sidebar-primary-foreground: #082f49;
+  --sidebar-accent: #182032;
   --sidebar-accent-foreground: #f8fafc;
-  --sidebar-border: #1f2538;
-  --sidebar-ring: #10b981;
+  --sidebar-border: #1f273d;
+  --sidebar-ring: #38bdf8;
 }
 
 @layer base {
@@ -139,9 +144,9 @@
     font-family: var(--font-sans);
     letter-spacing: -0.012em;
     background-image: 
-      radial-gradient(at 15% 15%, rgba(16, 185, 129, 0.07) 0px, transparent 50%),
-      radial-gradient(at 85% 20%, rgba(56, 189, 248, 0.06) 0px, transparent 50%),
-      radial-gradient(at 50% 80%, rgba(139, 92, 246, 0.05) 0px, transparent 50%);
+      radial-gradient(at 10% 10%, rgba(2, 132, 199, 0.06) 0px, transparent 50%),
+      radial-gradient(at 90% 15%, rgba(245, 158, 11, 0.05) 0px, transparent 50%),
+      radial-gradient(at 50% 85%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
     background-attachment: fixed;
   }
 
@@ -156,31 +161,51 @@
   }
 }
 
-/* Glassmorphism & Surface Utilities */
-.glass-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.85));
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--color-border);
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+/* SchoolAI Pill Button & Card Utility Classes */
+.btn-pill-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  height: 3rem;
+  padding-left: 1.5rem;
+  padding-right: 0.625rem;
+  padding-top: 0.625rem;
+  padding-bottom: 0.625rem;
+  border-radius: 9999px;
+  background-color: #0284c7;
+  color: #ffffff;
+  font-weight: 600;
+  transition: all 200ms ease;
+  box-shadow: 0 4px 14px 0 rgba(2, 132, 199, 0.3);
 }
 
-.dark .glass-card {
-  background: linear-gradient(135deg, rgba(15, 18, 29, 0.95), rgba(11, 14, 23, 0.85));
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px -4px rgba(0, 0, 0, 0.4);
+.btn-pill-primary:hover {
+  background-color: #0369a1;
+  transform: translateY(-1px);
 }
 
-.glow-emerald {
-  box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.35);
+.btn-pill-white {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  height: 3rem;
+  padding-left: 1.5rem;
+  padding-right: 0.625rem;
+  padding-top: 0.625rem;
+  padding-bottom: 0.625rem;
+  border-radius: 9999px;
+  background-color: #ffffff;
+  color: #0f172a;
+  border: 1px solid #e2e8f0;
+  font-weight: 600;
+  transition: all 200ms ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
-.glow-sky {
-  box-shadow: 0 0 25px -5px rgba(56, 189, 248, 0.35);
-}
-
-.glow-purple {
-  box-shadow: 0 0 25px -5px rgba(168, 85, 247, 0.35);
+.btn-pill-white:hover {
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
 }
 
 /* Custom sleek scrollbar */

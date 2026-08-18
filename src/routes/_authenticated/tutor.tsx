@@ -27,12 +27,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { evaluateAnswer } from "@/lib/api/assessment";
 import { toast } from "sonner";
 
+import { z } from "zod";
+
+const tutorSearchSchema = z.object({
+  topic: z.string().optional(),
+});
+
 export const Route = createFileRoute("/_authenticated/tutor")({
-  validateSearch: (search: Record<string, unknown>) => {
-    return {
-      topic: (search.topic as string) || undefined,
-    };
-  },
+  validateSearch: (search) => tutorSearchSchema.parse(search),
   head: () => ({
     meta: [
       { title: "AI Socratic Tutor Workspace — Scholar AI" },

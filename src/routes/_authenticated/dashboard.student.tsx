@@ -14,6 +14,10 @@ import {
   FileCheck,
   CheckCircle2,
   Clock,
+  ArrowRight,
+  Flame,
+  Bot,
+  Compass,
   ArrowUpRight,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -40,10 +44,10 @@ import { AiAgentHub } from "@/components/DashboardCards/AiAgentHub";
 export const Route = createFileRoute("/_authenticated/dashboard/student")({
   head: () => ({
     meta: [
-      { title: "Student Command Workspace — Scholar AI" },
+      { title: "Student Spaces & Mission Control — Scholar AI" },
       {
         name: "description",
-        content: "Intelligent student dashboard with real-time AI mentoring, mastery diagnostics, and active study planning.",
+        content: "SchoolAI-inspired student workspace with interactive Course Spaces, real-time Socratic AI tutoring, and adaptive mastery analytics.",
       },
     ],
   }),
@@ -59,15 +63,15 @@ interface UpcomingRow {
 }
 
 const upcoming: UpcomingRow[] = [
-  { id: "1", title: "Class Assignment #1: Photosynthesis & Light Reactions", course: "BIOL 101", due: "Tomorrow at 11:59 PM", status: "Pending Submission" },
-  { id: "2", title: "Problem Set #3: Partial Derivatives & Gradient Vectors", course: "MATH 201", due: "In 3 Days", status: "In Progress" },
-  { id: "3", title: "Lab Report #2: Newton's Motion & Inclined Friction", course: "PHYS 102", due: "Completed", status: "Graded (94/100)" },
-  { id: "4", title: "Coding Problem Set #1: Big-O Complexity Analysis", course: "CS 101", due: "In 5 Days", status: "Pending" },
+  { id: "1", title: "Class Space Mission: Cellular Energy & ATP", course: "BIOL 101", due: "Tomorrow at 11:59 PM", status: "Pending Submission" },
+  { id: "2", title: "Problem Set #3: Gradient Vectors & Tangent Planes", course: "MATH 201", due: "In 3 Days", status: "In Progress" },
+  { id: "3", title: "Lab Space: Newton's Laws & Friction", course: "PHYS 102", due: "Completed", status: "Graded (94/100)" },
+  { id: "4", title: "Coding Mission: Big-O Time Complexity", course: "CS 101", due: "In 5 Days", status: "Pending" },
 ];
 
 const columns: Column<UpcomingRow>[] = [
-  { key: "title", header: "Assignment", render: (r) => <span className="font-semibold text-xs text-foreground">{r.title}</span> },
-  { key: "course", header: "Course", render: (r) => <Badge variant="outline" className="text-[10px] font-bold uppercase">{r.course}</Badge> },
+  { key: "title", header: "Mission / Task", render: (r) => <span className="font-semibold text-xs text-foreground">{r.title}</span> },
+  { key: "course", header: "Space", render: (r) => <Badge variant="outline" className="text-[10px] font-bold uppercase">{r.course}</Badge> },
   { key: "due", header: "Due Date", render: (r) => <span className="text-xs text-muted-foreground">{r.due}</span> },
   {
     key: "status",
@@ -80,42 +84,50 @@ const columns: Column<UpcomingRow>[] = [
   },
 ];
 
-const enrolledCourses = [
+const schoolAiSpaces = [
   {
     id: "biol_101",
     code: "BIOL 101",
-    title: "Cell & Molecular Biology",
+    title: "Cell & Molecular Biology Space",
     instructor: "Dr. Elizabeth Vance",
     materials: 5,
     progress: 78,
-    color: "from-emerald-500/20 to-teal-500/10 border-emerald-500/30",
+    badgeColor: "bg-emerald-600 text-white",
+    bannerGradient: "from-emerald-600/15 via-emerald-500/5 to-transparent",
+    dotTopic: "Photosynthesis & Light Reactions",
   },
   {
     id: "math_201",
     code: "MATH 201",
-    title: "Multivariable Calculus",
+    title: "Multivariable Calculus Space",
     instructor: "Prof. Alan Turing",
     materials: 6,
     progress: 85,
-    color: "from-sky-500/20 to-blue-500/10 border-sky-500/30",
+    badgeColor: "bg-sky-600 text-white",
+    bannerGradient: "from-sky-600/15 via-sky-500/5 to-transparent",
+    dotTopic: "Partial Derivatives & Chain Rule",
   },
   {
     id: "phys_102",
     code: "PHYS 102",
-    title: "University Physics II",
+    title: "University Physics II Space",
     instructor: "Dr. Richard Feynman",
     materials: 4,
     progress: 62,
-    color: "from-purple-500/20 to-pink-500/10 border-purple-500/30",
+    badgeColor: "bg-purple-600 text-white",
+    bannerGradient: "from-purple-600/15 via-purple-500/5 to-transparent",
+    dotTopic: "Newtonian Mechanics & Vectors",
   },
   {
     id: "cs_101",
     code: "CS 101",
-    title: "Data Structures & Algorithms",
+    title: "Data Structures & Algorithms Space",
     instructor: "Prof. Donald Knuth",
     materials: 8,
     progress: 92,
-    color: "from-amber-500/20 to-orange-500/10 border-amber-500/30",
+    badgeColor: "bg-amber-600 text-white",
+    bannerGradient: "from-amber-600/15 via-amber-500/5 to-transparent",
+    dotTopic: "Asymptotic Complexity & Trees",
   },
 ];
 
@@ -123,7 +135,7 @@ function StudentDashboard() {
   const { profile, user } = useAuth();
   const [selectedQuery, setSelectedQuery] = useState<string | undefined>(undefined);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState("spaces");
 
   const name = profile?.full_name?.split(" ")[0] || user?.email?.split("@")[0] || "there";
 
@@ -135,9 +147,9 @@ function StudentDashboard() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6 pb-12">
-      {/* ── 1. UNIFIED TOP AI BRIEFING & INTELLIGENCE STRIP ── */}
-      <ComponentErrorBoundary fallbackTitle="AI Mentor Daily Briefing">
+    <div className="mx-auto max-w-7xl space-y-6 pb-16">
+      {/* ── 1. SCHOOLAI-STYLE MISSION CONTROL HERO BRIEFING ── */}
+      <ComponentErrorBoundary fallbackTitle="Mission Control Briefing">
         <AiDailyBriefing
           userName={name}
           analytics={analytics}
@@ -147,7 +159,7 @@ function StudentDashboard() {
         />
       </ComponentErrorBoundary>
 
-      <ComponentErrorBoundary fallbackTitle="AI Learning Intelligence">
+      <ComponentErrorBoundary fallbackTitle="Learning Intelligence">
         <AiLearningIntelligence
           studentId={user?.id || "demo_student"}
           analytics={analytics}
@@ -156,33 +168,92 @@ function StudentDashboard() {
         />
       </ComponentErrorBoundary>
 
-      {/* ── 2. MAIN WORKSPACE GRID WITH DOCKED AI ASSISTANT ── */}
+      {/* ── 2. MAIN WORKSPACE WITH TABS & STICKY DOT AI ASSISTANT ── */}
       <div className="grid gap-6 lg:grid-cols-12 items-start">
-        {/* Left Interactive Workspace (7 Cols) */}
+        {/* Left Side: SchoolAI Spaces & Tooling Tabs (7 Cols) */}
         <div className="space-y-6 lg:col-span-7">
-          {/* Workspace Navigation Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-5">
-            <TabsList className="w-full grid grid-cols-4 p-1.5 rounded-2xl bg-secondary/80 border border-border/80 h-auto">
-              <TabsTrigger value="overview" className="rounded-xl py-2 font-bold text-xs gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm">
-                <Brain className="h-3.5 w-3.5 text-emerald-600" />
-                <span>AI Agents</span>
+            <TabsList className="w-full grid grid-cols-4 p-1.5 rounded-full bg-secondary/80 border border-border/70 h-auto shadow-xs">
+              <TabsTrigger value="spaces" className="rounded-full py-2 font-bold text-xs gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm">
+                <BookOpen className="h-3.5 w-3.5 text-sky-600" />
+                <span>My Spaces</span>
               </TabsTrigger>
-              <TabsTrigger value="practice" className="rounded-xl py-2 font-bold text-xs gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm">
+              <TabsTrigger value="practice" className="rounded-full py-2 font-bold text-xs gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm">
                 <Target className="h-3.5 w-3.5 text-purple-600" />
                 <span>Practice & Quiz</span>
               </TabsTrigger>
-              <TabsTrigger value="planner" className="rounded-xl py-2 font-bold text-xs gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm">
-                <CalendarClock className="h-3.5 w-3.5 text-sky-600" />
+              <TabsTrigger value="planner" className="rounded-full py-2 font-bold text-xs gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm">
+                <CalendarClock className="h-3.5 w-3.5 text-emerald-600" />
                 <span>7-Day Plan</span>
               </TabsTrigger>
-              <TabsTrigger value="assignments" className="rounded-xl py-2 font-bold text-xs gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm">
+              <TabsTrigger value="assignments" className="rounded-full py-2 font-bold text-xs gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm">
                 <ClipboardList className="h-3.5 w-3.5 text-amber-600" />
-                <span>Assignments</span>
+                <span>Missions</span>
               </TabsTrigger>
             </TabsList>
 
-            {/* TAB 1: AI AGENT HUB & COURSES */}
-            <TabsContent value="overview" className="space-y-6 mt-0">
+            {/* TAB 1: SCHOOLAI SPACES & AI AGENTS */}
+            <TabsContent value="spaces" className="space-y-6 mt-0">
+              {/* Spaces Grid */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <h3 className="font-display text-lg font-bold tracking-tight text-foreground flex items-center gap-2">
+                      <span>Interactive Learning Spaces</span>
+                    </h3>
+                    <p className="text-xs text-muted-foreground">Each space contains course notes, RAG documents, and a dedicated Socratic Dot AI.</p>
+                  </div>
+                  <Link to="/courses" className="text-xs font-bold text-sky-600 hover:underline flex items-center gap-1">
+                    <span>All Spaces</span>
+                    <ArrowRight className="h-3 w-3" />
+                  </Link>
+                </div>
+
+                <div className="grid gap-3.5 sm:grid-cols-2">
+                  {schoolAiSpaces.map((space) => (
+                    <Link
+                      key={space.id}
+                      to="/courses/$courseId"
+                      params={{ courseId: space.id }}
+                      className={`group p-4 rounded-3xl border border-border/80 bg-card hover:border-sky-500/50 hover:shadow-md transition-all space-y-3 block cursor-pointer bg-gradient-to-br ${space.bannerGradient}`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <Badge className={`${space.badgeColor} font-bold text-[10px] px-2.5 py-0.5 rounded-full`}>
+                          {space.code}
+                        </Badge>
+                        <span className="text-[11px] font-bold text-sky-600 dark:text-sky-400 group-hover:translate-x-0.5 transition-transform flex items-center gap-1">
+                          <span>Enter Space</span>
+                          <ArrowRight className="h-3 w-3" />
+                        </span>
+                      </div>
+
+                      <div>
+                        <h4 className="font-display font-bold text-sm text-foreground line-clamp-1">{space.title}</h4>
+                        <p className="text-[11px] text-muted-foreground mt-0.5">{space.instructor}</p>
+                      </div>
+
+                      <div className="p-2 rounded-2xl bg-card/80 border border-border/60 text-xs space-y-1">
+                        <div className="flex items-center justify-between text-[10px] text-muted-foreground font-semibold">
+                          <span className="flex items-center gap-1 text-foreground font-bold">
+                            <Bot className="h-3 w-3 text-sky-600" /> Dot AI Topic:
+                          </span>
+                          <span>{space.progress}% Mastery</span>
+                        </div>
+                        <p className="text-[11px] text-sky-700 dark:text-sky-300 font-semibold line-clamp-1">
+                          {space.dotTopic}
+                        </p>
+                      </div>
+
+                      <div className="pt-1 flex items-center justify-between text-[11px] text-muted-foreground border-t border-border/40">
+                        <span>{space.materials} Documents Indexed</span>
+                        <span className="font-bold text-emerald-600 dark:text-emerald-400">🟢 Active Dot AI</span>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
+              {/* AI Agent Command Team */}
               <ComponentErrorBoundary fallbackTitle="AI Agent Command Team">
                 <AiAgentHub
                   agentStatuses={analytics?.agent_statuses}
@@ -192,50 +263,11 @@ function StudentDashboard() {
                 />
               </ComponentErrorBoundary>
 
-              {/* Enrolled Courses Grid */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-display text-base font-bold tracking-tight text-foreground flex items-center gap-2">
-                    <BookOpen className="h-4 w-4 text-emerald-600" />
-                    <span>Course Knowledge Bases</span>
-                  </h3>
-                  <Link to="/courses" className="text-xs font-semibold text-emerald-700 hover:underline">
-                    View All 6 Courses →
-                  </Link>
-                </div>
-
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {enrolledCourses.map((c) => (
-                    <Link
-                      key={c.id}
-                      to="/courses/$courseId"
-                      params={{ courseId: c.id }}
-                      className="group p-4 rounded-2xl border border-border/80 bg-card hover:border-emerald-600/50 hover:shadow-md transition-all space-y-2.5 block cursor-pointer"
-                    >
-                      <div className="flex items-center justify-between">
-                        <Badge className="bg-emerald-700 text-white font-bold text-[10px]">{c.code}</Badge>
-                        <span className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 group-hover:translate-x-0.5 transition-transform">
-                          Open Notes →
-                        </span>
-                      </div>
-                      <div>
-                        <h4 className="font-display font-bold text-sm text-foreground line-clamp-1">{c.title}</h4>
-                        <p className="text-[11px] text-muted-foreground mt-0.5">{c.instructor}</p>
-                      </div>
-                      <div className="pt-2 border-t border-border/40 flex items-center justify-between text-[11px] text-muted-foreground">
-                        <span>{c.materials} Docs Indexed</span>
-                        <span className="font-bold text-foreground">{c.progress}% Mastery</span>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-
               {/* Weekly Study Progress Chart */}
               <ComponentErrorBoundary fallbackTitle="Weekly AI Study Progress">
                 <ProgressChart
-                  title="Weekly AI Study Progress"
-                  description="Completed study blocks & AI Tutor practice sessions across active courses."
+                  title="Weekly Learning Space Engagement"
+                  description="Completed study blocks, AI dialogues, and quiz submissions across active spaces."
                   data={[
                     { label: "Mon", value: 4 },
                     { label: "Tue", value: 6 },
@@ -245,12 +277,12 @@ function StudentDashboard() {
                     { label: "Sat", value: 9 },
                     { label: "Sun", value: 6 },
                   ]}
-                  seriesLabel="Tasks & Quizzes Completed"
+                  seriesLabel="Space Missions Completed"
                 />
               </ComponentErrorBoundary>
             </TabsContent>
 
-            {/* TAB 2: ADAPTIVE PRACTICE & EXAM SIMULATOR */}
+            {/* TAB 2: ADAPTIVE PRACTICE & QUIZZES */}
             <TabsContent value="practice" className="space-y-6 mt-0">
               <ComponentErrorBoundary fallbackTitle="Adaptive Practice Quizzes & Flashcards">
                 <QuizGeneratorCard
@@ -293,7 +325,7 @@ function StudentDashboard() {
               </ComponentErrorBoundary>
             </TabsContent>
 
-            {/* TAB 4: ASSIGNMENTS & HOMEWORK COACH */}
+            {/* TAB 4: MISSIONS & ASSIGNMENTS */}
             <TabsContent value="assignments" className="space-y-6 mt-0">
               <ComponentErrorBoundary fallbackTitle="Assignment Homework Coach">
                 <AssignmentFeedbackCard
@@ -304,7 +336,7 @@ function StudentDashboard() {
 
               <div className="p-5 rounded-3xl bg-card border border-border/80 shadow-xs space-y-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-display text-base font-bold tracking-tight">Upcoming Deadlines</h3>
+                  <h3 className="font-display text-base font-bold tracking-tight">Active Classroom Missions</h3>
                   <Badge variant="outline" className="text-[10px] font-bold">4 Active</Badge>
                 </div>
                 <DataTable columns={columns} rows={upcoming} getRowId={(r) => r.id} />
@@ -313,12 +345,12 @@ function StudentDashboard() {
           </Tabs>
         </div>
 
-        {/* Right Sticky Column: Dedicated AI Study Assistant (5 Cols) */}
-        <div className="lg:col-span-5 lg:sticky lg:top-24 space-y-4">
-          <ComponentErrorBoundary fallbackTitle="AI Study Assistant">
+        {/* Right Sticky Column: SchoolAI-Style Socratic Dot AI Companion (5 Cols) */}
+        <div className="lg:col-span-5 lg:sticky lg:top-20 space-y-4">
+          <ComponentErrorBoundary fallbackTitle="AI Study Companion">
             <AiAssistantPanel
-              title="AI Socratic Assistant"
-              description="Ask questions, request study plans, or upload lecture notes for instant citations."
+              title="Dot AI Socratic Companion"
+              description="Ask questions, request worked derivations, or search uploaded lecture notes."
               studentId={user?.id || "demo_student"}
               externalPrompt={selectedQuery}
               recentChatsData={analytics?.recent_conversations}

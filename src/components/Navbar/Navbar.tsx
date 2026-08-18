@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { GraduationCap, LogOut, User as UserIcon } from "lucide-react";
+import { GraduationCap, LogOut, User as UserIcon, Sparkles, ArrowRight, BookOpen, ShieldCheck, Compass } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -29,129 +29,126 @@ export function Navbar({ withSidebarTrigger = false }: { withSidebarTrigger?: bo
     navigate({ to: "/auth", replace: true });
   }
 
-  const displayName = profile?.full_name || user?.email || "Account";
+  const displayName = profile?.full_name || user?.email?.split("@")[0] || "Student";
 
   return (
-    <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-border/40 bg-background/95 px-6 backdrop-blur md:px-12">
-      {withSidebarTrigger ? <SidebarTrigger /> : null}
+    <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-border/60 bg-background/85 backdrop-blur-xl px-4 sm:px-8">
+      <div className="flex items-center gap-6">
+        {withSidebarTrigger ? <SidebarTrigger /> : null}
 
-      <div className="flex items-center gap-8">
-        <Link to="/" className="flex items-center gap-2 text-2xl font-black tracking-tighter text-foreground">
-          <span className="text-emerald-700 dark:text-emerald-400">scholar</span>
-          <span className="text-emerald-800 dark:text-emerald-300 font-bold text-xs bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-            ai
-          </span>
+        {/* SchoolAI-style Brand Logo */}
+        <Link to="/" className="flex items-center gap-2 group">
+          <div className="h-8 w-8 rounded-xl bg-gradient-to-tr from-sky-600 to-indigo-600 flex items-center justify-center text-white shadow-sm font-bold text-sm">
+            🎓
+          </div>
+          <div className="flex items-baseline gap-1">
+            <span className="font-display font-extrabold text-xl tracking-tight text-foreground">Scholar</span>
+            <span className="text-xs font-bold text-sky-600 dark:text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded-full border border-sky-500/20">
+              AI
+            </span>
+          </div>
         </Link>
 
-        <nav className="hidden lg:flex items-center gap-7 text-sm font-semibold text-muted-foreground">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-1.5 hover:text-emerald-700 transition-colors focus:outline-none">
-                AI Agents <span className="text-[10px]">▼</span>
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-64 p-2 space-y-1">
-              <DropdownMenuItem asChild className="rounded-xl cursor-pointer">
-                <Link to="/dashboard/student" className="flex flex-col items-start gap-0.5">
-                  <span className="font-bold text-foreground text-xs">Personal Socratic Tutor</span>
-                  <span className="text-[11px] text-muted-foreground">Adaptive step-by-step math & concept guidance</span>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild className="rounded-xl cursor-pointer">
-                <Link to="/courses/$courseId" params={{ courseId: "biol_101" }} className="flex flex-col items-start gap-0.5">
-                  <span className="font-bold text-foreground text-xs">Course Document Assistant</span>
-                  <span className="text-[11px] text-muted-foreground">Document search & page-cited answers</span>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild className="rounded-xl cursor-pointer">
-                <Link to="/assignments" className="flex flex-col items-start gap-0.5">
-                  <span className="font-bold text-foreground text-xs">Essay Evaluator & Auto-Grader</span>
-                  <span className="text-[11px] text-muted-foreground">Rubric essay grading & feedback</span>
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-1.5 hover:text-emerald-700 transition-colors focus:outline-none">
-                Solutions <span className="text-[10px]">▼</span>
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-56 p-2 space-y-1">
-              <DropdownMenuItem asChild className="rounded-xl cursor-pointer">
-                <Link to="/dashboard/student" className="font-semibold text-xs">For Students</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild className="rounded-xl cursor-pointer">
-                <Link to="/dashboard/teacher" className="font-semibold text-xs">For Teachers & Educators</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild className="rounded-xl cursor-pointer">
-                <Link to="/dashboard/admin" className="font-semibold text-xs">For University Admins</Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <Link to="/courses" className="hover:text-emerald-700 transition-colors">
-            Course RAG Studio
+        {/* SchoolAI-style Role Switcher Pill (Desktop) */}
+        <div className="hidden lg:flex items-center bg-secondary/80 border border-border/80 rounded-full p-1 gap-1 text-xs font-semibold text-muted-foreground shadow-xs">
+          <span className="pl-3 pr-1 text-[11px] font-bold text-muted-foreground">Scholar for...</span>
+          <Link
+            to="/dashboard/student"
+            className="px-3.5 py-1 rounded-full bg-card text-foreground font-bold shadow-xs transition-all hover:text-sky-600"
+          >
+            Students
           </Link>
-          <Link to="/assignments" className="hover:text-emerald-700 transition-colors">
-            Assignments Hub
+          <Link
+            to="/dashboard/teacher"
+            className="px-3.5 py-1 rounded-full hover:bg-card/60 transition-all hover:text-sky-600"
+          >
+            Teachers
           </Link>
-        </nav>
+          <Link
+            to="/dashboard/admin"
+            className="px-3.5 py-1 rounded-full hover:bg-card/60 transition-all hover:text-sky-600"
+          >
+            Admins
+          </Link>
+        </div>
       </div>
 
-      <div className="flex items-center gap-2 sm:gap-3">
+      {/* Navigation Links & Action Buttons */}
+      <div className="flex items-center gap-3">
+        <nav className="hidden md:flex items-center gap-5 text-xs font-bold text-muted-foreground mr-2">
+          <Link to="/courses" className="hover:text-foreground transition-colors">
+            Course Spaces
+          </Link>
+          <Link to="/tutor" search={{ topic: undefined }} className="hover:text-foreground transition-colors flex items-center gap-1 text-sky-600 dark:text-sky-400">
+            <Sparkles className="h-3.5 w-3.5" />
+            <span>Socratic Tutor</span>
+          </Link>
+          <Link to="/mastery" className="hover:text-foreground transition-colors">
+            Mastery Analytics
+          </Link>
+        </nav>
+
+        {/* SchoolAI-style "Join a Space" Button */}
+        <Link to="/courses">
+          <Button
+            size="sm"
+            variant="outline"
+            className="rounded-full h-8 px-3.5 text-xs font-bold border-sky-500/30 text-sky-700 dark:text-sky-300 bg-sky-500/5 hover:bg-sky-500/15 gap-1.5 shadow-xs"
+          >
+            <span>Join a Space</span>
+            <ArrowRight className="h-3 w-3" />
+          </Button>
+        </Link>
+
         <ThemeToggle />
-        {isAuthenticated ? <NotificationsBell /> : null}
+        <NotificationsBell />
+
+        {/* User Account Menu */}
         {isAuthenticated ? (
-          <>
-            <Button asChild size="sm" className="rounded-full px-5 text-xs font-bold bg-emerald-800 hover:bg-emerald-900 text-white shadow-xs">
-              <Link to="/dashboard/student">My Dashboard →</Link>
-            </Button>
-            {role ? (
-              <Badge variant="secondary" className="hidden capitalize sm:inline-flex bg-emerald-50 text-emerald-800 border-emerald-200">
-                {role}
-              </Badge>
-            ) : null}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2 rounded-full px-4 font-semibold border-emerald-600/30">
-                  <UserIcon className="h-4 w-4 text-emerald-700" />
-                  <span className="max-w-36 truncate font-medium">{displayName}</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel className="truncate">{user?.email}</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link to="/dashboard/student">Student Workspace</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/assignments">Assignments Hub</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/dashboard/teacher">Teacher Portal</Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleSignOut}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Sign out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center gap-2 p-1 rounded-full hover:bg-secondary transition-colors focus:outline-none cursor-pointer">
+                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-sky-500 to-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-xs border border-white/20">
+                  {displayName[0].toUpperCase()}
+                </div>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl shadow-xl">
+              <DropdownMenuLabel className="font-bold text-xs pb-1">
+                <div className="text-foreground">{displayName}</div>
+                <div className="text-[11px] font-normal text-muted-foreground truncate">{user?.email}</div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild className="rounded-xl cursor-pointer text-xs">
+                <Link to="/profile" className="flex items-center gap-2">
+                  <UserIcon className="h-3.5 w-3.5 text-sky-600" />
+                  <span>My Learning Profile</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild className="rounded-xl cursor-pointer text-xs">
+                <Link to="/mastery" className="flex items-center gap-2">
+                  <Compass className="h-3.5 w-3.5 text-emerald-600" />
+                  <span>Topic Mastery & Skill Map</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={handleSignOut}
+                className="rounded-xl cursor-pointer text-xs text-destructive focus:text-destructive flex items-center gap-2 font-semibold"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+                <span>Sign Out</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         ) : (
-          <>
-            <Button asChild variant="ghost" size="sm" className="rounded-full px-5 text-xs font-bold text-muted-foreground hover:text-foreground hidden sm:inline-flex">
-              <Link to="/auth">Sign in</Link>
+          <Link to="/auth">
+            <Button size="sm" className="rounded-full h-8 px-4 text-xs font-bold bg-sky-600 hover:bg-sky-700 text-white shadow-xs">
+              Sign In
             </Button>
-            <Button asChild size="sm" className="rounded-full px-6 text-xs font-bold bg-emerald-800 hover:bg-emerald-900 text-white shadow-xs">
-              <Link to="/auth">Get Started Free</Link>
-            </Button>
-          </>
+          </Link>
         )}
       </div>
     </header>
   );
 }
-
