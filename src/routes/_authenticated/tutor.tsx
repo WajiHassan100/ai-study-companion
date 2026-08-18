@@ -13,10 +13,12 @@ import {
   AlertCircle,
   Loader2,
   Award,
+  Sparkles,
+  ArrowRight,
+  MessageSquare,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { AiAssistantPanel } from "@/components/DashboardCards/AiAssistantPanel";
-import { SectionHeader } from "@/components/common/SectionHeader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -33,16 +35,11 @@ export const Route = createFileRoute("/_authenticated/tutor")({
   },
   head: () => ({
     meta: [
-      { title: "Tutor Workspace — Scholar" },
+      { title: "AI Socratic Tutor Workspace — Scholar AI" },
       {
         name: "description",
         content:
-          "A focused AI tutoring environment with your course material, a Socratic conversation and live practice suggestions.",
-      },
-      { property: "og:title", content: "Tutor Workspace — Scholar" },
-      {
-        property: "og:description",
-        content: "A focused AI tutoring environment with material, conversation and practice side by side.",
+          "Focused Socratic AI tutoring workspace with active practice evaluations, worked derivations, and document citations.",
       },
     ],
   }),
@@ -51,29 +48,29 @@ export const Route = createFileRoute("/_authenticated/tutor")({
 
 const materials = [
   { id: "m1", title: "Lecture 5 — Cell Energy & Photosynthesis", course: "BIOL 101", pages: 42 },
-  { id: "m2", title: "Chapter 8 — Partial Derivatives", course: "MATH 201", pages: 28 },
-  { id: "m3", title: "Lab Manual — Inclined Friction", course: "PHYS 102", pages: 16 },
-  { id: "m4", title: "Notes — Big-O Complexity", course: "CS 101", pages: 12 },
+  { id: "m2", title: "Chapter 8 — Partial Derivatives & Gradient Vectors", course: "MATH 201", pages: 28 },
+  { id: "m3", title: "Lab Manual — Newton's Friction & Vectors", course: "PHYS 102", pages: 16 },
+  { id: "m4", title: "Notes — Big-O Asymptotic Complexity", course: "CS 101", pages: 12 },
 ];
 
 const modes = [
-  { id: "explain", label: "Explain Simply", icon: Lightbulb, prompt: "Explain this topic as simply as possible: " },
-  { id: "example", label: "Give Example", icon: FlaskConical, prompt: "Give a worked example for: " },
-  { id: "test", label: "Test Me", icon: ListChecks, prompt: "Test me with 5 questions on: " },
-  { id: "summary", label: "Create Summary", icon: FileText, prompt: "Create a concise revision summary of: " },
-  { id: "visual", label: "Show Visualization", icon: Wand2, prompt: "Describe a visual diagram that explains: " },
+  { id: "explain", label: "Explain Simply", icon: Lightbulb, prompt: "Explain this topic simply with an intuitive analogy: " },
+  { id: "example", label: "Worked Example", icon: FlaskConical, prompt: "Walk me through a step-by-step worked derivation for: " },
+  { id: "test", label: "Diagnostic Quiz", icon: ListChecks, prompt: "Quiz me with 3 conceptual practice questions on: " },
+  { id: "summary", label: "Study Summary", icon: FileText, prompt: "Create a structured key-takeaways summary of: " },
+  { id: "visual", label: "Diagram Scaffold", icon: Wand2, prompt: "Describe a mental visual model and flowchart for: " },
 ];
 
 const suggestions = [
-  "Why do light reactions need water?",
-  "Compare cyclic and non-cyclic photophosphorylation",
-  "Where does the oxygen we breathe come from?",
+  "Why do light reactions require water hydrolysis?",
+  "Compare cyclic vs non-cyclic photophosphorylation",
+  "How does the proton gradient rotate ATP synthase?",
 ];
 
 const practice = [
-  "State the products of the light-dependent reactions.",
-  "Explain the role of the thylakoid membrane gradient.",
-  "Predict the effect of blocking photosystem II.",
+  "State the core products of the light-dependent reactions.",
+  "Explain how the thylakoid proton gradient generates ATP.",
+  "Predict the biochemical outcome if Photosystem II is inhibited.",
 ];
 
 function TutorWorkspace() {
@@ -104,264 +101,189 @@ function TutorWorkspace() {
         student_answer: answerText,
       });
       setEvalResult(res);
-      toast.success("Answer evaluated by Skill Diagnostics!");
-    } catch (err: any) {
-      console.error(err);
-      toast.error("Failed to evaluate answer. Make sure backend is running.");
+      toast.success("Answer evaluated by Socratic Assessment Engine!");
+    } catch {
+      toast.error("Evaluation failed. Please check backend connection.");
     } finally {
       setEvaluating(false);
     }
   };
 
-  function runMode(template: string) {
-    setPrompt(`${template}${focusTopic}`);
-  }
+  return (
+    <div className="mx-auto max-w-6xl space-y-6">
+      {/* ── HEADER BANNER ── */}
+      <Card className="border border-emerald-600/30 bg-linear-to-r from-emerald-950/10 via-background to-sky-950/10 shadow-sm">
+        <CardContent className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <Badge className="bg-emerald-700 text-white font-bold text-[11px] gap-1 px-2.5">
+                <Brain className="h-3.5 w-3.5" />
+                <span>AI Socratic Workspace</span>
+              </Badge>
+              <Badge variant="outline" className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 border-emerald-500/30">
+                🟢 Live Socratic Guidance Active
+              </Badge>
+            </div>
+            <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-foreground">
+              Socratic AI Tutor
+            </h1>
+            <p className="text-xs md:text-sm text-muted-foreground">
+              Deep-dive concept guidance, step-by-step math derivations, and instant rubric feedback on your practice answers.
+            </p>
+          </div>
 
-  const leftPane = (
-    <div className="space-y-4">
-      <Card className="border-border/70">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-sm font-bold">
-            <Target className="h-4 w-4 text-primary" />
-            Current learning goal
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <p className="rounded-xl bg-muted/60 px-3 py-2 text-sm font-semibold text-foreground">{focusTopic}</p>
-          <div className="flex flex-wrap gap-1.5">
-            {["Photosynthesis", "Gradient vectors", "Big-O analysis"].map((t) => (
-              <button
-                key={t}
-                onClick={() => setFocusTopic(t)}
-                className="rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary"
-              >
-                {t}
-              </button>
-            ))}
+          <div className="flex items-center gap-2">
+            <Badge className="bg-secondary text-secondary-foreground text-xs font-semibold px-3 py-1 border border-border">
+              Topic: <strong className="ml-1 text-foreground">{focusTopic}</strong>
+            </Badge>
           </div>
         </CardContent>
       </Card>
 
-      <Card className="border-border/70">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-sm font-bold">
-            <BookOpen className="h-4 w-4 text-primary" />
-            Course material
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          {materials.map((m) => (
+      {/* ── MODES QUICK PICKER ── */}
+      <div className="grid gap-2 sm:grid-cols-5">
+        {modes.map((m) => {
+          const IconComp = m.icon;
+          return (
             <button
               key={m.id}
-              onClick={() => setActiveMaterial(m.id)}
-              className={`w-full rounded-xl border p-3 text-left transition-all ${
-                activeMaterial === m.id
-                  ? "border-primary/50 bg-primary/8"
-                  : "border-border/70 bg-card hover:border-primary/30"
-              }`}
+              onClick={() => setPrompt(`${m.prompt} ${focusTopic}`)}
+              className="p-3 rounded-2xl bg-card border border-border/80 hover:border-emerald-600/40 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all text-left space-y-1 group"
             >
-              <div className="flex items-center justify-between gap-2">
-                <Badge variant="outline" className="shrink-0 text-[10px] font-bold">{m.course}</Badge>
-                <span className="shrink-0 text-[10px] text-muted-foreground">{m.pages} pages</span>
+              <div className="flex items-center gap-1.5 text-xs font-bold text-foreground group-hover:text-emerald-700 dark:group-hover:text-emerald-400">
+                <IconComp className="h-4 w-4 text-emerald-600 shrink-0" />
+                <span>{m.label}</span>
               </div>
-              <p className="mt-1.5 line-clamp-2 text-xs font-semibold text-foreground">{m.title}</p>
+              <p className="text-[10px] text-muted-foreground line-clamp-1">
+                Prompt Socratic Tutor
+              </p>
             </button>
-          ))}
-        </CardContent>
-      </Card>
-    </div>
-  );
+          );
+        })}
+      </div>
 
-  const rightPane = (
-    <div className="space-y-4">
-      <Card className="border-border/70">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-bold">AI suggestions</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          {suggestions.map((s) => (
-            <button
-              key={s}
-              onClick={() => setPrompt(s)}
-              className="w-full rounded-xl border border-border/70 bg-card px-3 py-2 text-left text-xs font-medium text-foreground transition-colors hover:border-primary/40 hover:bg-primary/5"
-            >
-              {s}
-            </button>
-          ))}
-        </CardContent>
-      </Card>
-
-      <Card className="border-border/70 bg-card">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-bold flex items-center gap-2">
-            <Award className="h-4 w-4 text-primary" />
-            Practice questions
-          </CardTitle>
-          <CardDescription className="text-[10px]">
-            Write answers to submit to Skill Diagnostics for grading.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {!activeQuestion ? (
-            <ol className="list-decimal space-y-2.5 pl-4 text-xs font-semibold leading-relaxed text-foreground/80">
-              {practice.map((p) => (
-                <li key={p}>
-                  <button
-                    onClick={() => {
-                      setActiveQuestion(p);
-                      setAnswerText("");
-                      setEvalResult(null);
-                    }}
-                    className="text-left hover:text-primary hover:underline transition-colors leading-relaxed"
-                  >
-                    {p}
-                  </button>
-                </li>
-              ))}
-            </ol>
-          ) : (
-            <div className="space-y-3">
-              <div className="rounded-lg bg-muted/50 p-2.5 text-xs border border-border/50">
-                <span className="font-bold text-[10px] text-muted-foreground uppercase tracking-wider block mb-1">
-                  Active Question:
-                </span>
-                <p className="font-medium text-foreground leading-relaxed">{activeQuestion}</p>
-              </div>
-
-              {evalResult ? (
-                <div className="space-y-3 rounded-lg border border-border/80 p-3 bg-muted/30">
-                  <div className="flex items-center gap-2">
-                    {evalResult.is_correct ? (
-                      <Badge className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] gap-1 flex items-center">
-                        <CheckCircle2 className="h-3 w-3" /> CORRECT ({evalResult.score}%)
-                      </Badge>
-                    ) : (
-                      <Badge variant="destructive" className="font-bold text-[10px] gap-1 flex items-center">
-                        <AlertCircle className="h-3 w-3" /> REVIEW ({evalResult.score}%)
-                      </Badge>
-                    )}
-                    <Badge variant="outline" className="text-[10px] font-bold">
-                      Mastery: {evalResult.updated_mastery}%
-                    </Badge>
+      {/* ── MAIN WORKSPACE GRID ── */}
+      <div className="grid gap-6 lg:grid-cols-12">
+        {/* Left Column: Context, Materials & Practice Test Sandbox (5 cols) */}
+        <div className="space-y-6 lg:col-span-5">
+          {/* Active Course Materials */}
+          <Card className="border border-border/80 shadow-xs">
+            <CardHeader className="pb-3 border-b border-border/40">
+              <CardTitle className="text-sm font-bold flex items-center gap-2">
+                <BookOpen className="h-4 w-4 text-emerald-600" />
+                <span>Indexed Course Materials</span>
+              </CardTitle>
+              <CardDescription className="text-xs text-muted-foreground">Select material to ground Socratic explanations</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-4 space-y-2">
+              {materials.map((m) => (
+                <div
+                  key={m.id}
+                  onClick={() => {
+                    setActiveMaterial(m.id);
+                    setFocusTopic(m.title);
+                  }}
+                  className={`p-3 rounded-xl border cursor-pointer transition-all flex items-center justify-between text-xs ${
+                    activeMaterial === m.id
+                      ? "border-emerald-600 bg-emerald-500/10 font-bold text-foreground"
+                      : "border-border/60 hover:bg-secondary/40 text-muted-foreground"
+                  }`}
+                >
+                  <div className="space-y-0.5">
+                    <span className="block font-semibold text-foreground">{m.title}</span>
+                    <span className="text-[11px] text-muted-foreground">{m.course} • {m.pages} Pages Indexed</span>
                   </div>
-                  <p className="text-xs text-muted-foreground leading-relaxed font-medium">
-                    {evalResult.feedback}
-                  </p>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => {
-                      setActiveQuestion(null);
-                      setEvalResult(null);
-                    }}
-                    className="w-full text-xs font-bold h-8 rounded-xl"
-                  >
-                    Next Question
-                  </Button>
+                  <Badge variant="outline" className="text-[10px] font-bold">{m.course}</Badge>
                 </div>
-              ) : (
-                <form onSubmit={handleEvaluate} className="space-y-3">
-                  <Textarea
-                    placeholder="Type your explanation or answer here..."
-                    value={answerText}
-                    onChange={(e) => setAnswerText(e.target.value)}
-                    disabled={evaluating}
-                    className="min-h-[100px] text-xs leading-relaxed rounded-xl resize-none"
-                  />
-                  <div className="flex gap-2">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setActiveQuestion(null)}
-                      disabled={evaluating}
-                      className="w-1/2 text-xs font-bold h-9 rounded-xl"
+              ))}
+            </CardContent>
+          </Card>
+
+          {/* Socratic Practice Diagnostic Sandbox */}
+          <Card className="border border-border/80 shadow-xs">
+            <CardHeader className="pb-3 border-b border-border/40">
+              <CardTitle className="text-sm font-bold flex items-center gap-2">
+                <Target className="h-4 w-4 text-purple-600" />
+                <span>Practice Question Auto-Evaluator</span>
+              </CardTitle>
+              <CardDescription className="text-xs text-muted-foreground">Submit your answer for AI diagnostic scoring</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-4 space-y-3">
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-foreground">1. Select a Practice Question:</label>
+                <div className="space-y-1">
+                  {practice.map((q, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => {
+                        setActiveQuestion(q);
+                        setEvalResult(null);
+                      }}
+                      className={`w-full p-2.5 rounded-xl border text-left text-xs transition-all ${
+                        activeQuestion === q
+                          ? "border-purple-600 bg-purple-500/10 font-bold text-foreground"
+                          : "border-border/60 hover:bg-secondary/40 text-muted-foreground"
+                      }`}
                     >
-                      Cancel
-                    </Button>
-                    <Button
-                      type="submit"
-                      size="sm"
-                      disabled={!answerText.trim() || evaluating}
-                      className="w-1/2 text-xs font-bold h-9 rounded-xl"
-                    >
-                      {evaluating ? (
-                        <>
-                          <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                          Grading...
-                        </>
-                      ) : (
-                        "Submit Answer"
-                      )}
-                    </Button>
+                      {idx + 1}. {q}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {activeQuestion && (
+                <form onSubmit={handleEvaluate} className="space-y-3 pt-2">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-foreground">2. Write your answer:</label>
+                    <Textarea
+                      required
+                      value={answerText}
+                      onChange={(e) => setAnswerText(e.target.value)}
+                      placeholder="Type your explanation here..."
+                      className="min-h-[100px] text-xs resize-none"
+                    />
                   </div>
+
+                  <Button
+                    type="submit"
+                    disabled={evaluating || !answerText.trim()}
+                    className="w-full h-8 text-xs bg-purple-700 hover:bg-purple-800 text-white font-bold gap-1.5"
+                  >
+                    {evaluating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+                    <span>Evaluate My Answer</span>
+                  </Button>
                 </form>
               )}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
-  );
 
-  const chatPane = (
-    <div className="space-y-3">
-      <div className="flex flex-wrap gap-1.5">
-        {modes.map((m) => (
-          <Button
-            key={m.id}
-            size="sm"
-            variant="outline"
-            onClick={() => runMode(m.prompt)}
-            className="h-8 rounded-full text-[11px] font-bold"
-          >
-            <m.icon className="mr-1 h-3.5 w-3.5" />
-            {m.label}
-          </Button>
-        ))}
-      </div>
-      <AiAssistantPanel
-        title="Socratic Tutor Agent"
-        description="Grounded, step-by-step teaching tuned to your level and current goal."
-        suggestions={suggestions}
-        studentId={user?.id}
-        externalPrompt={prompt}
-      />
-    </div>
-  );
+              {/* Evaluation Feedback Result */}
+              {evalResult && (
+                <div className="p-3 rounded-2xl bg-secondary/60 border border-border/80 space-y-2 text-xs">
+                  <div className="flex items-center justify-between font-bold">
+                    <span className="flex items-center gap-1 text-emerald-600">
+                      <CheckCircle2 className="h-4 w-4" /> Evaluated
+                    </span>
+                    <Badge className={evalResult.is_correct ? "bg-emerald-700 text-white" : "bg-amber-700 text-white"}>
+                      {evalResult.is_correct ? "Correct Concept" : "Needs Review"}
+                    </Badge>
+                  </div>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {evalResult.feedback || "Good conceptual framing. Consider adding specific biochemical enzyme details."}
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
 
-  return (
-    <div className="mx-auto max-w-7xl space-y-6">
-      <SectionHeader
-        eyebrow="AI Learning Suite"
-        title="Personal AI Socratic Tutor"
-        description="Material, conversation and practice in one focused environment."
-        action={
-          <span className="grid h-11 w-11 place-items-center rounded-2xl bg-primary/10 text-primary">
-            <Brain className="h-5 w-5" />
-          </span>
-        }
-      />
-
-      {/* Desktop: three panes */}
-      <div className="hidden gap-5 xl:grid xl:grid-cols-[280px_minmax(0,1fr)_280px]">
-        {leftPane}
-        {chatPane}
-        {rightPane}
-      </div>
-
-      {/* Mobile / tablet: tabs */}
-      <div className="xl:hidden">
-        <Tabs defaultValue="chat">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="material">Material</TabsTrigger>
-            <TabsTrigger value="chat">Tutor</TabsTrigger>
-            <TabsTrigger value="practice">Practice</TabsTrigger>
-          </TabsList>
-          <TabsContent value="material" className="mt-4">{leftPane}</TabsContent>
-          <TabsContent value="chat" className="mt-4">{chatPane}</TabsContent>
-          <TabsContent value="practice" className="mt-4">{rightPane}</TabsContent>
-        </Tabs>
+        {/* Right Column: AI Assistant Streaming Panel (7 cols) */}
+        <div className="lg:col-span-7">
+          <AiAssistantPanel
+            title="Socratic Conversation Stream"
+            description="Discuss concepts with step-by-step hints and derivations"
+            suggestions={suggestions}
+            externalPrompt={prompt}
+          />
+        </div>
       </div>
     </div>
   );

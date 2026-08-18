@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
 import {
   BookOpen,
   GraduationCap,
-  ShieldCheck,
   Sparkles,
   Play,
   Brain,
@@ -14,9 +13,12 @@ import {
   Bot,
   Layers,
   Star,
-  Award,
-  Video,
-  ClipboardList,
+  FileCheck,
+  TrendingUp,
+  ShieldCheck,
+  MessageSquare,
+  Compass,
+  Cpu,
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar/Navbar";
 import { Button } from "@/components/ui/button";
@@ -26,13 +28,13 @@ import { Badge } from "@/components/ui/badge";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Scholar AI — Personal AI School Assistant" },
+      { title: "Scholar AI — Autonomous AI Education & Mentorship Platform" },
       {
         name: "description",
         content:
-          "Socratic AI Tutor, 7-Day Revision Planner with Video Lessons, RAG PDF Document Studio, and Teacher Essay Auto-Grader.",
+          "Your personal AI education command team: Socratic Tutor, 7-Day Revision Planner, RAG Document Studio, and Adaptive Diagnostic Engine.",
       },
-      { property: "og:title", content: "Scholar AI — Personal AI School Assistant" },
+      { property: "og:title", content: "Scholar AI — Autonomous AI Education Platform" },
       {
         property: "og:description",
         content:
@@ -45,460 +47,306 @@ export const Route = createFileRoute("/")({
 
 type RoleType = "Students" | "Teachers" | "Administrators";
 
-const roleContentMap: Record<RoleType, { headline: string; highlight: string; subtitle: string; primaryLink: string; primaryText: string }> = {
+const roleContentMap: Record<
+  RoleType,
+  { headline: string; highlight: string; subtitle: string; primaryLink: string; primaryText: string; tag: string }
+> = {
   Students: {
-    headline: "AI that guides every student through",
-    highlight: "coursework & revision",
-    subtitle: "Get 1-on-1 Socratic tutoring, 7-day study timetables with YouTube video lessons, PDF note search, and instant assignment help.",
+    tag: "Autonomous Student Copilot",
+    headline: "An autonomous AI team guiding every step of your",
+    highlight: "learning & exam revision",
+    subtitle:
+      "Get 1-on-1 Socratic concept guidance, continuous cognitive behavior tracking, 7-day revision timetables, and exact page citations from your course PDFs.",
     primaryLink: "/dashboard/student",
-    primaryText: "Open Student Workspace",
+    primaryText: "Open Student Command Workspace",
   },
   Teachers: {
-    headline: "AI that drafts lesson plans and",
-    highlight: "auto-grades essays",
-    subtitle: "Automate minute-by-minute lesson timelines, construct adaptive quizzes, and grade student submissions with rubric-based feedback.",
+    tag: "Educator AI Co-Pilot",
+    headline: "AI that drafts minute-by-minute lesson plans and",
+    highlight: "auto-evaluates submissions",
+    subtitle:
+      "Automate class timelines, construct diagnostic quizzes in seconds, and grade student submissions with rubric-backed constructive feedback.",
     primaryLink: "/dashboard/teacher",
-    primaryText: "Open Teacher Assistant",
+    primaryText: "Open Educator Assistant",
   },
   Administrators: {
-    headline: "Centralized control for every",
-    highlight: "role & course",
-    subtitle: "Manage student and teacher accounts, role permissions, course catalogs, and database connections from one control console.",
+    tag: "Institutional Intelligence",
+    headline: "Centralized multi-agent management for every",
+    highlight: "department & curriculum",
+    subtitle:
+      "Monitor student engagement health, system load, API throughput, role permissions, and course vector indices from a single enterprise console.",
     primaryLink: "/dashboard/admin",
     primaryText: "Open Admin Console",
   },
 };
 
-const heroPrompts = [
-  {
-    topic: "🧬 Biology",
-    prompt: "Explain thylakoid light reactions and ATP synthase rotary motor simply",
-    response: "Light-dependent reactions absorb photons in Photosystem II & I, establishing a proton gradient across the thylakoid membrane that rotates ATP Synthase!",
-  },
-  {
-    topic: "📐 Mathematics",
-    prompt: "Show step-by-step how to find directional derivative of f(x,y) = x^2 + y^2",
-    response: "Step 1: Calculate gradient vector ∇f = <2x, 2y>. Step 2: Compute dot product ∇f · u in the direction of unit vector u!",
-  },
-  {
-    topic: "📜 History",
-    prompt: "Summarize the top 3 economic causes of the Industrial Revolution",
-    response: "1. Commercial capital reserves. 2. Coal & iron deposit abundance. 3. Steam engine mechanization boosting factory output!",
-  },
-];
-
 const agentFeatures = [
   {
     id: "tutor",
-    badge: "Interactive Learning",
-    title: "Personal Socratic AI Tutor",
-    icon: Bot,
-    description: "Step-by-step guidance tailored to your learning pace, using visual analogies, clear math notation, and interactive hints.",
-    highlights: ["Guided step-by-step hints", "Mathematical formulas", "Visual concept flowcharts"],
-    color: "from-emerald-500/20 to-teal-500/10 border-emerald-500/30 text-emerald-700",
-  },
-  {
-    id: "profiler",
-    badge: "Progress Diagnostics",
-    title: "Mastery & Skill Diagnostic Studio",
-    icon: Brain,
-    description: "Tracks your learning progress across topics, pinpoints foundational concept gaps, and tailors explanations to your level.",
-    highlights: ["Real-time mastery tracking", "Prerequisite skill gaps", "Adaptive level tuning"],
-    color: "from-blue-500/20 to-indigo-500/10 border-blue-500/30 text-blue-700",
+    badge: "Socratic Dialogues",
+    title: "AI Socratic Tutor",
+    icon: MessageSquare,
+    description:
+      "Step-by-step concept breakdown with interactive scaffolding hints, visual analogies, and worked mathematical derivations.",
+    highlights: ["Interactive socratic hints", "Mathematical LaTeX formulas", "Custom analogies"],
+    accent: "from-emerald-500/20 to-teal-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400",
   },
   {
     id: "planner",
-    badge: "Personalized Timetables",
-    title: "7-Day Revision Planner",
+    badge: "Adaptive Scheduling",
+    title: "Academic Learning Planner",
     icon: Zap,
-    description: "Builds custom daily revision schedules based on upcoming exam dates, complete with recommended video lessons.",
-    highlights: ["Smart review scheduling", "Curated video lesson links", "Daily progress checklist"],
-    color: "from-amber-500/20 to-orange-500/10 border-amber-500/30 text-amber-700",
+    description:
+      "Constructs personalized 7-day study timetables tailored to upcoming assignment deadlines, peak focus hours, and decay curves.",
+    highlights: ["Smart workload rebalancing", "Curated video lesson links", "Daily progress checklist"],
+    accent: "from-sky-500/20 to-blue-500/10 border-sky-500/30 text-sky-600 dark:text-sky-400",
   },
   {
-    id: "quiz",
-    badge: "Practice & Recall",
-    title: "Adaptive Practice Quizzes & Flashcards",
-    icon: Sparkles,
-    description: "Generates custom multiple-choice quizzes and active recall flashcards on any subject, with instant grading and explanations.",
-    highlights: ["Instant answer grading", "Active recall flashcards", "Detailed explanation feedback"],
-    color: "from-purple-500/20 to-pink-500/10 border-purple-500/30 text-purple-700",
+    id: "assessment",
+    badge: "Diagnostic Mastery",
+    title: "Mastery & Assessment Diagnostics",
+    icon: FileCheck,
+    description:
+      "Generates multi-format adaptive quizzes (MCQs, Numerical, Conceptual) and practice exams with instant rubric-based evaluation.",
+    highlights: ["Adaptive difficulty tuning", "Sub-topic mastery bars", "Automated rubric grading"],
+    accent: "from-purple-500/20 to-pink-500/10 border-purple-500/30 text-purple-600 dark:text-purple-400",
+  },
+  {
+    id: "analytics",
+    badge: "Cognitive Intelligence",
+    title: "Progress & Predictive Analytics",
+    icon: TrendingUp,
+    description:
+      "Evaluates retention spacing consistency scores (0-100), monitors mastery growth trajectories, and forecasts exam readiness.",
+    highlights: ["Explainable [Why?] AI reasoning", "Exam outcome predictions", "Streak retention tracking"],
+    accent: "from-blue-500/20 to-cyan-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400",
   },
   {
     id: "rag",
-    badge: "Document Search Studio",
-    title: "Course Document Assistant",
+    badge: "Vector Knowledge Search",
+    title: "Course Document RAG Studio",
     icon: Layers,
-    description: "Upload textbook PDFs, lecture slides, and notes. Ask questions and receive exact, page-cited answers from your course materials.",
-    highlights: ["PDF & slide document upload", "Exact page citations", "Instant lecture summaries"],
-    color: "from-cyan-500/20 to-blue-500/10 border-cyan-500/30 text-cyan-700",
+    description:
+      "Index lecture slides, textbook PDFs, and lab notes into vector embeddings for instant questions with verified page citations.",
+    highlights: ["PDF & slide document upload", "Verified page citations", "Instant lecture summaries"],
+    accent: "from-teal-500/20 to-emerald-500/10 border-teal-500/30 text-teal-600 dark:text-teal-400",
   },
   {
-    id: "teacher",
-    badge: "Teacher Co-Pilot",
-    title: "Educator Assistant & Essay Evaluator",
-    icon: GraduationCap,
-    description: "Empowers teachers with automated lesson plan drafting, structured timelines, and rubric-based homework evaluation.",
-    highlights: ["Structured lesson timelines", "Rubric essay grading", "Constructive feedback reports"],
-    color: "from-rose-500/20 to-red-500/10 border-rose-500/30 text-rose-700",
+    id: "coach",
+    badge: "Continuous Coaching",
+    title: "Consistency & Study Habits Coach",
+    icon: Compass,
+    description:
+      "Detects study bottlenecks, burnout patterns, and optimal focus windows, actively nudging you before knowledge decays.",
+    highlights: ["Peak focus hour discovery", "Spaced interval alerts", "Milestone celebrations"],
+    accent: "from-amber-500/20 to-orange-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400",
   },
 ];
 
 function Index() {
-  const { isAuthenticated, loading } = useAuth();
-  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const [activeRole, setActiveRole] = useState<RoleType>("Students");
-  const [activePromptIdx, setActivePromptIdx] = useState(0);
-
-  useEffect(() => {
-    if (!loading && isAuthenticated) {
-      navigate({ to: "/dashboard/student", replace: true });
-    }
-  }, [loading, isAuthenticated, navigate]);
-
-  const roleInfo = roleContentMap[activeRole];
-  const activePrompt = heroPrompts[activePromptIdx];
+  const content = roleContentMap[activeRole];
 
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans antialiased">
+    <div className="min-h-screen bg-background text-foreground flex flex-col selection:bg-emerald-500/20">
       <Navbar />
 
-      <main>
-        {/* ── HERO SECTION TAILORED TO OUR FEATURES ── */}
-        <section className="relative overflow-hidden bg-gradient-to-b from-emerald-500/10 via-emerald-500/5 to-background border-b border-border/50 px-6 pt-8 pb-16 md:px-12 lg:pt-12 lg:pb-24">
-          <div className="mx-auto max-w-7xl">
+      <main className="flex-1">
+        {/* ── HERO SECTION ── */}
+        <section className="relative overflow-hidden pt-12 pb-20 md:pt-20 md:pb-28 border-b border-border/40">
+          {/* Radial Ambient Glows */}
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-radial from-emerald-500/15 via-sky-500/5 to-transparent blur-3xl pointer-events-none" />
+          <div className="absolute top-10 right-10 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
 
-            {/* Role Capsule Selector Bar */}
-            <div className="mb-8 inline-flex items-center gap-1 rounded-full border border-emerald-600/30 bg-card p-1.5 shadow-sm">
-              <span className="px-3.5 text-xs font-semibold text-muted-foreground hidden sm:inline-block">
-                ScholarAI for...
-              </span>
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 relative space-y-8 text-center">
+            {/* Top Pill Badge */}
+            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-1 text-xs font-semibold text-emerald-800 dark:text-emerald-300 shadow-xs">
+              <Sparkles className="h-3.5 w-3.5 animate-pulse text-emerald-600" />
+              <span>Multi-Agent AI Education Platform</span>
+              <span className="text-muted-foreground">•</span>
+              <span className="font-bold text-[11px] text-foreground">4 Autonomous Agents Active</span>
+            </div>
+
+            {/* Main Headline */}
+            <div className="max-w-4xl mx-auto space-y-4">
+              <h1 className="font-display text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-foreground leading-[1.08]">
+                {content.headline}{" "}
+                <span className="bg-linear-to-r from-emerald-600 via-teal-600 to-sky-600 bg-clip-text text-transparent">
+                  {content.highlight}.
+                </span>
+              </h1>
+              <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed font-medium">
+                {content.subtitle}
+              </p>
+            </div>
+
+            {/* Role Switcher Tabs */}
+            <div className="inline-flex p-1 rounded-2xl bg-secondary/60 border border-border/80 text-xs font-semibold shadow-xs">
               {(["Students", "Teachers", "Administrators"] as RoleType[]).map((role) => (
                 <button
                   key={role}
                   onClick={() => setActiveRole(role)}
-                  className={`rounded-full px-4 py-1.5 text-xs font-bold transition-all ${
+                  className={`px-4 py-2 rounded-xl transition-all font-bold ${
                     activeRole === role
-                      ? "bg-emerald-800 text-white dark:bg-emerald-700 shadow-xs"
+                      ? "bg-card text-foreground shadow-sm border border-border/60"
                       : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  {role}
+                  For {role}
                 </button>
               ))}
             </div>
 
-            <div className="grid gap-12 lg:grid-cols-12 lg:items-center">
-
-              {/* Left Column Text */}
-              <div className="lg:col-span-7 space-y-6">
-                <h1 className="font-display text-4xl font-extrabold leading-[1.10] tracking-tight text-foreground sm:text-6xl md:text-6xl lg:text-7xl">
-                  {roleInfo.headline}{" "}
-                  <span className="relative inline-block text-emerald-800 dark:text-emerald-400">
-                    {roleInfo.highlight}
-                    <svg
-                      className="absolute -bottom-2 left-0 w-full h-3 text-amber-400"
-                      viewBox="0 0 200 12"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M2.5 9.5C50 3.5 150 2.5 197.5 8.5"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                  </span>
-                </h1>
-
-                <p className="text-base text-muted-foreground md:text-lg leading-relaxed max-w-xl font-normal">
-                  {roleInfo.subtitle}
-                </p>
-
-                <div className="flex flex-wrap items-center gap-4 pt-2">
-                  <Button
-                    asChild
-                    size="lg"
-                    className="rounded-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-base px-8 py-3.5 h-auto shadow-md"
-                  >
-                    <Link to={roleInfo.primaryLink} className="flex items-center gap-2">
-                      {roleInfo.primaryText} <ArrowRight className="h-5 w-5" />
-                    </Link>
-                  </Button>
-                  <Button
-                    asChild
-                    size="lg"
-                    variant="outline"
-                    className="rounded-full bg-card hover:bg-secondary text-foreground font-semibold px-8 py-3.5 h-auto border-emerald-600/30 text-emerald-800 dark:text-emerald-400"
-                  >
-                    <Link to="/courses/$courseId" params={{ courseId: "biol_101" }} className="flex items-center gap-2">
-                      <Layers className="h-4 w-4 text-emerald-600" /> Open Course Document Studio
-                    </Link>
-                  </Button>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-6 text-xs text-muted-foreground font-medium pt-4">
-                  <span className="flex items-center gap-1.5 text-foreground font-semibold">
-                    <Star className="h-4 w-4 text-amber-500 fill-amber-500" /> Full AI Learning Suite
-                  </span>
-                  <span>•</span>
-                  <span className="flex items-center gap-1.5">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-600" /> Real-Time Database Sync
-                  </span>
-                  <span>•</span>
-                  <span className="flex items-center gap-1.5">
-                    <Award className="h-4 w-4 text-blue-600" /> Advanced Reasoning & Search
-                  </span>
-                </div>
-              </div>
-
-              {/* Right Column: Infinite Slow Upward Moving Photo Gallery (SchoolAI Style) */}
-              <div className="lg:col-span-5 h-[460px] overflow-hidden relative rounded-3xl border border-border/80 bg-card/40 p-3 shadow-xl">
-                {/* Top & Bottom Mask Blurs for Smooth Fade */}
-                <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />
-                <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none" />
-
-                <div className="grid grid-cols-2 gap-3 animate-marquee-up hover:[animation-play-state:paused] cursor-pointer">
-                  
-                  {/* Column 1 Track */}
-                  <div className="space-y-3">
-                    {/* Item 1: Astronomy & Space Physics */}
-                    <div className="p-4 rounded-3xl bg-gradient-to-br from-blue-600 via-indigo-600 to-slate-900 text-white space-y-3 shadow-md hover:scale-102 transition-transform">
-                      <div className="h-10 w-10 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center font-bold text-xl">
-                        🧑‍🚀
-                      </div>
-                      <div>
-                        <span className="text-[10px] font-extrabold uppercase tracking-wider bg-black/30 px-2 py-0.5 rounded-md text-blue-200">
-                          Physics & Dynamics
-                        </span>
-                        <h4 className="font-bold text-xs mt-1">Newtonian Gravity & Orbit Mechanics</h4>
-                      </div>
-                    </div>
-
-                    {/* Item 2: Colosseum & World History */}
-                    <div className="p-4 rounded-3xl bg-gradient-to-br from-amber-600 via-orange-600 to-amber-900 text-white space-y-3 shadow-md hover:scale-102 transition-transform">
-                      <div className="h-10 w-10 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center font-bold text-xl">
-                        🏛️
-                      </div>
-                      <div>
-                        <span className="text-[10px] font-extrabold uppercase tracking-wider bg-black/30 px-2 py-0.5 rounded-md text-amber-200">
-                          World History
-                        </span>
-                        <h4 className="font-bold text-xs mt-1">Roman Empire & Industrial Revolution</h4>
-                      </div>
-                    </div>
-
-                    {/* Item 3: Thylakoid Cell & Frog Biology */}
-                    <div className="p-4 rounded-3xl bg-gradient-to-br from-emerald-600 via-teal-600 to-emerald-950 text-white space-y-3 shadow-md hover:scale-102 transition-transform">
-                      <div className="h-10 w-10 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center font-bold text-xl">
-                        🐸
-                      </div>
-                      <div>
-                        <span className="text-[10px] font-extrabold uppercase tracking-wider bg-black/30 px-2 py-0.5 rounded-md text-emerald-200">
-                          Cell Biology
-                        </span>
-                        <h4 className="font-bold text-xs mt-1">Thylakoid Light & Calvin Reactions</h4>
-                      </div>
-                    </div>
-
-                    {/* Item 1 Duplicate for Infinite Loop */}
-                    <div className="p-4 rounded-3xl bg-gradient-to-br from-blue-600 via-indigo-600 to-slate-900 text-white space-y-3 shadow-md">
-                      <div className="h-10 w-10 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center font-bold text-xl">
-                        🧑‍🚀
-                      </div>
-                      <div>
-                        <span className="text-[10px] font-extrabold uppercase tracking-wider bg-black/30 px-2 py-0.5 rounded-md text-blue-200">
-                          Physics & Dynamics
-                        </span>
-                        <h4 className="font-bold text-xs mt-1">Newtonian Gravity & Orbit Mechanics</h4>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Column 2 Track (Staggered) */}
-                  <div className="space-y-3 pt-6">
-                    {/* Item 4: 7-Day Revision Planner */}
-                    <div className="p-4 rounded-3xl bg-gradient-to-br from-purple-600 via-pink-600 to-purple-950 text-white space-y-3 shadow-md hover:scale-102 transition-transform">
-                      <div className="h-10 w-10 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center font-bold text-xl">
-                        ⚡
-                      </div>
-                      <div>
-                        <span className="text-[10px] font-extrabold uppercase tracking-wider bg-black/30 px-2 py-0.5 rounded-md text-pink-200">
-                          Study Planner
-                        </span>
-                        <h4 className="font-bold text-xs mt-1">7-Day Schedule & Video Lessons</h4>
-                      </div>
-                    </div>
-
-                    {/* Item 5: Document Studio */}
-                    <div className="p-4 rounded-3xl bg-gradient-to-br from-cyan-600 via-blue-600 to-cyan-950 text-white space-y-3 shadow-md hover:scale-102 transition-transform">
-                      <div className="h-10 w-10 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center font-bold text-xl">
-                        📄
-                      </div>
-                      <div>
-                        <span className="text-[10px] font-extrabold uppercase tracking-wider bg-black/30 px-2 py-0.5 rounded-md text-cyan-200">
-                          Document Studio
-                        </span>
-                        <h4 className="font-bold text-xs mt-1">PDF & DOCX Page Citations</h4>
-                      </div>
-                    </div>
-
-                    {/* Item 6: Teacher Assistant */}
-                    <div className="p-4 rounded-3xl bg-gradient-to-br from-rose-600 via-red-600 to-rose-950 text-white space-y-3 shadow-md hover:scale-102 transition-transform">
-                      <div className="h-10 w-10 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center font-bold text-xl">
-                        📝
-                      </div>
-                      <div>
-                        <span className="text-[10px] font-extrabold uppercase tracking-wider bg-black/30 px-2 py-0.5 rounded-md text-rose-200">
-                          Essay Evaluator
-                        </span>
-                        <h4 className="font-bold text-xs mt-1">Rubric Essay Evaluation</h4>
-                      </div>
-                    </div>
-
-                    {/* Item 4 Duplicate for Infinite Loop */}
-                    <div className="p-4 rounded-3xl bg-gradient-to-br from-purple-600 via-pink-600 to-purple-950 text-white space-y-3 shadow-md">
-                      <div className="h-10 w-10 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center font-bold text-xl">
-                        ⚡
-                      </div>
-                      <div>
-                        <span className="text-[10px] font-extrabold uppercase tracking-wider bg-black/30 px-2 py-0.5 rounded-md text-pink-200">
-                          Study Planner
-                        </span>
-                        <h4 className="font-bold text-xs mt-1">7-Day Schedule & Video Lessons</h4>
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-
-            </div>
-
-            {/* ── LIVE INTERACTIVE PROMPT SANDBOX DEMO ── */}
-            <div className="mt-16 max-w-4xl mx-auto rounded-3xl border border-emerald-600/30 bg-card p-6 md:p-8 shadow-2xl text-left space-y-5">
-              <div className="flex items-center justify-between pb-4 border-b border-border/60">
-                <div className="flex items-center gap-2">
-                  <span className="h-3 w-3 rounded-full bg-red-500 inline-block" />
-                  <span className="h-3 w-3 rounded-full bg-amber-500 inline-block" />
-                  <span className="h-3 w-3 rounded-full bg-emerald-500 inline-block" />
-                  <span className="ml-2 text-xs font-bold text-foreground">Interactive AI Tutor Sandbox — Click a Subject to Try:</span>
-                </div>
-                <Badge variant="outline" className="text-[10px] uppercase font-bold border-emerald-500/40 text-emerald-700 bg-emerald-50">
-                  Live Interactive Tutor
-                </Badge>
-              </div>
-
-              {/* Subject Tabs */}
-              <div className="flex flex-wrap gap-2">
-                {heroPrompts.map((p, idx) => (
-                  <button
-                    key={p.topic}
-                    onClick={() => setActivePromptIdx(idx)}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                      activePromptIdx === idx
-                        ? "bg-emerald-800 text-white shadow-xs"
-                        : "bg-secondary/60 text-muted-foreground hover:bg-secondary"
-                    }`}
-                  >
-                    {p.topic}
-                  </button>
-                ))}
-              </div>
-
-              {/* Interactive Prompt & Response Preview Box */}
-              <div className="space-y-4 p-4 rounded-2xl bg-secondary/30 border border-border/60">
-                <div className="flex items-start gap-3">
-                  <div className="h-8 w-8 rounded-full bg-emerald-800 text-white flex items-center justify-center shrink-0 font-bold text-xs">
-                    You
-                  </div>
-                  <div className="p-3 rounded-xl bg-emerald-600/10 border border-emerald-600/20 text-xs font-semibold text-foreground">
-                    "{activePrompt.prompt}"
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 pt-2">
-                  <div className="h-8 w-8 rounded-full bg-emerald-700 text-white flex items-center justify-center shrink-0 font-bold text-xs">
-                    <Bot className="h-4 w-4" />
-                  </div>
-                  <div className="p-4 rounded-xl bg-card border border-border/80 text-xs text-foreground leading-relaxed shadow-xs flex-1 space-y-2">
-                    <span className="font-bold text-emerald-700 block">Personal AI Tutor:</span>
-                    <p>{activePrompt.response}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between pt-1 text-xs text-muted-foreground">
-                <span>Try this live in your student workspace:</span>
-                <Button size="sm" asChild className="h-8 text-xs bg-emerald-700 hover:bg-emerald-800 text-white font-semibold">
-                  <Link to="/dashboard/student">Ask AI Tutor Now →</Link>
+            {/* CTAs */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+              <Link to={isAuthenticated ? content.primaryLink : "/auth"}>
+                <Button size="lg" className="h-12 px-7 rounded-2xl bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-sm gap-2 shadow-md hover:shadow-lg transition-all">
+                  <Sparkles className="h-4 w-4" />
+                  <span>{isAuthenticated ? content.primaryText : "Get Started Free"}</span>
+                  <ArrowRight className="h-4 w-4" />
                 </Button>
-              </div>
+              </Link>
+
+              <Link to="/auth">
+                <Button size="lg" variant="outline" className="h-12 px-6 rounded-2xl border-border hover:bg-accent font-semibold text-sm gap-2">
+                  <Cpu className="h-4 w-4 text-emerald-600" />
+                  <span>Explore Live 1-Click Demo</span>
+                </Button>
+              </Link>
             </div>
 
+            {/* Interactive Hero Preview Card */}
+            <div className="pt-8 max-w-4xl mx-auto">
+              <Card className="border border-border/80 bg-card/80 backdrop-blur shadow-2xl rounded-3xl overflow-hidden text-left">
+                <div className="bg-secondary/40 border-b border-border/60 px-5 py-3 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="h-3 w-3 rounded-full bg-rose-500/80" />
+                    <span className="h-3 w-3 rounded-full bg-amber-500/80" />
+                    <span className="h-3 w-3 rounded-full bg-emerald-500/80" />
+                    <span className="text-xs font-bold text-muted-foreground ml-2">scholar-ai // command-team</span>
+                  </div>
+                  <Badge className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 text-[10px] font-bold">
+                    🟢 Socratic Multi-Agent Orchestrator Online
+                  </Badge>
+                </div>
+
+                <div className="p-6 grid gap-4 sm:grid-cols-3 bg-card">
+                  <div className="p-3.5 rounded-2xl bg-secondary/30 border border-border/60 space-y-1.5">
+                    <div className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+                      <Bot className="h-3.5 w-3.5" /> Socratic AI Tutor
+                    </div>
+                    <p className="text-xs font-semibold text-foreground">"Step-by-step calculus derivation for chain rule."</p>
+                    <span className="text-[10px] text-muted-foreground">Answered with LaTeX math & worked hints.</span>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-secondary/30 border border-border/60 space-y-1.5">
+                    <div className="text-[11px] font-bold text-sky-700 dark:text-sky-400 flex items-center gap-1.5">
+                      <Zap className="h-3.5 w-3.5" /> Learning Planner
+                    </div>
+                    <p className="text-xs font-semibold text-foreground">"7-Day Revision plan calibrated for BIOL 101."</p>
+                    <span className="text-[10px] text-muted-foreground">Rebalanced to 7:00 PM peak focus window.</span>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-secondary/30 border border-border/60 space-y-1.5">
+                    <div className="text-[11px] font-bold text-purple-700 dark:text-purple-400 flex items-center gap-1.5">
+                      <TrendingUp className="h-3.5 w-3.5" /> Predictive Analytics
+                    </div>
+                    <p className="text-xs font-semibold text-foreground">"94% Math 201 Exam Readiness Forecast."</p>
+                    <span className="text-[10px] text-muted-foreground">Calculated across 14-day quiz accuracy.</span>
+                  </div>
+                </div>
+              </Card>
+            </div>
           </div>
         </section>
 
-        {/* ── 6 SPECIALIZED AI AGENTS SHOWCASE GRID ── */}
-        <section className="mx-auto max-w-7xl px-4 py-20 md:py-28 space-y-12">
-          <div className="text-center max-w-3xl mx-auto space-y-3">
-            <Badge variant="outline" className="text-xs uppercase font-bold text-emerald-700 border-emerald-300 bg-emerald-50">
-              Complete Intelligent Education Platform
-            </Badge>
-            <h2 className="font-display text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl md:text-5xl">
-              Explore Your Personal AI Learning Suite
+        {/* ── 6 SPECIALIZED AGENT GRID ── */}
+        <section className="py-20 md:py-28 px-4 sm:px-6 max-w-6xl mx-auto space-y-12">
+          <div className="text-center space-y-3 max-w-2xl mx-auto">
+            <Badge className="bg-emerald-800 text-white font-bold text-[11px]">Specialized AI Ecosystem</Badge>
+            <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
+              A Dedicated Team of AI Assistants Working For You
             </h2>
-            <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-              Each tool is designed to support every step of your learning journey, from step-by-step tutoring to course document search.
+            <p className="text-sm text-muted-foreground font-medium">
+              Each agent is trained with a dedicated role—from Socratic guidance to automated grading and vector document citations.
             </p>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {agentFeatures.map((agent) => (
-              <Card key={agent.id} className="border border-border/80 shadow-xs rounded-2xl overflow-hidden hover:shadow-md hover:border-emerald-500/40 transition-all flex flex-col justify-between">
-                <CardHeader className="p-6 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="h-12 w-12 rounded-2xl bg-emerald-700/10 border border-emerald-500/30 text-emerald-700 flex items-center justify-center">
-                      <agent.icon className="h-6 w-6" />
-                    </span>
-                    <Badge variant="outline" className={`text-[10px] uppercase font-bold ${agent.color}`}>
-                      {agent.badge}
-                    </Badge>
-                  </div>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {agentFeatures.map((agent) => {
+              const IconComp = agent.icon;
+              return (
+                <div
+                  key={agent.id}
+                  className="p-6 rounded-3xl border border-border/80 bg-card hover:border-emerald-600/40 hover:shadow-lg transition-all space-y-4 flex flex-col justify-between group"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className={`p-3 rounded-2xl border ${agent.accent}`}>
+                        <IconComp className="h-6 w-6" />
+                      </div>
+                      <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-wider">
+                        {agent.badge}
+                      </Badge>
+                    </div>
 
-                  <div>
-                    <CardTitle className="font-display text-xl font-bold text-foreground">{agent.title}</CardTitle>
-                    <CardDescription className="text-xs text-muted-foreground mt-2 leading-relaxed">
+                    <h3 className="font-display text-lg font-bold text-foreground group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
+                      {agent.title}
+                    </h3>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
                       {agent.description}
-                    </CardDescription>
+                    </p>
                   </div>
-                </CardHeader>
 
-                <CardContent className="px-6 pb-6 pt-0 space-y-4">
-                  <ul className="space-y-2 pt-3 border-t border-border/50 text-xs font-medium text-foreground">
+                  <div className="space-y-2 pt-3 border-t border-border/40">
                     {agent.highlights.map((h, i) => (
-                      <li key={i} className="flex items-center gap-2">
+                      <div key={i} className="flex items-center gap-2 text-xs font-semibold text-foreground/90">
                         <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
                         <span>{h}</span>
-                      </li>
+                      </div>
                     ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            ))}
+                  </div>
+                </div>
+              );
+            })}
           </div>
+        </section>
+
+        {/* ── CALL TO ACTION BANNER ── */}
+        <section className="py-16 px-4 sm:px-6 max-w-5xl mx-auto pb-24">
+          <Card className="border border-emerald-600/40 bg-linear-to-r from-emerald-950/20 via-background to-sky-950/20 shadow-xl rounded-3xl p-8 sm:p-12 text-center relative overflow-hidden space-y-6">
+            <div className="absolute -top-24 -right-24 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="max-w-2xl mx-auto space-y-3 relative">
+              <Badge className="bg-emerald-700 text-white font-bold text-xs">Ready to Elevate Your Learning?</Badge>
+              <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-foreground">
+                Experience Your Personal AI Study Companion Today
+              </h2>
+              <p className="text-sm text-muted-foreground font-medium">
+                Log in instantly via Google or try our 1-click workspace demo to explore the full multi-agent dashboard.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+              <Link to="/auth">
+                <Button size="lg" className="h-12 px-8 rounded-2xl bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-sm gap-2 shadow-md">
+                  <span>Enter Student Workspace →</span>
+                </Button>
+              </Link>
+            </div>
+          </Card>
         </section>
       </main>
 
-      <footer className="border-t border-border/50 py-8 bg-card text-center text-xs text-muted-foreground font-medium">
-        <div className="mx-auto max-w-6xl px-4 flex flex-wrap items-center justify-between gap-4">
-          <span>Personal AI School Assistant © 2026 • Intelligent Learning Platform</span>
-          <div className="flex items-center gap-4">
-            <Link to="/dashboard/student" className="hover:underline">Student Workspace</Link>
-            <Link to="/assignments" className="hover:underline">Assignments Hub</Link>
-            <Link to="/courses/$courseId" params={{ courseId: "biol_101" }} className="hover:underline">Document Studio</Link>
+      {/* ── FOOTER ── */}
+      <footer className="border-t border-border/50 py-8 px-6 bg-secondary/20 text-xs text-muted-foreground text-center">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-foreground">Scholar AI</span>
+            <span>— Autonomous Multi-Agent Educational Suite</span>
           </div>
+          <p>© {new Date().getFullYear()} Scholar AI. All rights reserved.</p>
         </div>
       </footer>
     </div>
