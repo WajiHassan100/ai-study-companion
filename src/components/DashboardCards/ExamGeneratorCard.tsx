@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { FileCheck, Sparkles, RefreshCw, CheckCircle2, AlertCircle, Award, Brain, Calculator, HelpCircle, Layers, Play } from "lucide-react";
+import { useState, useEffect } from "react";
+import { FileCheck, Sparkles, RefreshCw, CheckCircle2, AlertCircle, Award, Brain, Calculator, HelpCircle, Layers, Play, Loader2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,9 +13,17 @@ interface ExamGeneratorCardProps {
   onAskTutor?: (query: string) => void;
 }
 
+const EXAM_LOADING_STAGES = [
+  "Retrieving course documents and syllabus formulas...",
+  "Constructing multi-format questions (MCQ, Short, Long, Numerical)...",
+  "Formulating mark schemes and step-by-step model solutions...",
+  "Finalizing examination simulator paper...",
+];
+
 export function ExamGeneratorCard({ studentId, onAskTutor }: ExamGeneratorCardProps) {
   const [exam, setExam] = useState<PracticeExam | null>(null);
   const [generating, setGenerating] = useState(false);
+  const [loadingStage, setLoadingStage] = useState(0);
   const [evaluating, setEvaluating] = useState(false);
   const [difficulty, setDifficulty] = useState<"easy" | "medium" | "advanced">("medium");
   const [course, setCourse] = useState("MATH 201");
@@ -23,6 +31,18 @@ export function ExamGeneratorCard({ studentId, onAskTutor }: ExamGeneratorCardPr
   const [userAnswers, setUserAnswers] = useState<Record<string, string>>({});
   const [result, setResult] = useState<ExamEvaluationResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Progressive loading timer
+  useEffect(() => {
+    let interval: any;
+    if (generating) {
+      setLoadingStage(0);
+      interval = setInterval(() => {
+        setLoadingStage((prev) => (prev < EXAM_LOADING_STAGES.length - 1 ? prev + 1 : prev));
+      }, 2000);
+    }
+    return () => clearInterval(interval);
+  }, [generating]);
 
   const handleGenerate = async (targetDifficulty = difficulty) => {
     setGenerating(true);
@@ -112,170 +132,155 @@ export function ExamGeneratorCard({ studentId, onAskTutor }: ExamGeneratorCardPr
           </div>
         </div>
 
-        <Button
-          size="sm"
-          className="w-full text-xs font-bold gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white"
-          onClick={() => handleGenerate(difficulty)}
-          disabled={generating}
-        >
-          {generating ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
-          {generating ? "Synthesizing Exam Paper..." : "Generate 5-Question Practice Exam"}
-        </Button>
-
-        {/* Controls & Difficulty Level Selector */}
-        <div className="p-2.5 rounded-xl bg-secondary/50 border border-border/50 flex flex-wrap items-center justify-between gap-2 text-xs">
-          <div className="flex items-center gap-2">
-            <span className="font-semibold text-muted-foreground">Difficulty:</span>
-            <div className="flex gap-1">
-              {(["easy", "medium", "advanced"] as const).map((lvl) => (
-                <button
-                  key={lvl}
-                  onClick={() => {
-                    setDifficulty(lvl);
-                    handleGenerate(lvl);
-                  }}
-                  className={`px-2.5 py-1 rounded-md capitalize text-xs font-semibold transition-all ${
-                    difficulty === lvl
-                      ? "bg-indigo-600 text-white shadow-xs"
-                      : "bg-background border border-border text-muted-foreground hover:bg-secondary"
-                  }`}
-                >
-                  {lvl}
-                </button>
-              ))}
+        {generating && (
+          <div className="py-8 text-center border border-dashed border-indigo-500/40 rounded-2xl space-y-3 bg-indigo-500/10 animate-pulse">
+            <Loader2 className="h-7 w-7 mx-auto text-indigo-600 animate-spin" />
+            <div className="space-y-1">
+              <p className="text-xs font-bold text-foreground">{EXAM_LOADING_STAGES[loadingStage]}</p>
+              <p className="text-[11px] text-muted-foreground">Creating a multi-format exam grounded in course materials...</p>
             </div>
-          </div>
-
-          <Badge variant="secondary" className="bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-semibold text-[11px]">
-            Grounded in Course RAG ✓
-          </Badge>
-        </div>
-
-        {/* Evaluation Result Header Banner */}
-        {result && (
-          <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 text-xs space-y-2">
-            <div className="flex items-center justify-between font-bold text-emerald-900 dark:text-emerald-200">
-              <div className="flex items-center gap-1.5">
-                <Award className="h-4 w-4 text-emerald-600" />
-                <span>Exam Assessment Complete!</span>
-              </div>
-              <Badge className="bg-emerald-600 text-white text-xs font-bold">
-                Score: {result.score_percentage}% ({result.earned_marks}/{result.total_marks} Marks)
-              </Badge>
-            </div>
-            <p className="text-foreground/90 font-medium">{result.planner_recommendation}</p>
           </div>
         )}
 
-        {/* Generated Questions List */}
-        {generating ? (
-          <div className="py-8 text-center text-xs text-muted-foreground flex items-center justify-center gap-2">
-            <RefreshCw className="h-4 w-4 animate-spin text-indigo-600" />
-            <span>Synthesizing MCQs, numerical calculations & conceptual questions from course notes...</span>
-          </div>
-        ) : exam?.questions && exam.questions.length > 0 ? (
-          <div className="space-y-3">
-            {exam.questions?.map((q, idx) => {
-              const IconComp = typeIconMap[q.type] || HelpCircle;
-              const feedback = result?.question_feedback?.[q.id];
+        {!generating && (
+          <Button
+            size="sm"
+            className="w-full text-xs font-bold gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white cursor-pointer"
+            onClick={() => handleGenerate(difficulty)}
+          >
+            <Play className="h-3.5 w-3.5" />
+            <span>Generate New Practice Exam</span>
+          </Button>
+        )}
 
-              return (
-                <div key={q.id || idx} className="p-3 rounded-xl bg-background border border-border/70 shadow-xs space-y-2.5">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-bold text-xs text-indigo-600 dark:text-indigo-400">Q{idx + 1}.</span>
-                      <Badge variant="outline" className={`text-[10px] uppercase font-bold py-0 px-2 flex items-center gap-1 ${typeBadgeMap[q.type] || "bg-secondary"}`}>
-                        <IconComp className="h-3 w-3" />
-                        <span>{q.type}</span>
-                      </Badge>
-                      <span className="text-[11px] text-muted-foreground font-semibold">({q.max_marks || 20} Marks)</span>
+        {/* Generated Exam Paper */}
+        {exam && !generating && (
+          <div className="space-y-5 pt-2 border-t border-border/60">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="font-bold text-sm text-foreground">{exam.title}</h4>
+                <p className="text-xs text-muted-foreground">Total Marks: {exam.total_marks} pts • {exam.questions.length} Questions</p>
+              </div>
+              <Badge className="bg-indigo-600 text-white font-bold text-xs uppercase">{exam.difficulty}</Badge>
+            </div>
+
+            {/* Questions List */}
+            <div className="space-y-4">
+              {exam.questions.map((q, idx) => {
+                const IconComp = typeIconMap[q.type] || HelpCircle;
+                const badgeColor = typeBadgeMap[q.type] || "bg-secondary text-secondary-foreground";
+                const qResult = result?.feedback?.[q.id];
+
+                return (
+                  <div key={q.id} className="p-4 rounded-2xl bg-card border border-border/80 space-y-3 shadow-xs">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <Badge className={`${badgeColor} font-bold text-[10px] uppercase gap-1`}>
+                          <IconComp className="h-3 w-3" />
+                          {q.type}
+                        </Badge>
+                        <span className="font-mono text-xs font-bold text-foreground">Q{idx + 1}</span>
+                      </div>
+                      <span className="text-xs font-bold text-muted-foreground">{q.max_marks} marks</span>
                     </div>
 
-                    {feedback && (
-                      <Badge className={feedback.is_correct ? "bg-emerald-600 text-white" : "bg-amber-600 text-white"}>
-                        {feedback.score}/{feedback.max_marks} Marks
-                      </Badge>
+                    <p className="text-xs font-semibold text-foreground leading-relaxed">{q.question}</p>
+
+                    {/* MCQ Options */}
+                    {q.type === "mcq" && q.options && (
+                      <div className="grid gap-1.5 sm:grid-cols-2">
+                        {Object.entries(q.options).map(([optKey, optText]) => {
+                          const isSelected = userAnswers[q.id] === optKey;
+                          return (
+                            <button
+                              key={optKey}
+                              onClick={() => handleAnswerChange(q.id, optKey)}
+                              disabled={!!result}
+                              className={`p-2.5 rounded-xl border text-xs text-left transition-colors flex items-center gap-2 ${
+                                isSelected
+                                  ? "border-indigo-600 bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-bold"
+                                  : "border-border/60 hover:bg-secondary/40 text-foreground"
+                              }`}
+                            >
+                              <span className="w-5 h-5 rounded-full border border-border flex items-center justify-center font-bold text-[10px] shrink-0">
+                                {optKey}
+                              </span>
+                              <span>{optText}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* Open Ended Answer Textarea */}
+                    {q.type !== "mcq" && (
+                      <Textarea
+                        value={userAnswers[q.id] || ""}
+                        onChange={(e) => handleAnswerChange(q.id, e.target.value)}
+                        disabled={!!result}
+                        placeholder={`Write your step-by-step ${q.type} response or calculation here...`}
+                        rows={3}
+                        className="text-xs resize-none bg-secondary/30 border-border/70 rounded-xl"
+                      />
+                    )}
+
+                    {/* Graded Feedback Item */}
+                    {qResult && (
+                      <div className="p-3 rounded-xl bg-secondary/60 border border-border/70 space-y-1.5 text-xs">
+                        <div className="flex items-center justify-between font-bold">
+                          <span>Awarded: {qResult.marks_awarded} / {qResult.max_marks} marks</span>
+                          {qResult.marks_awarded > 0 ? (
+                            <span className="text-emerald-600 flex items-center gap-1"><CheckCircle2 className="h-3.5 w-3.5" /> Graded</span>
+                          ) : (
+                            <span className="text-rose-600">Review Needed</span>
+                          )}
+                        </div>
+                        <p className="text-muted-foreground">{qResult.feedback}</p>
+                        {qResult.model_solution && (
+                          <div className="p-2 rounded-lg bg-indigo-500/5 border border-indigo-500/20 text-[11px] text-indigo-900 dark:text-indigo-200">
+                            <span className="font-bold">Model Solution: </span>
+                            <span>{qResult.model_solution}</span>
+                          </div>
+                        )}
+                      </div>
                     )}
                   </div>
+                );
+              })}
+            </div>
 
-                  <p className="text-xs font-semibold text-foreground leading-relaxed">{q.question}</p>
-
-                  {/* MCQ Radio Options */}
-                  {q.type === "mcq" && q.options && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-1">
-                      {Object.entries(q.options).map(([optKey, optValue]) => {
-                        const isSelected = userAnswers[q.id] === optKey;
-                        return (
-                          <button
-                            key={optKey}
-                            onClick={() => handleAnswerChange(q.id, optKey)}
-                            className={`p-2 rounded-lg text-xs text-left border transition-all cursor-pointer ${
-                              isSelected
-                                ? "bg-indigo-600 text-white border-indigo-600 font-semibold"
-                                : "bg-secondary/30 border-border hover:bg-secondary text-foreground font-medium"
-                            }`}
-                          >
-                            <strong>{optKey}:</strong> {optValue}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-
-                  {/* Text Input for Written & Numerical Questions */}
-                  {q.type !== "mcq" && (
-                    <Textarea
-                      placeholder={q.type === "numerical" ? "Show step-by-step formula calculation..." : "Type your answer and intuition..."}
-                      value={userAnswers[q.id] || ""}
-                      onChange={(e) => handleAnswerChange(q.id, e.target.value)}
-                      rows={2}
-                      className="text-xs bg-background resize-none min-h-[45px]"
-                    />
-                  )}
-
-                  {/* Feedback Model Solution Display */}
-                  {feedback && (
-                    <div className="p-2 rounded-lg bg-secondary/60 text-[11px] text-muted-foreground space-y-1">
-                      <span className="font-semibold text-foreground">AI Model Solution: </span>
-                      <span className="italic">{feedback.feedback}</span>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-
-            {/* Submit Exam Button */}
+            {/* Exam Submission & Results */}
             {!result ? (
               <Button
+                size="sm"
+                className="w-full text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white"
                 onClick={handleSubmitExam}
                 disabled={evaluating || Object.keys(userAnswers).length === 0}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs h-9 gap-2"
               >
-                {evaluating ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
-                <span>Submit Practice Exam for AI Evaluation →</span>
+                {evaluating ? <RefreshCw className="h-3.5 w-3.5 animate-spin mr-1" /> : null}
+                <span>{evaluating ? "Grading Exam Paper..." : "Submit Exam for AI Grading"}</span>
               </Button>
             ) : (
-              <Button
-                variant="outline"
-                onClick={() => handleGenerate(difficulty)}
-                className="w-full border-indigo-500/30 text-indigo-600 hover:bg-indigo-50 text-xs h-9 gap-2 font-semibold"
-              >
-                <RefreshCw className="h-3.5 w-3.5 text-indigo-600" />
-                <span>Generate Next Practice Exam →</span>
-              </Button>
+              <div className="p-5 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h5 className="font-bold text-sm text-foreground">Exam Grading Summary</h5>
+                    <p className="text-xs text-muted-foreground">Mastery profile updated</p>
+                  </div>
+                  <Badge className="bg-indigo-600 text-white font-extrabold text-sm px-3 py-1">
+                    {result.percentage}% ({result.earned_marks} / {result.total_marks} Marks)
+                  </Badge>
+                </div>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="w-full text-xs font-bold border-indigo-500/30 text-indigo-700"
+                  onClick={() => handleGenerate(difficulty)}
+                >
+                  Generate Another Exam
+                </Button>
+              </div>
             )}
-          </div>
-        ) : (
-          <div className="py-6 text-center space-y-2">
-            <p className="text-xs text-muted-foreground">Click "Generate AI Exam" to create multi-format practice questions on {topic}.</p>
-            <Button
-              size="sm"
-              className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs h-8 gap-1.5"
-              onClick={() => handleGenerate(difficulty)}
-            >
-              <Sparkles className="h-3.5 w-3.5" />
-              <span>Generate AI Practice Exam</span>
-            </Button>
           </div>
         )}
       </CardContent>

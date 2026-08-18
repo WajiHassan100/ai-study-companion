@@ -52,8 +52,10 @@ def get_llm() -> BaseChatModel:
             model=settings.llm_model,
             openai_api_key=settings.openrouter_api_key,
             openai_api_base="https://openrouter.ai/api/v1",
-            temperature=settings.llm_temperature,
+            temperature=0.3,
             max_tokens=settings.llm_max_tokens,
+            request_timeout=15.0,
+            max_retries=1,
         )
 
     elif provider == "gemini":

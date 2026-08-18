@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { HelpCircle, Sparkles, CheckCircle2, XCircle, ArrowRight, RefreshCw, Trophy, BookOpen, RotateCcw } from "lucide-react";
+import { useState, useEffect } from "react";
+import { HelpCircle, Sparkles, CheckCircle2, XCircle, ArrowRight, RefreshCw, Trophy, BookOpen, RotateCcw, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,16 +11,36 @@ interface QuizGeneratorProps {
   onProfileUpdated?: () => void;
 }
 
+const LOADING_STAGES = [
+  "Analyzing your learning profile & weak concepts...",
+  "Adapting question difficulty to your mastery level...",
+  "Synthesizing multiple-choice questions & answer keys...",
+  "Finalizing interactive quiz session...",
+];
+
 export function QuizGeneratorCard({ studentId, onProfileUpdated }: QuizGeneratorProps) {
   const [mode, setMode] = useState<"quiz" | "flashcard">("quiz");
   const [quizData, setQuizData] = useState<QuizData | null>(null);
   const [loading, setLoading] = useState(false);
+  const [loadingStage, setLoadingStage] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [userAnswers, setUserAnswers] = useState<Record<string, string>>({});
   const [submitResult, setSubmitResult] = useState<QuizSubmitResult | null>(null);
   const [showFlashcardAnswer, setShowFlashcardAnswer] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Progressive loading stage timer
+  useEffect(() => {
+    let interval: any;
+    if (loading) {
+      setLoadingStage(0);
+      interval = setInterval(() => {
+        setLoadingStage((prev) => (prev < LOADING_STAGES.length - 1 ? prev + 1 : prev));
+      }, 1800);
+    }
+    return () => clearInterval(interval);
+  }, [loading]);
 
   const handleGenerate = async () => {
     setLoading(true);
@@ -112,202 +132,234 @@ export function QuizGeneratorCard({ studentId, onProfileUpdated }: QuizGenerator
       <CardContent className="space-y-4 text-sm">
         {error ? <InlineError message={error} /> : null}
 
-        {!quizData && !loading ? (
+        {loading && (
+          <div className="py-8 text-center border border-dashed border-purple-500/30 rounded-2xl space-y-3 bg-purple-500/5 animate-pulse">
+            <Loader2 className="h-7 w-7 mx-auto text-purple-600 animate-spin" />
+            <div className="space-y-1">
+              <p className="text-xs font-bold text-foreground">{LOADING_STAGES[loadingStage]}</p>
+              <p className="text-[11px] text-muted-foreground">Synthesizing questions customized to your mastery profile...</p>
+            </div>
+          </div>
+        )}
+
+        {!quizData && !loading && (
           <div className="py-8 text-center border border-dashed border-border rounded-xl space-y-2 bg-background/50">
             <Trophy className="h-8 w-8 mx-auto text-purple-500/60" />
             <p className="text-xs font-medium text-foreground">Ready to test your knowledge?</p>
             <p className="text-xs text-muted-foreground max-w-sm mx-auto">
               Generates a personalized practice quiz focusing on your target concepts to build topic mastery!
             </p>
-            <Button size="sm" onClick={handleGenerate} className="mt-2 bg-purple-600 hover:bg-purple-700 text-white text-xs">
-              <Sparkles className="h-3.5 w-3.5 mr-1.5" /> Generate Practice Quiz
+            <Button
+              size="sm"
+              className="mt-2 text-xs bg-purple-600 hover:bg-purple-700 text-white"
+              onClick={handleGenerate}
+            >
+              Start Diagnostic Quiz
             </Button>
           </div>
-        ) : null}
+        )}
 
-        {loading ? (
-          <div className="py-10 text-center text-xs text-muted-foreground flex flex-col items-center justify-center gap-2">
-            <RefreshCw className="h-5 w-5 animate-spin text-purple-500" />
-            <span>Building adaptive practice questions based on your learning profile...</span>
-          </div>
-        ) : null}
-
-        {/* ── QUIZ MODE CONTENT ── */}
-        {quizData && mode === "quiz" && !submitResult ? (
+        {quizData && !loading && (
           <div className="space-y-4">
             {/* Header info */}
-            <div className="flex items-center justify-between text-xs pb-2 border-b border-border/50">
-              <div className="flex items-center gap-2 font-medium">
-                <Badge variant="outline" className="capitalize text-[10px] bg-purple-500/10 text-purple-600 border-purple-500/20">
+            <div className="flex items-center justify-between pb-2 border-b border-border/50 text-xs">
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="font-mono text-[10px]">
                   {quizData.topic}
                 </Badge>
-                <span className="text-muted-foreground">Question {currentIndex + 1} of {quizData.questions.length}</span>
+                <Badge className="bg-purple-500/10 text-purple-600 border-purple-500/20 text-[10px]">
+                  {quizData.difficulty}
+                </Badge>
               </div>
-              <Badge variant="secondary" className="capitalize text-[10px]">
-                {quizData.difficulty}
-              </Badge>
+              <span className="text-muted-foreground">
+                Question {currentIndex + 1} of {quizData.questions.length}
+              </span>
             </div>
 
-            {/* Active Question */}
-            {currentQ ? (
+            {/* Flashcard Mode */}
+            {mode === "flashcard" && currentQ && (
               <div className="space-y-3">
-                <h4 className="font-semibold text-xs sm:text-sm leading-relaxed text-foreground">
-                  {currentIndex + 1}. {currentQ.question}
-                </h4>
+                <div
+                  onClick={() => setShowFlashcardAnswer(!showFlashcardAnswer)}
+                  className="min-h-[160px] p-5 rounded-xl border border-border bg-card hover:bg-secondary/40 cursor-pointer flex flex-col justify-between transition-colors shadow-xs"
+                >
+                  <div className="space-y-2">
+                    <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
+                      {showFlashcardAnswer ? "Answer & Explanation" : "Prompt / Concept"}
+                    </span>
+                    <p className="text-sm font-semibold text-foreground">
+                      {showFlashcardAnswer ? currentQ.explanation : currentQ.question}
+                    </p>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground text-center italic">
+                    Click card to {showFlashcardAnswer ? "flip back" : "reveal answer"}
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between pt-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-xs h-7"
+                    disabled={currentIndex === 0}
+                    onClick={() => {
+                      setCurrentIndex((prev) => prev - 1);
+                      setShowFlashcardAnswer(false);
+                    }}
+                  >
+                    Previous
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="text-xs h-7 bg-purple-600 hover:bg-purple-700 text-white"
+                    disabled={currentIndex === quizData.questions.length - 1}
+                    onClick={() => {
+                      setCurrentIndex((prev) => prev + 1);
+                      setShowFlashcardAnswer(false);
+                    }}
+                  >
+                    Next Card
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Standard Quiz Mode */}
+            {mode === "quiz" && currentQ && (
+              <div className="space-y-4">
+                <div className="p-3.5 rounded-xl bg-secondary/50 border border-border/50 space-y-1">
+                  <p className="font-semibold text-foreground text-xs leading-relaxed">
+                    {currentIndex + 1}. {currentQ.question}
+                  </p>
+                  {currentQ.target_concept && (
+                    <span className="text-[10px] text-muted-foreground font-mono">
+                      Target: {currentQ.target_concept}
+                    </span>
+                  )}
+                </div>
 
                 {/* Options List */}
-                <div className="grid gap-2">
-                  {Object.entries(currentQ.options).map(([key, text]) => {
+                <div className="space-y-2">
+                  {Object.entries(currentQ.options).map(([key, optText]) => {
                     const isSelected = userAnswers[currentQ.id] === key;
+                    const feedback = submitResult?.question_feedback?.[currentQ.id];
+                    const isCorrect = feedback?.correct_option === key;
+                    const isWrongSelection = isSelected && !feedback?.is_correct;
+
+                    let btnStyle = "border-border/70 hover:bg-secondary/40 text-foreground";
+                    if (submitResult) {
+                      if (isCorrect) {
+                        btnStyle = "border-emerald-500/50 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 font-semibold";
+                      } else if (isWrongSelection) {
+                        btnStyle = "border-rose-500/50 bg-rose-500/10 text-rose-700 dark:text-rose-300";
+                      }
+                    } else if (isSelected) {
+                      btnStyle = "border-purple-500 bg-purple-500/10 text-purple-700 dark:text-purple-300 font-semibold";
+                    }
+
                     return (
                       <button
                         key={key}
                         onClick={() => handleSelectOption(currentQ.id, key)}
-                        className={`p-2.5 rounded-lg border text-xs text-left transition-all flex items-start gap-2.5 ${
-                          isSelected
-                            ? "border-purple-500 bg-purple-500/10 font-semibold text-purple-900 dark:text-purple-100"
-                            : "border-border/60 bg-card hover:bg-secondary/50 text-foreground"
-                        }`}
+                        disabled={!!submitResult}
+                        className={`w-full p-2.5 rounded-xl border text-left text-xs transition-all flex items-center justify-between ${btnStyle} cursor-pointer`}
                       >
-                        <span className={`h-5 w-5 rounded-full border text-[11px] font-bold flex items-center justify-center shrink-0 ${
-                          isSelected ? "border-purple-500 bg-purple-500 text-white" : "border-border text-muted-foreground"
-                        }`}>
-                          {key}
-                        </span>
-                        <span className="mt-0.5 leading-relaxed">{text}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="w-5 h-5 rounded-full border border-border flex items-center justify-center text-[10px] font-bold shrink-0">
+                            {key}
+                          </span>
+                          <span>{optText}</span>
+                        </div>
+                        {submitResult && isCorrect && <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />}
+                        {submitResult && isWrongSelection && <XCircle className="h-4 w-4 text-rose-600 shrink-0" />}
                       </button>
                     );
                   })}
                 </div>
+
+                {/* Question Feedback after Submit */}
+                {submitResult && (
+                  <div className="p-3 rounded-xl bg-purple-500/5 border border-purple-500/20 text-xs space-y-1">
+                    <p className="font-semibold text-purple-900 dark:text-purple-200 flex items-center gap-1.5">
+                      <BookOpen className="h-3.5 w-3.5 text-purple-600" />
+                      Explanation:
+                    </p>
+                    <p className="text-muted-foreground leading-relaxed">
+                      {submitResult.question_feedback?.[currentQ.id]?.explanation || currentQ.explanation}
+                    </p>
+                  </div>
+                )}
+
+                {/* Question Navigation & Submit */}
+                <div className="flex items-center justify-between pt-2">
+                  <div className="flex gap-1.5">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-xs h-8"
+                      disabled={currentIndex === 0}
+                      onClick={() => setCurrentIndex((prev) => prev - 1)}
+                    >
+                      Previous
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-xs h-8"
+                      disabled={currentIndex === quizData.questions.length - 1}
+                      onClick={() => setCurrentIndex((prev) => prev + 1)}
+                    >
+                      Next
+                    </Button>
+                  </div>
+
+                  {!submitResult ? (
+                    <Button
+                      size="sm"
+                      className="text-xs h-8 bg-purple-600 hover:bg-purple-700 text-white font-semibold"
+                      disabled={Object.keys(userAnswers).length === 0 || submitting}
+                      onClick={handleSubmit}
+                    >
+                      {submitting ? "Grading..." : "Submit Answers"}
+                    </Button>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-xs h-8 gap-1 border-purple-500/30 text-purple-700"
+                      onClick={handleGenerate}
+                    >
+                      <RotateCcw className="h-3 w-3" />
+                      Try Another Quiz
+                    </Button>
+                  )}
+                </div>
+
+                {/* Submit Results Overview */}
+                {submitResult && (
+                  <div className="p-4 rounded-2xl bg-secondary/60 border border-border space-y-2 mt-3">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-bold text-foreground">Score:</span>
+                      <Badge className="bg-purple-600 text-white text-xs">
+                        {submitResult.score_percentage}% ({submitResult.correct_count}/{submitResult.total_count} Correct)
+                      </Badge>
+                    </div>
+                    {submitResult.recommended_next_steps?.length > 0 && (
+                      <div className="text-[11px] text-muted-foreground space-y-1 pt-1 border-t border-border/50">
+                        <span className="font-semibold text-foreground">Recommendations:</span>
+                        <ul className="list-disc list-inside space-y-0.5">
+                          {submitResult.recommended_next_steps.map((rec, i) => (
+                            <li key={i}>{rec}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
-            ) : null}
-
-            {/* Question Navigation Footer */}
-            <div className="flex items-center justify-between pt-2 border-t border-border/50">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-xs"
-                disabled={currentIndex === 0}
-                onClick={() => setCurrentIndex((prev) => prev - 1)}
-              >
-                Previous
-              </Button>
-
-              {currentIndex < quizData.questions.length - 1 ? (
-                <Button
-                  size="sm"
-                  className="text-xs bg-purple-600 hover:bg-purple-700 text-white"
-                  onClick={() => setCurrentIndex((prev) => prev + 1)}
-                >
-                  Next Question <ArrowRight className="h-3.5 w-3.5 ml-1" />
-                </Button>
-              ) : (
-                <Button
-                  size="sm"
-                  className="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold"
-                  disabled={submitting || Object.keys(userAnswers).length === 0}
-                  onClick={handleSubmit}
-                >
-                  {submitting ? "Grading..." : "Submit Quiz & Update Profile"}
-                </Button>
-              )}
-            </div>
+            )}
           </div>
-        ) : null}
-
-        {/* ── FLASHCARD MODE CONTENT ── */}
-        {quizData && mode === "flashcard" && !submitResult ? (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between text-xs pb-2 border-b border-border/50">
-              <span className="font-semibold text-muted-foreground">Flashcard {currentIndex + 1} of {quizData.questions.length}</span>
-              <Badge variant="outline" className="bg-purple-500/10 text-purple-600 text-[10px]">
-                {quizData.topic}
-              </Badge>
-            </div>
-
-            {currentQ ? (
-              <div
-                onClick={() => setShowFlashcardAnswer(!showFlashcardAnswer)}
-                className="min-h-[160px] p-6 rounded-xl border border-purple-500/30 bg-accent/5 hover:bg-accent/10 transition-all flex flex-col items-center justify-center text-center cursor-pointer relative"
-              >
-                <span className="text-[10px] uppercase font-bold tracking-widest text-purple-500 mb-2">
-                  {showFlashcardAnswer ? "Answer & Explanation" : "Question Concept"}
-                </span>
-                <p className="font-medium text-xs sm:text-sm text-foreground leading-relaxed">
-                  {showFlashcardAnswer
-                    ? `${currentQ.options[currentQ.correct_option]} — ${currentQ.explanation}`
-                    : currentQ.question}
-                </p>
-                <span className="text-[10px] text-muted-foreground mt-4 flex items-center gap-1">
-                  <RotateCcw className="h-3 w-3" /> Click card to flip
-                </span>
-              </div>
-            ) : null}
-
-            <div className="flex items-center justify-between">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-xs"
-                disabled={currentIndex === 0}
-                onClick={() => {
-                  setCurrentIndex((prev) => prev - 1);
-                  setShowFlashcardAnswer(false);
-                }}
-              >
-                Previous Card
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="text-xs"
-                disabled={currentIndex === quizData.questions.length - 1}
-                onClick={() => {
-                  setCurrentIndex((prev) => prev + 1);
-                  setShowFlashcardAnswer(false);
-                }}
-              >
-                Next Card <ArrowRight className="h-3.5 w-3.5 ml-1" />
-              </Button>
-            </div>
-          </div>
-        ) : null}
-
-        {/* ── SUBMITTED RESULTS VIEW ── */}
-        {submitResult ? (
-          <div className="space-y-4 p-4 rounded-xl bg-secondary/30 border border-border/60">
-            <div className="flex items-center justify-between">
-              <div>
-                <h4 className="font-bold text-sm text-foreground flex items-center gap-2">
-                  <Trophy className="h-4 w-4 text-amber-500" /> Quiz Completed!
-                </h4>
-                <p className="text-xs text-muted-foreground">
-                  Score: {submitResult.correct_count} / {submitResult.total_count} ({submitResult.score_percentage}%)
-                </p>
-              </div>
-              <Badge className={submitResult.score_percentage >= 80 ? "bg-emerald-500 text-white" : "bg-amber-500 text-white"}>
-                Mastery Updated: {submitResult.updated_mastery}%
-              </Badge>
-            </div>
-
-            <div className="space-y-2 pt-2 border-t border-border/50">
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Next Steps:</p>
-              <ul className="space-y-1 text-xs text-foreground/90">
-                {submitResult.recommended_next_steps?.map((rec, i) => (
-                  <li key={i} className="flex items-start gap-1.5">
-                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                    <span>{rec}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <Button size="sm" variant="outline" onClick={handleGenerate} className="w-full text-xs gap-1.5 mt-2">
-              <RotateCcw className="h-3.5 w-3.5" /> Take Another Practice Quiz
-            </Button>
-          </div>
-        ) : null}
+        )}
       </CardContent>
     </Card>
   );
