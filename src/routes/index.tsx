@@ -1,77 +1,41 @@
-import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
 import {
   BookOpen,
-  GraduationCap,
   Sparkles,
-  Play,
-  Brain,
   Zap,
-  CheckCircle2,
   ArrowRight,
-  Bot,
-  Layers,
-  Star,
-  FileCheck,
-  TrendingUp,
   ShieldCheck,
   MessageSquare,
-  Compass,
   Lock,
   Award,
+  FileCheck,
+  TrendingUp,
+  Brain,
+  CheckCircle2,
+  Flame,
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar/Navbar";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Scholar AI — AI Built for Personalized Education" },
+      { title: "Scholar AI — Personal AI Study Companion & Socratic Tutor" },
       {
         name: "description",
         content:
-          "AI that helps every teacher reach every student. Scholar AI makes personalized Socratic learning, 7-day study planning, and classroom Spaces practical for every school.",
+          "The personal AI study companion built for students. Socratic step-by-step tutoring, 7-day adaptive revision planning, and instant lecture note citations.",
       },
-      { property: "og:title", content: "Scholar AI — AI Built for Education" },
+      { property: "og:title", content: "Scholar AI — Personal AI Study Companion" },
       {
         property: "og:description",
-        content: "Personalized AI Socratic Tutoring, Course Spaces, and Real-time Mastery Diagnostics.",
+        content: "Personalized Socratic AI Tutoring, 7-Day Study Plans, and Interactive Course Spaces.",
       },
     ],
   }),
   component: Index,
 });
-
-type RoleType = "Teachers" | "Students" | "Leaders" | "Higher Ed";
-
-const roleDescriptions: Record<RoleType, { headline: string; subtitle: string; primaryLink: string; primaryLabel: string }> = {
-  Teachers: {
-    headline: "AI that connects teachers with",
-    subtitle: "See how every student is doing, know what to do next, and spend more time with the students who need you most.",
-    primaryLink: "/dashboard/teacher",
-    primaryLabel: "I'm a teacher",
-  },
-  Students: {
-    headline: "An AI personal tutor for",
-    subtitle: "Get step-by-step Socratic hints, 7-day revision timetables, practice exam simulations, and instant answers cited from your lecture notes.",
-    primaryLink: "/dashboard/student",
-    primaryLabel: "I'm a student",
-  },
-  Leaders: {
-    headline: "Safe, institutional AI for",
-    subtitle: "Equip your school or district with enterprise-grade learning spaces, FERPA/COPPA compliance, and live curriculum analytics.",
-    primaryLink: "/dashboard/admin",
-    primaryLabel: "I'm a leader",
-  },
-  "Higher Ed": {
-    headline: "Autonomous research & tutoring for",
-    subtitle: "Scale departmental tutoring, automated coding & essay rubric feedback, and vector RAG document intelligence across university courses.",
-    primaryLink: "/courses",
-    primaryLabel: "Explore Higher Ed",
-  },
-};
 
 // Illustrated cards for the vertical moving columns
 const leftColCards = [
@@ -128,7 +92,7 @@ const rightColCards = [
     aspect: "aspect-[16/11]",
   },
   {
-    title: "Data Structures & Neural Networks",
+    title: "Data Structures & Algorithms",
     category: "Computer Science",
     imgUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=800&auto=format&fit=crop",
     gradient: "from-emerald-900/60 to-sky-950/80",
@@ -137,43 +101,31 @@ const rightColCards = [
 ];
 
 function Index() {
-  const { isAuthenticated, role } = useAuth();
-  const [selectedRole, setSelectedRole] = useState<RoleType>("Teachers");
-
-  const activeContent = roleDescriptions[selectedRole];
+  const { isAuthenticated } = useAuth();
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col selection:bg-sky-500/20">
       <Navbar />
 
-      {/* ── 1. SCHOOLAI HERO SECTION (WITH MOVING PICTURE COLUMNS ON RIGHT) ── */}
+      {/* ── 1. 100% STUDENT-FOCUSED HERO (WITH MOVING PICTURE COLUMNS ON RIGHT) ── */}
       <section className="relative overflow-hidden pt-8 pb-16 lg:py-20 max-w-7xl mx-auto px-4 sm:px-8 w-full flex-1">
         <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
-          {/* Left Column: Role Switcher Pill + Big Typography + Action Pills (7 Cols) */}
+          {/* Left Column: Student Value Proposition + Big Typography + Action Pills (6 Cols) */}
           <div className="lg:col-span-6 space-y-6 lg:space-y-8 z-10">
-            {/* SchoolAI-style Floating Pill Role Switcher */}
-            <div className="inline-flex items-center bg-card border border-border/80 rounded-full p-1.5 gap-1.5 shadow-md">
-              <span className="pl-3 pr-1 text-xs font-bold text-muted-foreground">Scholar AI for...</span>
-              {(["Teachers", "Students", "Leaders", "Higher Ed"] as RoleType[]).map((r) => (
-                <button
-                  key={r}
-                  onClick={() => setSelectedRole(r)}
-                  className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
-                    selectedRole === r
-                      ? "bg-slate-900 text-white dark:bg-sky-600 dark:text-white shadow-xs"
-                      : "text-foreground hover:bg-secondary/60"
-                  }`}
-                >
-                  {r}
-                </button>
-              ))}
+            {/* Student Copilot Pill Tag */}
+            <div className="inline-flex items-center bg-card border border-border/80 rounded-full px-4 py-1.5 gap-2 shadow-xs">
+              <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-xs font-bold text-sky-700 dark:text-sky-300">
+                ✨ Personal AI Study Companion
+              </span>
+              <span className="text-xs text-muted-foreground font-semibold">| Built 100% for Students</span>
             </div>
 
             {/* Main Headline with SchoolAI Yellow Brushstroke Accent */}
             <div className="space-y-4">
               <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-[1.12]">
-                {activeContent.headline}{" "}
+                The AI tutor built for{" "}
                 <span className="relative whitespace-nowrap inline-block text-sky-600 dark:text-sky-400">
                   every student
                   {/* Playful Yellow Brushstroke Underline SVG */}
@@ -195,17 +147,17 @@ function Index() {
               </h1>
 
               <p className="text-base sm:text-lg text-muted-foreground font-normal leading-relaxed max-w-xl">
-                {activeContent.subtitle}
+                Master any concept step-by-step with your 24/7 Socratic tutor, 7-day adaptive revision planner, and instant page-cited answers from your course lecture notes.
               </p>
             </div>
 
             {/* SchoolAI-style Rounded Big Action Buttons */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
               <Link
-                to={isAuthenticated ? (role === "teacher" ? "/dashboard/teacher" : "/dashboard/student") : "/auth"}
+                to={isAuthenticated ? "/dashboard/student" : "/auth"}
                 className="inline-flex items-center justify-between gap-4 h-14 pl-7 pr-3.5 rounded-full bg-sky-600 hover:bg-sky-700 text-white font-bold text-base shadow-lg shadow-sky-600/25 transition-all hover:-translate-y-0.5 group"
               >
-                <span>{activeContent.primaryLabel}</span>
+                <span>Start Learning Free</span>
                 <span className="h-9 w-9 rounded-full bg-sky-800 flex items-center justify-center shrink-0 group-hover:translate-x-0.5 transition-transform">
                   <ArrowRight className="h-4 w-4 text-white" />
                 </span>
@@ -215,31 +167,31 @@ function Index() {
                 to="/courses"
                 className="inline-flex items-center justify-between gap-4 h-14 pl-7 pr-3.5 rounded-full bg-card hover:bg-secondary/60 text-foreground border border-border/80 font-bold text-base shadow-sm transition-all hover:-translate-y-0.5 group"
               >
-                <span>Join a Space</span>
+                <span>Enter Your Course Space</span>
                 <span className="h-9 w-9 rounded-full bg-secondary flex items-center justify-center shrink-0 group-hover:translate-x-0.5 transition-transform">
                   <Sparkles className="h-4 w-4 text-sky-600" />
                 </span>
               </Link>
             </div>
 
-            {/* Compliance & Trust Badges */}
-            <div className="pt-4 flex flex-wrap items-center gap-2 text-xs text-muted-foreground font-semibold">
+            {/* Student Trust Badges */}
+            <div className="pt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground font-semibold">
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-800 dark:text-sky-300">
-                <ShieldCheck className="h-3.5 w-3.5 text-sky-600" />
-                <span>FERPA & COPPA Compliant</span>
+                <Brain className="h-3.5 w-3.5 text-sky-600" />
+                <span>Socratic Step-by-Step Hints</span>
               </div>
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:text-emerald-300">
-                <Lock className="h-3.5 w-3.5 text-emerald-600" />
-                <span>SOC 2 Type II Certified</span>
+                <Flame className="h-3.5 w-3.5 text-emerald-600" />
+                <span>7-Day Adaptive Study Plans</span>
               </div>
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-800 dark:text-amber-300">
-                <Award className="h-3.5 w-3.5 text-amber-600" />
-                <span>1EdTech TrustEd Apps</span>
+                <BookOpen className="h-3.5 w-3.5 text-amber-600" />
+                <span>PDF Lecture Notes Grounding</span>
               </div>
             </div>
           </div>
 
-          {/* Right Column: SchoolAI-Style Animated Moving Masonry Picture Showcase (5 Cols) */}
+          {/* Right Column: SchoolAI-Style Animated Moving Masonry Picture Showcase (6 Cols) */}
           <div className="lg:col-span-6 relative h-[520px] sm:h-[580px] overflow-hidden rounded-[40px] [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)]">
             <div className="grid grid-cols-2 gap-4 h-full">
               
@@ -301,49 +253,49 @@ function Index() {
         </div>
       </section>
 
-      {/* ── 2. SCHOOLAI SPACES & MULTI-AGENT CAPABILITIES ── */}
+      {/* ── 2. STUDENT SUPERPOWERS & SPACES ── */}
       <section className="py-16 bg-secondary/40 border-t border-border/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 space-y-12">
           <div className="text-center max-w-2xl mx-auto space-y-3">
             <Badge className="bg-sky-600 text-white font-bold text-xs px-3 py-1 rounded-full">
-              Classroom & Course Spaces
+              Student AI Superpowers
             </Badge>
             <h2 className="font-display text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
-              Every course gets a dedicated AI Space
+              Everything you need to ace your courses
             </h2>
             <p className="text-sm sm:text-base text-muted-foreground">
-              Interactive environments grounded in your curriculum notes, lecture slides, and Socratic Dot AI tutors.
+              An intelligent learning companion tailored to your personal speed, strengths, and study goals.
             </p>
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {[
               {
-                title: "Personal Socratic Tutor",
-                desc: "Guides students step-by-step with hints, analogies, and derivations without spoiling answers.",
+                title: "Socratic AI Tutor",
+                desc: "Never get stuck. Get hints, analogies, and derivations that guide you to the solution without spoiling answers.",
                 icon: MessageSquare,
-                badge: "Dot AI Tutor",
+                badge: "Concept Guidance",
                 color: "bg-sky-500/10 text-sky-600 border-sky-500/20",
               },
               {
                 title: "7-Day Revision Planner",
-                desc: "Generates custom daily timetables with curated YouTube lessons and spaced repetition intervals.",
+                desc: "Auto-balances your study load across deadlines, adds curated video links, and prevents last-minute cramming.",
                 icon: Zap,
-                badge: "Learning Planner",
+                badge: "Smart Schedules",
                 color: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
               },
               {
-                title: "Diagnostic Quizzes & Exams",
-                desc: "Adaptive practice tests that pinpoint exact sub-topic weaknesses and update mastery scores.",
+                title: "Diagnostic Practice Quizzes",
+                desc: "Adaptive practice tests that identify weak concepts before exams and boost your topic mastery score.",
                 icon: FileCheck,
-                badge: "Assessment Engine",
+                badge: "Adaptive Quiz",
                 color: "bg-purple-500/10 text-purple-600 border-purple-500/20",
               },
               {
-                title: "Lecture Document RAG",
-                desc: "Upload PDFs and lecture slides to get answers with exact slide citations and page numbers.",
+                title: "PDF Lecture Grounding",
+                desc: "Upload slides and textbooks to chat directly with your course notes and receive exact page citations.",
                 icon: BookOpen,
-                badge: "Vector Knowledge Base",
+                badge: "Document RAG",
                 color: "bg-amber-500/10 text-amber-600 border-amber-500/20",
               },
             ].map((agent, i) => {
@@ -372,15 +324,15 @@ function Index() {
         </div>
       </section>
 
-      {/* ── 3. BOTTOM CALL TO ACTION ── */}
+      {/* ── 3. STUDENT CALL TO ACTION ── */}
       <section className="py-20 max-w-7xl mx-auto px-4 sm:px-8 text-center">
         <div className="p-10 sm:p-16 rounded-[40px] bg-gradient-to-br from-sky-600 via-sky-700 to-indigo-800 text-white space-y-6 shadow-xl">
           <div className="max-w-2xl mx-auto space-y-4">
             <h2 className="font-display text-3xl sm:text-5xl font-extrabold tracking-tight">
-              Ready to transform your classroom?
+              Ready to master your courses?
             </h2>
             <p className="text-sm sm:text-base text-sky-100 font-medium">
-              Join thousands of students and teachers using Scholar AI to reach their full potential.
+              Start chatting with your Socratic AI Tutor and generate your 7-day study plan today.
             </p>
           </div>
 
@@ -395,7 +347,7 @@ function Index() {
               to="/dashboard/student"
               className="inline-flex items-center justify-center h-12 px-8 rounded-full bg-sky-900/60 hover:bg-sky-900 text-white border border-white/20 font-bold text-sm transition-all"
             >
-              Launch Live Workspace
+              Open Student Command Space
             </Link>
           </div>
         </div>

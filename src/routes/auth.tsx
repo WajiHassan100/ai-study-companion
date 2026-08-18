@@ -248,52 +248,29 @@ function AuthPage() {
           <span className="font-display text-xl font-bold tracking-tight">Scholar</span>
         </Link>
 
-        {/* ── 1-CLICK INSTANT DEMO ACCESS BANNER ── */}
-        <Card className="border border-emerald-600/40 bg-emerald-500/5 shadow-xs overflow-hidden">
+        {/* ── 1-CLICK INSTANT STUDENT ACCESS BANNER ── */}
+        <Card className="border border-sky-600/40 bg-sky-500/5 shadow-xs overflow-hidden rounded-3xl">
           <CardHeader className="pb-2.5 pt-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5 font-bold text-xs text-emerald-800 dark:text-emerald-300">
-                <Sparkles className="h-4 w-4 text-emerald-600" />
-                <span>Instant Workspace Access</span>
+              <div className="flex items-center gap-1.5 font-bold text-xs text-sky-800 dark:text-sky-300">
+                <Sparkles className="h-4 w-4 text-sky-600" />
+                <span>Instant Student Access</span>
               </div>
-              <Badge className="bg-emerald-700 text-white text-[10px] font-bold">1-Click Login</Badge>
+              <Badge className="bg-sky-600 text-white text-[10px] font-bold rounded-full">1-Click Demo</Badge>
             </div>
             <CardDescription className="text-xs text-muted-foreground">
-              Select your role to jump straight into your AI workspace:
+              Jump straight into your personal AI study workspace:
             </CardDescription>
           </CardHeader>
-          <CardContent className="pb-4 pt-1 space-y-2">
-            <div className="grid grid-cols-3 gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleInstantDemo("student")}
-                className="h-10 text-xs font-bold border-emerald-600/30 hover:bg-emerald-100 dark:hover:bg-emerald-950/50 text-emerald-900 dark:text-emerald-200 flex flex-col gap-0.5 items-center justify-center py-1"
-              >
-                <User className="h-3.5 w-3.5 text-emerald-600" />
-                <span>Student</span>
-              </Button>
-
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleInstantDemo("teacher")}
-                className="h-10 text-xs font-bold border-blue-600/30 hover:bg-blue-100 dark:hover:bg-blue-950/50 text-blue-900 dark:text-blue-200 flex flex-col gap-0.5 items-center justify-center py-1"
-              >
-                <BookOpen className="h-3.5 w-3.5 text-blue-600" />
-                <span>Teacher</span>
-              </Button>
-
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleInstantDemo("admin")}
-                className="h-10 text-xs font-bold border-purple-600/30 hover:bg-purple-100 dark:hover:bg-purple-950/50 text-purple-900 dark:text-purple-200 flex flex-col gap-0.5 items-center justify-center py-1"
-              >
-                <Shield className="h-3.5 w-3.5 text-purple-600" />
-                <span>Admin</span>
-              </Button>
-            </div>
+          <CardContent className="pb-4 pt-1">
+            <Button
+              size="sm"
+              onClick={() => handleInstantDemo("student")}
+              className="w-full h-11 text-xs font-bold bg-sky-600 hover:bg-sky-700 text-white rounded-full flex items-center justify-center gap-2 shadow-sm"
+            >
+              <User className="h-4 w-4" />
+              <span>Launch Student AI Command Workspace →</span>
+            </Button>
           </CardContent>
         </Card>
 

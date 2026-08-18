@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { GraduationCap, LogOut, User as UserIcon, Sparkles, ArrowRight, BookOpen, ShieldCheck, Compass } from "lucide-react";
+import { GraduationCap, LogOut, User as UserIcon, Sparkles, ArrowRight, BookOpen, ShieldCheck, Compass, Brain, Flame } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -36,7 +36,7 @@ export function Navbar({ withSidebarTrigger = false }: { withSidebarTrigger?: bo
       <div className="flex items-center gap-6">
         {withSidebarTrigger ? <SidebarTrigger /> : null}
 
-        {/* SchoolAI-style Brand Logo */}
+        {/* Brand Logo: Scholar AI */}
         <Link to="/" className="flex items-center gap-2 group">
           <div className="h-8 w-8 rounded-xl bg-gradient-to-tr from-sky-600 to-indigo-600 flex items-center justify-center text-white shadow-sm font-bold text-sm">
             🎓
@@ -49,27 +49,10 @@ export function Navbar({ withSidebarTrigger = false }: { withSidebarTrigger?: bo
           </div>
         </Link>
 
-        {/* SchoolAI-style Role Switcher Pill (Desktop) */}
-        <div className="hidden lg:flex items-center bg-secondary/80 border border-border/80 rounded-full p-1 gap-1 text-xs font-semibold text-muted-foreground shadow-xs">
-          <span className="pl-3 pr-1 text-[11px] font-bold text-muted-foreground">Scholar for...</span>
-          <Link
-            to="/dashboard/student"
-            className="px-3.5 py-1 rounded-full bg-card text-foreground font-bold shadow-xs transition-all hover:text-sky-600"
-          >
-            Students
-          </Link>
-          <Link
-            to="/dashboard/teacher"
-            className="px-3.5 py-1 rounded-full hover:bg-card/60 transition-all hover:text-sky-600"
-          >
-            Teachers
-          </Link>
-          <Link
-            to="/dashboard/admin"
-            className="px-3.5 py-1 rounded-full hover:bg-card/60 transition-all hover:text-sky-600"
-          >
-            Admins
-          </Link>
+        {/* Student Workspace Pill Tag */}
+        <div className="hidden lg:flex items-center bg-secondary/80 border border-border/80 rounded-full px-3.5 py-1 gap-2 text-xs font-bold text-sky-700 dark:text-sky-300 shadow-xs">
+          <span className="flex h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span>Student AI Study Companion</span>
         </div>
       </div>
 
@@ -77,14 +60,21 @@ export function Navbar({ withSidebarTrigger = false }: { withSidebarTrigger?: bo
       <div className="flex items-center gap-3">
         <nav className="hidden md:flex items-center gap-5 text-xs font-bold text-muted-foreground mr-2">
           <Link to="/courses" className="hover:text-foreground transition-colors">
-            Course Spaces
+            Study Spaces
           </Link>
-          <Link to="/tutor" search={{ topic: undefined }} className="hover:text-foreground transition-colors flex items-center gap-1 text-sky-600 dark:text-sky-400">
+          <Link
+            to="/tutor"
+            search={{ topic: undefined }}
+            className="hover:text-foreground transition-colors flex items-center gap-1 text-sky-600 dark:text-sky-400"
+          >
             <Sparkles className="h-3.5 w-3.5" />
             <span>Socratic Tutor</span>
           </Link>
           <Link to="/mastery" className="hover:text-foreground transition-colors">
             Mastery Analytics
+          </Link>
+          <Link to="/assignments" className="hover:text-foreground transition-colors">
+            Homework Coach
           </Link>
         </nav>
 
@@ -120,14 +110,20 @@ export function Navbar({ withSidebarTrigger = false }: { withSidebarTrigger?: bo
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild className="rounded-xl cursor-pointer text-xs">
+                <Link to="/dashboard/student" className="flex items-center gap-2">
+                  <Brain className="h-3.5 w-3.5 text-sky-600" />
+                  <span>My Student Workspace</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild className="rounded-xl cursor-pointer text-xs">
                 <Link to="/profile" className="flex items-center gap-2">
-                  <UserIcon className="h-3.5 w-3.5 text-sky-600" />
+                  <UserIcon className="h-3.5 w-3.5 text-emerald-600" />
                   <span>My Learning Profile</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild className="rounded-xl cursor-pointer text-xs">
                 <Link to="/mastery" className="flex items-center gap-2">
-                  <Compass className="h-3.5 w-3.5 text-emerald-600" />
+                  <Compass className="h-3.5 w-3.5 text-purple-600" />
                   <span>Topic Mastery & Skill Map</span>
                 </Link>
               </DropdownMenuItem>
