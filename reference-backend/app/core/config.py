@@ -21,6 +21,12 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60 * 24
 
+    # Optional Supabase JWT secret (SUPABASE_JWT_SECRET from the Supabase
+    # project settings). When set, the backend also accepts Supabase-issued
+    # access tokens, so the frontend's existing Authorization header works
+    # and user ids map directly to Supabase auth.users ids.
+    supabase_jwt_secret: str | None = None
+
     # CORS
     cors_origins: list[str] = ["http://localhost:5173", "http://localhost:8080", "http://localhost:3000"]
 

@@ -2,21 +2,24 @@
 
 from datetime import datetime, timedelta, timezone
 
-from jose import JWTError, jwt
-from passlib.context import CryptContext
+import bcrypt
+import jwt
+from jwt import InvalidTokenError
 
 from app.core.config import get_settings
 
 settings = get_settings()
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
 
 def verify_password(plain: str, hashed: str) -> bool:
-    return pwd_context.verify(plain, hashed)
+    try:
+        return bcrypt.checkpw(plain.encode("utf-8"), hashed.encode("utf-8"))
+    except ValueError:
+        return False
 
 
 def create_access_token(subject: str, role: str) -> str:
@@ -32,5 +35,27 @@ def decode_access_token(token: str) -> dict | None:
         return jwt.decode(
             token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm]
         )
-    except JWTError:
+    except InvalidTokenError:
+        return None
+
+
+def decode_supabase_token(token: str) -> dict | None:
+    """
+    Decodes a Supabase-issued access token (signed with SUPABASE_JWT_SECRET).
+
+    Returns None when the secret is not configured or the token is invalid,
+    so callers can fall back gracefully.
+    """
+    if not settings.supabase_jwt_secret:
+        return None
+    try:
+        # Signature verification is the trust anchor; the aud claim varies by
+        # Supabase setup (e.g. "authenticated"), so it is not enforced here.
+        return jwt.decode(
+            token,
+            settings.supabase_jwt_secret,
+            algorithms=["HS256"],
+            options={"verify_aud": False},
+        )
+    except InvalidTokenError:
         return None

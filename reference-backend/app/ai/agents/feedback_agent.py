@@ -16,7 +16,7 @@ from app.ai.services.llm_service import get_llm
 from app.ai.prompts.feedback_prompt import get_feedback_prompt_template
 from app.ai.services.student_memory_service import student_memory_service
 from app.models.models import StudentProfile
-from app.ai.utils import clean_llm_json
+from app.ai.utils import clean_llm_json, AgentOutputError
 
 logger = logging.getLogger(__name__)
 
@@ -63,42 +63,21 @@ class AssignmentFeedbackAgent:
         try:
             parsed = json.loads(cleaned_text)
         except Exception as e:
-            logger.warning("Failed to parse Feedback JSON output: %s. Using fallback feedback structure.", e)
-            parsed = {
-                "assignment_title": assignment_title,
-                "subject": subject,
-                "overall_score": 78.0,
-                "letter_grade": "C+",
-                "error_identification": [
-                    "Algorithmic Complexity Bottleneck: Solution uses nested loops resulting in O(n²) time complexity.",
-                    "Edge Case Vulnerability: Does not check for empty or zero input bounds.",
-                ],
-                "explanation_of_mistakes": (
-                    "Your logic works correctly for basic test cases, but iterating through the entire list inside a secondary "
-                    "loop causes quadratic O(n²) execution time, leading to performance timeouts on larger datasets."
-                ),
-                "suggestions_for_improvement": [
-                    "Replace the inner loop with a Hash Map / Dictionary to store key-value pairs for instantaneous O(1) lookups.",
-                    "Add guard clauses at the beginning of the function to handle boundary edge cases cleanly.",
-                ],
-                "learning_resources": [
-                    "Review Data Structures: Hash Table vs Array Lookup time complexity",
-                    "Ask AI Tutor: 'Explain how to optimize nested loops using a hash map step by step'",
-                    "YouTube Search: 'Big-O notation hash map optimization tutorial'",
-                ],
-                "refactored_solution_snippet": (
-                    "# Optimized O(n) Hash Map Solution\n"
-                    "def optimized_solution(data):\n"
-                    "    seen = {}\n"
-                    "    for item in data:\n"
-                    "        if item in seen:\n"
-                    "            return seen[item]\n"
-                    "        seen[item] = True\n"
-                    "    return None"
-                ),
-            }
+            logger.warning("Failed to parse Feedback JSON output: %s", e)
+            raise AgentOutputError("Assignment Feedback Agent could not produce a valid feedback structure.") from e
 
-        score = parsed.get("overall_score", 78.0)
+        required_keys = [
+            "overall_score",
+            "letter_grade",
+            "error_identification",
+            "explanation_of_mistakes",
+            "suggestions_for_improvement",
+            "learning_resources",
+        ]
+        if not all(k in parsed for k in required_keys):
+            raise AgentOutputError("Assignment Feedback Agent returned an incomplete feedback report.")
+
+        score = parsed.get("overall_score")
         errors = parsed.get("error_identification", [])
         explanation = parsed.get("explanation_of_mistakes", "")
         suggestions = parsed.get("suggestions_for_improvement", [])
@@ -131,7 +110,7 @@ class AssignmentFeedbackAgent:
             "assignment_title": assignment_title,
             "subject": subject,
             "overall_score": score,
-            "letter_grade": parsed.get("letter_grade", "B"),
+            "letter_grade": parsed.get("letter_grade"),
             "error_identification": errors,
             "explanation_of_mistakes": explanation,
             "suggestions_for_improvement": suggestions,

@@ -10,7 +10,7 @@ import logging
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session as DBSession
 
-from app.api.deps import get_optional_current_user
+from app.api.deps import get_current_user, resolve_student_id
 from app.db.session import get_db
 from app.models.models import User
 from app.schemas.schemas import (
@@ -30,12 +30,12 @@ router = APIRouter(prefix="/ai", tags=["Agent #7: AI Exam Generator Agent"])
 async def generate_practice_exam(
     req: ExamGenerateRequest,
     db: DBSession = Depends(get_db),
-    current_user: User | None = Depends(get_optional_current_user),
+    current_user: User = Depends(get_current_user),
 ) -> ExamGenerateResponse:
     """
     Generates a multi-format practice assessment tailored to student weak concepts and requested difficulty.
     """
-    student_id = req.student_id or (current_user.id if current_user else "demo_student")
+    student_id = resolve_student_id(req.student_id, current_user)
 
     try:
         res = await exam_agent.generate_exam(
@@ -59,12 +59,12 @@ async def generate_practice_exam(
 async def evaluate_practice_exam(
     req: ExamEvaluateRequest,
     db: DBSession = Depends(get_db),
-    current_user: User | None = Depends(get_optional_current_user),
+    current_user: User = Depends(get_current_user),
 ) -> ExamEvaluateResponse:
     """
     Evaluates a submitted practice exam, scores each question, updates Agent #2 Mastery, and returns recommendations.
     """
-    student_id = req.student_id or (current_user.id if current_user else "demo_student")
+    student_id = resolve_student_id(req.student_id, current_user)
 
     try:
         res = await exam_agent.evaluate_exam(

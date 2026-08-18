@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { BookOpen, CalendarClock, ClipboardList, TrendingUp } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { StatCard } from "@/components/DashboardCards/StatCard";
+import { useDashboardAnalytics } from "@/hooks/useDashboardAnalytics";
 import { AiAssistantPanel } from "@/components/DashboardCards/AiAssistantPanel";
 import { WeaknessTrackerCard } from "@/components/DashboardCards/WeaknessTrackerCard";
 import { StudyPlannerCard } from "@/components/DashboardCards/StudyPlannerCard";
@@ -65,32 +64,40 @@ function StudentDashboard() {
   const [refreshKey, setRefreshKey] = useState(0);
   const name = profile?.full_name?.split(" ")[0] || user?.email?.split("@")[0] || "there";
 
+  // Fetch real analytics data from the backend
+  const { data: analytics, isLoading: analyticsLoading } = useDashboardAnalytics(user?.id);
+
   const handleProfileUpdated = () => {
     setRefreshKey((prev) => prev + 1);
   };
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
-      {/* ── 1. AI DAILY BRIEFING (Personalized Greeting, Streak, Issues, Recommended Actions) ── */}
+      {/* ── 1. AI DAILY BRIEFING ── */}
       <ComponentErrorBoundary fallbackTitle="AI Mentor Daily Briefing">
         <AiDailyBriefing
           userName={name}
+          analytics={analytics}
+          isLoading={analyticsLoading}
           onAskTutor={(query) => setSelectedQuery(query)}
           onOpenPlanner={handleProfileUpdated}
         />
       </ComponentErrorBoundary>
 
-      {/* ── 2. AI LEARNING INTELLIGENCE (Consistency Score, Trend, Predictions, [Why?] Triggers) ── */}
+      {/* ── 2. AI LEARNING INTELLIGENCE ── */}
       <ComponentErrorBoundary fallbackTitle="AI Learning Intelligence">
         <AiLearningIntelligence
           studentId={user?.id || "demo_student"}
+          analytics={analytics}
+          isLoading={analyticsLoading}
           onAskTutor={(query) => setSelectedQuery(query)}
         />
       </ComponentErrorBoundary>
 
-      {/* ── 3. DEDICATED AI AGENT HUB (Socratic Tutor, Learning Planner, Assessment & Diagnostics, Progress Analytics) ── */}
+      {/* ── 3. AI AGENT HUB ── */}
       <ComponentErrorBoundary fallbackTitle="AI Agent Command Team">
         <AiAgentHub
+          agentStatuses={analytics?.agent_statuses}
           onAskTutor={(query) => setSelectedQuery(query)}
           onOpenPlanner={handleProfileUpdated}
           onOpenAssessment={handleProfileUpdated}
@@ -249,9 +256,10 @@ function StudentDashboard() {
           <AiAssistantPanel
             title="AI Study Assistant"
             description="Ask concepts, request study plans, or get homework help anytime."
-            suggestions={["Explain photosynthesis simply", "Build a math revision plan", "Summarise key history notes"]}
             studentId={user?.id || "demo_student"}
             externalPrompt={selectedQuery}
+            recentChatsData={analytics?.recent_conversations}
+            indexedDocsData={analytics?.indexed_documents}
           />
         </ComponentErrorBoundary>
       </div>

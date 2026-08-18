@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session as DBSession
 
-from app.api.deps import get_optional_current_user
+from app.api.deps import get_current_user, resolve_student_id, ensure_owns_student
 from app.db.session import get_db
 from app.models.models import User, StudentProfile
 from app.schemas.schemas import (
@@ -33,13 +33,13 @@ profiler_agent = ProfilerAgent()
 async def evaluate_student_answer(
     payload: AssessmentEvaluateRequest,
     db: DBSession = Depends(get_db),
-    current_user: User | None = Depends(get_optional_current_user),
+    current_user: User = Depends(get_current_user),
 ) -> AssessmentEvaluateResponse:
     """
     Evaluates a student's answer to a practice question or assignment prompt,
     computes updated topic mastery, identifies concept gaps, and updates profile.
     """
-    student_id = payload.student_id or (current_user.id if current_user else "demo_student")
+    student_id = resolve_student_id(payload.student_id, current_user)
 
     try:
         result = await profiler_agent.evaluate_and_profile(
@@ -72,21 +72,24 @@ async def evaluate_student_answer(
 def get_student_profile(
     student_id: str,
     db: DBSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> StudentProfileResponse:
     """
     Retrieves live student learning profile including level, style,
     weaknesses list, and topic mastery dictionary.
     """
+    ensure_owns_student(student_id, current_user)
+
     profile = db.query(StudentProfile).filter_by(student_id=student_id).first()
 
     if not profile:
-        # Return default initial profile
+        # Honest empty profile — a new student has no weaknesses or mastery yet.
         return StudentProfileResponse(
             student_id=student_id,
             current_level="beginner",
             learning_style="visual",
-            weaknesses=["Quadratic Factoring", "Photosynthesis Reactions"],
-            topic_mastery={"Mathematics": 65.0, "Biology": 45.0, "Physics": 80.0},
+            weaknesses=[],
+            topic_mastery={},
             updated_at=datetime.now(timezone.utc),
         )
 
@@ -114,11 +117,14 @@ def get_student_profile(
 def analyze_student_knowledge(
     student_id: str,
     db: DBSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """
     Returns explainable student knowledge depth analysis, root cause analysis,
     and prerequisite knowledge dependency mapping trees.
     """
+    ensure_owns_student(student_id, current_user)
+
     try:
         return profiler_agent.analyze_knowledge_depth(db, student_id)
     except Exception as e:

@@ -58,7 +58,7 @@ export interface ChatMessage {
   data?: TutorChatResponse;
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
+import { apiFetch, API_BASE_URL } from "./client";
 
 /**
  * Sends a query message to the AI Tutor Agent backend endpoint.
@@ -72,7 +72,7 @@ export async function sendTutorMessage(payload: TutorChatPayload, token?: string
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_BASE_URL}/ai/tutor/chat`, {
+  const response = await apiFetch(`${API_BASE_URL}/ai/tutor/chat`, {
     method: "POST",
     headers,
     body: JSON.stringify({
@@ -105,7 +105,7 @@ export async function orchestrateMessage(payload: OrchestratorPayload, token?: s
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_BASE_URL}/ai/orchestrate`, {
+  const response = await apiFetch(`${API_BASE_URL}/ai/orchestrate`, {
     method: "POST",
     headers,
     body: JSON.stringify({
@@ -122,4 +122,75 @@ export async function orchestrateMessage(payload: OrchestratorPayload, token?: s
   }
 
   return response.json();
+}
+
+interface StreamHandlers {
+  onToken: (text: string) => void;
+  onComplete: (data: TutorChatResponse) => void;
+  onError: (err: Error) => void;
+}
+
+/**
+ * Streams a tutor response token-by-token via the backend SSE endpoint
+ * (POST /ai/tutor/chat/stream). Events: `token`, `complete`, `error`.
+ */
+export async function streamTutorMessage(
+  payload: TutorChatPayload,
+  handlers: StreamHandlers,
+  signal?: AbortSignal,
+): Promise<void> {
+  const response = await apiFetch(`${API_BASE_URL}/ai/tutor/chat/stream`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      student_id: payload.student_id || "",
+      message: payload.message,
+      course_id: payload.course_id || null,
+      session_id: payload.session_id || null,
+      student_level: payload.student_level || "beginner",
+      learning_style: payload.learning_style || "visual",
+    }),
+    signal,
+  });
+
+  if (!response.ok || !response.body) {
+    const errorData = await response.json().catch(() => ({ detail: `Server returned status ${response.status}` }));
+    throw new Error(errorData.detail || `Server returned status ${response.status}`);
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  const handleEvent = (rawEvent: string) => {
+    const line = rawEvent.split("\n").find((l) => l.startsWith("data: "));
+    if (!line) return;
+    try {
+      const data = JSON.parse(line.slice(6));
+      if (data.type === "token") {
+        handlers.onToken(data.content ?? "");
+      } else if (data.type === "complete") {
+        handlers.onComplete(data.content as TutorChatResponse);
+      } else if (data.type === "error") {
+        handlers.onError(new Error(data.content ?? "Stream error"));
+      }
+    } catch {
+      // Ignore malformed SSE events.
+    }
+  };
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const events = buffer.split("\n\n");
+    buffer = events.pop() ?? "";
+    for (const evt of events) {
+      handleEvent(evt);
+    }
+  }
+  buffer += decoder.decode();
+  if (buffer.trim()) {
+    handleEvent(buffer);
+  }
 }

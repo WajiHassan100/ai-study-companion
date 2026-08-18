@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { getAllCourses, type CourseListItem } from "@/lib/api/courses";
+import { InlineError } from "@/components/common/InlineError";
 
 export const Route = createFileRoute("/_authenticated/courses/")({
   head: () => ({
@@ -39,17 +40,20 @@ export const Route = createFileRoute("/_authenticated/courses/")({
 function CoursesCatalogPage() {
   const [courses, setCourses] = useState<CourseListItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("all");
 
   useEffect(() => {
     async function loadData() {
       setLoading(true);
+      setError(null);
       try {
         const data = await getAllCourses();
         setCourses(data);
       } catch (err) {
         console.error("Failed to load course catalog:", err);
+        setError(err instanceof Error ? err.message : "Failed to load course catalog. Is the AI backend reachable?");
       } finally {
         setLoading(false);
       }
@@ -165,7 +169,16 @@ function CoursesCatalogPage() {
       </div>
 
       {/* ── COURSES GRID ── */}
-      {loading ? (
+      {error ? (
+        <div className="space-y-3">
+          <InlineError message={error} />
+          <div className="text-center">
+            <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
+              Retry
+            </Button>
+          </div>
+        </div>
+      ) : loading ? (
         <div className="py-12 text-center text-emerald-800 font-semibold flex items-center justify-center gap-3">
           <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
           <span>Loading course catalog...</span>
@@ -233,7 +246,7 @@ function CoursesCatalogPage() {
                   asChild
                   className="w-full bg-emerald-800 hover:bg-emerald-900 text-white font-semibold text-xs h-9 rounded-xl gap-2"
                 >
-                  <Link to={`/courses/${c.id}`}>
+                  <Link to="/courses/$courseId" params={{ courseId: c.id }}>
                     <BookOpen className="h-4 w-4" />
                     <span>Open Course Workspace →</span>
                   </Link>

@@ -14,7 +14,7 @@ from langchain_core.messages import HumanMessage
 
 from app.ai.prompts.rag_prompt import RAG_KNOWLEDGE_AGENT_PROMPT
 from app.ai.services.llm_service import get_llm
-from app.ai.utils import clean_llm_json
+from app.ai.utils import clean_llm_json, AgentOutputError
 from app.db.session import SessionLocal
 from app.models.models import CourseDocument
 
@@ -284,10 +284,12 @@ class RAGAgent:
             raw_text = response.content.strip()
             cleaned_text = clean_llm_json(raw_text)
             data = json.loads(cleaned_text)
+            if not data.get("answer"):
+                raise ValueError("LLM returned no answer")
             return data
         except Exception as e:
-            logger.error(f"LLM call failed for RAGAgent: {e}")
-            return self._build_fallback_rag_response(retrieved_chunks, query)
+            logger.error("LLM call failed for RAGAgent: %s", e)
+            raise AgentOutputError("RAG Agent could not produce a grounded answer.") from e
 
     def index_new_material(
         self,
@@ -332,49 +334,6 @@ class RAGAgent:
             "status": "indexed",
             "chunks_indexed": indexed_count,
             "message": f"Successfully indexed '{material_title}' into {course_id} knowledge base.",
-        }
-
-    def _build_fallback_rag_response(self, chunks: list[dict[str, Any]], query: str) -> dict[str, Any]:
-        """Generates a comprehensive assignment solution & concept breakdown based on uploaded file content."""
-        citations = []
-        snippets_summary = []
-
-        for c in chunks:
-            citations.append({
-                "material_title": c["material_title"],
-                "chapter": c["chapter"],
-                "page_number": c["page_number"],
-                "snippet": c["content"][:150] + "...",
-            })
-            snippets_summary.append(c["content"])
-
-        combined_text = "\n".join(snippets_summary)
-        
-        # Check if query requests assignment solving
-        if any(w in query.lower() for w in ["solve", "assignment", "homework", "question", "answer", "explain"]):
-            answer = (
-                f"📝 **Comprehensive Assignment Solution for '{chunks[0]['material_title']}':**\n\n"
-                f"### **Step-by-Step Breakdown & Answers:**\n\n"
-                f"**1. Core Concept Overview:**\n"
-                f"{combined_text[:400]}\n\n"
-                f"**2. Detailed Solution & Key Takeaways:**\n"
-                f"- **Analysis:** The document covers key principles and requirements outlined above.\n"
-                f"- **Step 1:** Review primary objectives and input variables.\n"
-                f"- **Step 2:** Apply relevant formulas and structural logic.\n"
-                f"- **Final Answer:** All questions in '{chunks[0]['material_title']}' are grounded in the core topics above."
-            )
-        else:
-            clean_preview = combined_text[:450].replace("\n", " ").strip()
-            answer = (
-                f"📚 **Detailed Explanation from '{chunks[0]['material_title']}':**\n\n"
-                f"{clean_preview}"
-            )
-
-        return {
-            "answer": answer,
-            "cited_sources": citations,
-            "confidence_score": 0.96,
-            "topic": f"Assignment Solution: {chunks[0]['material_title']}",
         }
 
     def execute_learning_action(

@@ -68,7 +68,7 @@ export function AgentCard({ agent, className }: { agent: AgentDefinition; classN
               <ArrowRight className="ml-1 h-4 w-4" />
             </Link>
           ) : agent.id === "tutor" ? (
-            <Link to="/tutor">
+            <Link to="/tutor" search={{ topic: undefined }}>
               Launch {agent.shortName}
               <ArrowRight className="ml-1 h-4 w-4" />
             </Link>

@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { generateQuiz, submitQuiz, type QuizData, type QuizSubmitResult } from "@/lib/api/quiz";
+import { InlineError } from "@/components/common/InlineError";
 
 interface QuizGeneratorProps {
   studentId: string;
@@ -19,9 +20,11 @@ export function QuizGeneratorCard({ studentId, onProfileUpdated }: QuizGenerator
   const [userAnswers, setUserAnswers] = useState<Record<string, string>>({});
   const [submitResult, setSubmitResult] = useState<QuizSubmitResult | null>(null);
   const [showFlashcardAnswer, setShowFlashcardAnswer] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleGenerate = async () => {
     setLoading(true);
+    setError(null);
     setSubmitResult(null);
     setUserAnswers({});
     setCurrentIndex(0);
@@ -32,6 +35,7 @@ export function QuizGeneratorCard({ studentId, onProfileUpdated }: QuizGenerator
       setQuizData(data);
     } catch (err) {
       console.error("Failed to generate quiz:", err);
+      setError(err instanceof Error ? err.message : "Failed to generate quiz. Is the AI backend reachable?");
     } finally {
       setLoading(false);
     }
@@ -45,6 +49,7 @@ export function QuizGeneratorCard({ studentId, onProfileUpdated }: QuizGenerator
   const handleSubmit = async () => {
     if (!quizData || submitting) return;
     setSubmitting(true);
+    setError(null);
     try {
       const result = await submitQuiz(quizData.quiz_id, studentId, userAnswers);
       setSubmitResult(result);
@@ -52,6 +57,7 @@ export function QuizGeneratorCard({ studentId, onProfileUpdated }: QuizGenerator
       onProfileUpdated?.();
     } catch (err) {
       console.error("Quiz submission failed:", err);
+      setError(err instanceof Error ? err.message : "Quiz submission failed. Is the AI backend reachable?");
     } finally {
       setSubmitting(false);
     }
@@ -104,6 +110,8 @@ export function QuizGeneratorCard({ studentId, onProfileUpdated }: QuizGenerator
       </CardHeader>
 
       <CardContent className="space-y-4 text-sm">
+        {error ? <InlineError message={error} /> : null}
+
         {!quizData && !loading ? (
           <div className="py-8 text-center border border-dashed border-border rounded-xl space-y-2 bg-background/50">
             <Trophy className="h-8 w-8 mx-auto text-purple-500/60" />

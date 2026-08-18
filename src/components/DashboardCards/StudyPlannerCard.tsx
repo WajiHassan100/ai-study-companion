@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { generateStudyPlan, getStudentStudyPlans, type StudyPlan, type StudyBlock } from "@/lib/api/planner";
+import { InlineError } from "@/components/common/InlineError";
 
 interface StudyPlannerProps {
   studentId: string;
@@ -14,6 +15,7 @@ export function StudyPlannerCard({ studentId, onAskTutor }: StudyPlannerProps) {
   const [plans, setPlans] = useState<StudyPlan[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [completedItems, setCompletedItems] = useState<Record<string, boolean>>({});
   const [expandedIndex, setExpandedIndex] = useState<number | null>(0); // Default expand first day
 
@@ -21,11 +23,13 @@ export function StudyPlannerCard({ studentId, onAskTutor }: StudyPlannerProps) {
 
   const fetchPlans = async () => {
     setLoading(true);
+    setError(null);
     try {
       const data = await getStudentStudyPlans(studentId);
       setPlans(data);
     } catch (err) {
       console.error("Failed to load study plans:", err);
+      setError(err instanceof Error ? err.message : "Failed to load study plans. Is the AI backend reachable?");
     } finally {
       setLoading(false);
     }
@@ -37,12 +41,14 @@ export function StudyPlannerCard({ studentId, onAskTutor }: StudyPlannerProps) {
 
   const handleGenerate = async () => {
     setGenerating(true);
+    setError(null);
     try {
       const newPlan = await generateStudyPlan(studentId, targetDays, customGoal, availableHours, "moderate");
       setPlans((prev) => [newPlan, ...prev]);
       setExpandedIndex(0);
     } catch (err) {
       console.error("Failed to generate plan:", err);
+      setError(err instanceof Error ? err.message : "Failed to generate study plan. Is the AI backend reachable?");
     } finally {
       setGenerating(false);
     }
@@ -91,6 +97,8 @@ export function StudyPlannerCard({ studentId, onAskTutor }: StudyPlannerProps) {
       </CardHeader>
 
       <CardContent className="space-y-4 text-sm">
+        {error ? <InlineError message={error} /> : null}
+
         {/* Adaptive Parameters Selector Bar */}
         <div className="p-2.5 rounded-xl bg-secondary/50 border border-border/50 flex flex-wrap items-center justify-between gap-2 text-xs">
           <div className="flex items-center gap-3">

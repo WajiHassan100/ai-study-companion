@@ -10,7 +10,7 @@ import logging
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session as DBSession
 
-from app.api.deps import get_optional_current_user
+from app.api.deps import get_current_user, resolve_student_id
 from app.db.session import get_db
 from app.models.models import User
 from app.schemas.schemas import (
@@ -28,12 +28,12 @@ router = APIRouter(prefix="/ai", tags=["Agent #9: AI Learning Coach Agent"])
 async def get_coaching_insights(
     req: LearningCoachRequest,
     db: DBSession = Depends(get_db),
-    current_user: User | None = Depends(get_optional_current_user),
+    current_user: User = Depends(get_current_user),
 ) -> LearningCoachResponse:
     """
     Generates long-term AI coaching mentorship analysis based on student performance trends and consistency.
     """
-    student_id = req.student_id or (current_user.id if current_user else "demo_student")
+    student_id = resolve_student_id(req.student_id, current_user)
 
     try:
         res = await coach_agent.generate_coaching_insights(

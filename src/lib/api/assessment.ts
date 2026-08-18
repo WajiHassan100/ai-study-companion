@@ -32,7 +32,7 @@ export interface EvaluationResponse {
   recommended_level: "beginner" | "intermediate" | "advanced";
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
+import { apiFetch, API_BASE_URL } from "./client";
 
 /**
  * Fetches the live student profile and topic mastery scores.
@@ -43,34 +43,16 @@ export async function getStudentProfile(studentId: string, token?: string): Prom
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  try {
-    const response = await fetch(`${API_BASE_URL}/ai/student/profile/${encodeURIComponent(studentId)}`, {
-      method: "GET",
-      headers,
-    });
+  const response = await apiFetch(`${API_BASE_URL}/ai/student/profile/${encodeURIComponent(studentId)}`, {
+    method: "GET",
+    headers,
+  });
 
-    if (!response.ok) {
-      throw new Error(`Status ${response.status}`);
-    }
-
-    return await response.json();
-  } catch (err) {
-    console.warn("Using fallback student profile data:", err);
-    // Fallback default profile if server unavailable
-    return {
-      student_id: studentId,
-      current_level: "intermediate",
-      learning_style: "visual",
-      weaknesses: ["Quadratic Factoring", "Photosynthesis Reactions", "Newton's 3rd Law"],
-      topic_mastery: {
-        "Mathematics": 65,
-        "Biology": 82,
-        "Physics": 54,
-        "History": 90,
-      },
-      updated_at: new Date().toISOString(),
-    };
+  if (!response.ok) {
+    throw new Error(`Status ${response.status}`);
   }
+
+  return await response.json();
 }
 
 /**
@@ -84,7 +66,7 @@ export async function evaluateAnswer(payload: EvaluationPayload, token?: string)
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_BASE_URL}/ai/assessment/evaluate`, {
+  const response = await apiFetch(`${API_BASE_URL}/ai/assessment/evaluate`, {
     method: "POST",
     headers,
     body: JSON.stringify(payload),

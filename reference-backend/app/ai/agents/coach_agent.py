@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session as DBSession
 from app.ai.services.llm_service import get_llm
 from app.ai.prompts.coach_prompt import get_coach_prompt_template
 from app.ai.services.student_memory_service import student_memory_service
-from app.ai.utils import clean_llm_json
+from app.ai.utils import clean_llm_json, AgentOutputError
 from app.models.models import StudentProfile
 
 logger = logging.getLogger(__name__)
@@ -62,34 +62,21 @@ class LearningCoachAgent:
         try:
             parsed = json.loads(cleaned_text)
         except Exception as e:
-            logger.warning("Failed to parse Learning Coach JSON output: %s. Using fallback coach mentorship.", e)
-            parsed = {
-                "coach_title": "AI Learning Coach Performance Report",
-                "consistency_score": 82.0,
-                "missed_sessions_count": 3,
-                "performance_recommendations": [
-                    "You improved in mathematics (+12%) this week, demonstrating strong progress in derivatives.",
-                    "Cellular biology review remained consistent, maintaining a 78% mastery level.",
-                ],
-                "problem_detection": [
-                    "You have missed three planned study sessions for Physics II over the past 5 days.",
-                    "Gradient vector weakness is likely caused by incomplete understanding of partial derivatives.",
-                ],
-                "strategic_improvements": [
-                    "Reduce biology study sessions from 2h to 1h daily and focus more on calculus & Newton's laws before your upcoming exam.",
-                    "Schedule an AI Tutor Socratic session on Partial Derivatives before Friday's practice exam.",
-                ],
-                "planner_rebalance_action": {
-                    "suggested_hours_per_day": 2.0,
-                    "priority_focus_subject": "Multivariable Calculus & Physics",
-                    "reduced_subject": "Cellular Biology",
-                    "reasoning": "Reallocating hours from mastered biology towards high-priority calculus exam prep.",
-                },
-                "socratic_tutor_prompts": [
-                    "Explain the physical intuition of gradient vectors step by step",
-                    "How does partial derivative chain rule apply to multivariable optimization?",
-                ],
-            }
+            logger.warning("Failed to parse Learning Coach JSON output: %s", e)
+            raise AgentOutputError("Learning Coach Agent could not produce a valid coaching report.") from e
+
+        required_keys = [
+            "coach_title",
+            "consistency_score",
+            "missed_sessions_count",
+            "performance_recommendations",
+            "problem_detection",
+            "strategic_improvements",
+            "planner_rebalance_action",
+            "socratic_tutor_prompts",
+        ]
+        if not all(k in parsed for k in required_keys):
+            raise AgentOutputError("Learning Coach Agent returned an incomplete coaching report.")
 
         # Save coach observation summary back into StudentProfile progress_trends_json
         if db:

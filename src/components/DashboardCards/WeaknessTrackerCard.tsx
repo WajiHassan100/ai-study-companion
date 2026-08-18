@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { getStudentProfile, type StudentProfile } from "@/lib/api/assessment";
+import { InlineError } from "@/components/common/InlineError";
 
 interface WeaknessTrackerProps {
   studentId: string;
@@ -14,14 +15,17 @@ interface WeaknessTrackerProps {
 export function WeaknessTrackerCard({ studentId, onAskTutor }: WeaknessTrackerProps) {
   const [profile, setProfile] = useState<StudentProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchProfile = async () => {
     setLoading(true);
+    setError(null);
     try {
       const data = await getStudentProfile(studentId);
       setProfile(data);
     } catch (err) {
       console.error("Failed to load student profile:", err);
+      setError(err instanceof Error ? err.message : "Failed to load profile. Is the AI backend reachable?");
     } finally {
       setLoading(false);
     }
@@ -61,6 +65,8 @@ export function WeaknessTrackerCard({ studentId, onAskTutor }: WeaknessTrackerPr
       </CardHeader>
 
       <CardContent className="space-y-4 text-sm">
+        {error ? <InlineError message={error} /> : null}
+
         {/* Student Level & Style Header */}
         <div className="flex items-center justify-between p-2.5 rounded-lg bg-secondary/50 border border-border/50">
           <div className="flex items-center gap-2">

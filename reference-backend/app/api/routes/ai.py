@@ -13,9 +13,9 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session as DBSession
 
-from app.api.deps import get_optional_current_user
+from app.api.deps import get_current_user, resolve_student_id, ensure_owns_student
 from app.db.session import get_db
-from app.models.models import User, AIChatMessage
+from app.models.models import User, AIChatMessage, AIChatSession
 from app.schemas.schemas import (
     ChatRequest,
     ChatResponse,
@@ -39,14 +39,14 @@ tutor_agent = TutorAgent()
 async def orchestrate_request(
     payload: OrchestrationRequest,
     db: DBSession = Depends(get_db),
-    current_user: User | None = Depends(get_optional_current_user),
+    current_user: User = Depends(get_current_user),
 ) -> OrchestrationResponse:
     """
     Central AI Orchestrator endpoint.
     Analyzes student prompt intent, delegates execution to specialized agents,
     and returns unified multi-agent response with decision reasoning.
     """
-    student_id = payload.student_id or (current_user.id if current_user else f"demo_{uuid.uuid4().hex[:8]}")
+    student_id = resolve_student_id(payload.student_id, current_user)
     try:
         res = await orchestrator_agent.orchestrate(
             db=db,
@@ -73,14 +73,14 @@ async def orchestrate_request(
 async def tutor_chat(
     payload: TutorChatRequest,
     db: DBSession = Depends(get_db),
-    current_user: User | None = Depends(get_optional_current_user),
+    current_user: User = Depends(get_current_user),
 ) -> TutorChatResponse:
     """
     Dedicated AI Tutor endpoint.
     Accepts student questions, maintains conversation history in DB,
     and returns a structured educational response.
     """
-    student_id = payload.student_id or (current_user.id if current_user else f"demo_{uuid.uuid4().hex[:8]}")
+    student_id = resolve_student_id(payload.student_id, current_user)
 
     try:
         result = await tutor_agent.ask(
@@ -115,12 +115,12 @@ async def tutor_chat(
 async def chat(
     payload: ChatRequest,
     db: DBSession = Depends(get_db),
-    current_user: User | None = Depends(get_optional_current_user),
+    current_user: User = Depends(get_current_user),
 ) -> ChatResponse:
     """
     General AI assistant route invoking the AI Tutor Agent under the hood.
     """
-    student_id = current_user.id if current_user else "demo_student"
+    student_id = current_user.id
     try:
         result = await tutor_agent.ask(
             db=db,
@@ -147,7 +147,7 @@ async def chat(
 async def tutor_chat_stream(
     payload: TutorChatRequest,
     db: DBSession = Depends(get_db),
-    current_user: User | None = Depends(get_optional_current_user),
+    current_user: User = Depends(get_current_user),
 ):
     """
     Streams the AI Tutor response token-by-token via Server-Sent Events (SSE).
@@ -156,7 +156,7 @@ async def tutor_chat_stream(
     import json
     import asyncio
 
-    student_id = payload.student_id or (current_user.id if current_user else f"demo_{uuid.uuid4().hex[:8]}")
+    student_id = resolve_student_id(payload.student_id, current_user)
     session_id = payload.session_id or str(uuid.uuid4())
 
     async def event_generator():
@@ -313,10 +313,16 @@ async def tutor_chat_stream(
 def get_session_history(
     session_id: str,
     db: DBSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """
     Returns saved message history for a given chat session.
     """
+    session = db.get(AIChatSession, session_id)
+    if session is None:
+        raise HTTPException(status_code=404, detail="Session not found")
+    ensure_owns_student(session.student_id, current_user)
+
     messages = (
         db.query(AIChatMessage)
         .filter(AIChatMessage.session_id == session_id)

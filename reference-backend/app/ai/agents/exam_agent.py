@@ -19,7 +19,7 @@ from app.ai.prompts.exam_prompt import get_exam_prompt_template
 from app.ai.services.student_memory_service import student_memory_service
 from app.ai.agents.rag_agent import rag_agent
 from app.models.models import StudentProfile, Quiz, QuizAttempt
-from app.ai.utils import clean_llm_json
+from app.ai.utils import clean_llm_json, AgentOutputError
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +48,7 @@ class ExamGeneratorAgent:
         # Fetch student memory profile
         p = student_memory_service.get_or_create_profile(db, student_id)
         student_level = p.get("current_level", "intermediate")
-        weaknesses = p.get("weaknesses", ["Calculus Derivatives", "Newtonian Mechanics"])
+        weaknesses = p.get("weaknesses", [])
 
         if not topic:
             topic = weaknesses[0] if weaknesses else "Multivariable Calculus & Physics"
@@ -79,65 +79,14 @@ class ExamGeneratorAgent:
         try:
             parsed = json.loads(cleaned_text)
         except Exception as e:
-            logger.warning("Failed to parse Exam JSON output: %s. Using fallback exam structure.", e)
-            parsed = {
-                "title": f"{topic} Comprehensive Practice Exam",
-                "topic": topic,
-                "difficulty": difficulty,
-                "total_marks": 100,
-                "questions": [
-                    {
-                        "id": "q1",
-                        "type": "mcq",
-                        "question": f"What is the fundamental property of {topic}?",
-                        "difficulty": difficulty,
-                        "options": {
-                            "A": f"Primary governing equation in {topic}",
-                            "B": "Secondary boundary condition",
-                            "C": "Zero rate limit",
-                            "D": "None of the above",
-                        },
-                        "correct_option": "A",
-                        "model_solution": f"Option A correctly defines the foundational property of {topic}.",
-                        "max_marks": 20,
-                    },
-                    {
-                        "id": "q2",
-                        "type": "numerical",
-                        "question": f"Calculate the rate of change for {topic} given initial parameters x = 2 and y = 5.",
-                        "difficulty": difficulty,
-                        "model_solution": "Substitute values into rate formula dy/dx = 2x + y -> 2(2) + 5 = 9.",
-                        "max_marks": 20,
-                    },
-                    {
-                        "id": "q3",
-                        "type": "short",
-                        "question": f"Explain the core physical or mathematical intuition behind {topic}.",
-                        "difficulty": difficulty,
-                        "model_solution": f"{topic} measures instantaneous change and directional gradients across continuous fields.",
-                        "max_marks": 20,
-                    },
-                    {
-                        "id": "q4",
-                        "type": "conceptual",
-                        "question": f"How does {topic} connect with prerequisite foundational concepts?",
-                        "difficulty": difficulty,
-                        "model_solution": f"It extends lower-dimensional differentiation into vector spaces.",
-                        "max_marks": 20,
-                    },
-                    {
-                        "id": "q5",
-                        "type": "long",
-                        "question": f"Provide a complete multi-step derivation and real-world application of {topic}.",
-                        "difficulty": difficulty,
-                        "model_solution": f"Step 1: Set up function. Step 2: Differentiate with respect to independent variables. Step 3: Interpret physical gradient vectors.",
-                        "max_marks": 20,
-                    },
-                ],
-            }
+            logger.warning("Failed to parse Exam JSON output: %s", e)
+            raise AgentOutputError("Exam Generator could not produce a valid exam structure.") from e
+
+        questions = parsed.get("questions", []) or []
+        if not questions:
+            raise AgentOutputError("Exam Generator produced no questions.")
 
         title = parsed.get("title", f"{topic} Practice Exam")
-        questions = parsed.get("questions", [])
 
         # Store exam in DB (reusing Quiz model for persistence)
         exam_record = Quiz(
@@ -173,15 +122,18 @@ class ExamGeneratorAgent:
         updates Student Profile Mastery (Agent #2), and provides Planner Agent (#3) recommendations.
         """
         exam_record = db.query(Quiz).filter_by(id=exam_id).first()
-        if exam_record:
-            try:
-                questions = json.loads(exam_record.questions_json)
-            except Exception:
-                questions = []
-            topic = exam_record.topic
-        else:
+        if not exam_record:
+            raise AgentOutputError(f"Exam {exam_id} not found — cannot grade an unknown exam.")
+
+        try:
+            questions = json.loads(exam_record.questions_json)
+        except Exception:
             questions = []
-            topic = "General Assessment"
+
+        if not questions:
+            raise AgentOutputError(f"Exam {exam_id} has no stored questions to grade.")
+
+        topic = exam_record.topic
 
         total_marks = 0
         earned_marks = 0

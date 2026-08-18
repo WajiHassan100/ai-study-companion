@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session as DBSession
 
-from app.api.deps import get_optional_current_user
+from app.api.deps import get_current_user, resolve_student_id, ensure_owns_student
 from app.db.session import get_db
 from app.models.models import User, StudyPlan
 from app.schemas.schemas import (
@@ -34,12 +34,12 @@ planner_agent = PlannerAgent()
 async def generate_study_plan(
     payload: PlannerGenerateRequest,
     db: DBSession = Depends(get_db),
-    current_user: User | None = Depends(get_optional_current_user),
+    current_user: User = Depends(get_current_user),
 ) -> PlannerGenerateResponse:
     """
     Generates a personalized AI study schedule incorporating weak concepts and deadlines.
     """
-    student_id = payload.student_id or (current_user.id if current_user else "demo_student")
+    student_id = resolve_student_id(payload.student_id, current_user)
 
     try:
         result = await planner_agent.generate_plan(
@@ -73,10 +73,13 @@ async def generate_study_plan(
 def get_student_study_plans(
     student_id: str,
     db: DBSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> list[StudyPlanResponse]:
     """
     Retrieves saved study schedules for a given student.
     """
+    ensure_owns_student(student_id, current_user)
+
     plans = (
         db.query(StudyPlan)
         .filter(StudyPlan.student_id == student_id)
@@ -86,44 +89,8 @@ def get_student_study_plans(
     )
 
     if not plans:
-        # Return initial default fallback plan for instant UX feedback
-        return [
-            StudyPlanResponse(
-                id="default_plan",
-                student_id=student_id,
-                title="7-Day Foundation & Revision Plan",
-                summary="Balanced schedule prioritizing concept weakness review and daily practice.",
-                schedule=[
-                    StudyBlock(
-                        day="Monday",
-                        topic="Mathematics: Quadratic Factoring",
-                        duration_minutes=45,
-                        priority="high",
-                        description="Review core factoring formulas and solve 5 practice problems.",
-                    ),
-                    StudyBlock(
-                        day="Tuesday",
-                        topic="Biology: Photosynthesis Reactions",
-                        duration_minutes=30,
-                        priority="normal",
-                        description="Diagram light-dependent vs light-independent reaction pathways.",
-                    ),
-                    StudyBlock(
-                        day="Wednesday",
-                        topic="History: Industrial Revolution",
-                        duration_minutes=40,
-                        priority="normal",
-                        description="Outline essay thesis statement and primary economic causes.",
-                    ),
-                ],
-                action_items=[
-                    "Ask AI Tutor for guidance on factoring steps",
-                    "Complete 15-minute flashcard review daily",
-                    "Submit assignment outline before weekend",
-                ],
-                created_at=datetime.now(timezone.utc),
-            )
-        ]
+        # Honest empty result — no fabricated default plan.
+        return []
 
     response = []
     for plan in plans:

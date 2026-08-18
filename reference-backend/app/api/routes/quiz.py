@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session as DBSession
 
-from app.api.deps import get_optional_current_user
+from app.api.deps import get_current_user, resolve_student_id, ensure_owns_student
 from app.db.session import get_db
 from app.models.models import User, Quiz, QuizAttempt
 from app.schemas.schemas import (
@@ -35,12 +35,12 @@ quiz_agent = QuizAgent()
 async def generate_quiz(
     payload: QuizGenerateRequest,
     db: DBSession = Depends(get_db),
-    current_user: User | None = Depends(get_optional_current_user),
+    current_user: User = Depends(get_current_user),
 ) -> QuizGenerateResponse:
     """
     Generates an adaptive practice quiz or flashcard deck based on student profile.
     """
-    student_id = payload.student_id or (current_user.id if current_user else "demo_student")
+    student_id = resolve_student_id(payload.student_id, current_user)
 
     try:
         result = await quiz_agent.generate_quiz(
@@ -73,13 +73,13 @@ async def generate_quiz(
 async def submit_quiz(
     payload: QuizSubmitRequest,
     db: DBSession = Depends(get_db),
-    current_user: User | None = Depends(get_optional_current_user),
+    current_user: User = Depends(get_current_user),
 ) -> QuizSubmitResponse:
     """
     Grades a student quiz submission, provides question feedback,
     and updates Agent #2 StudentProfile topic mastery in database.
     """
-    student_id = payload.student_id or (current_user.id if current_user else "demo_student")
+    student_id = resolve_student_id(payload.student_id, current_user)
 
     try:
         result = await quiz_agent.submit_and_evaluate_quiz(
@@ -111,10 +111,13 @@ async def submit_quiz(
 def get_student_quizzes(
     student_id: str,
     db: DBSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """
     Retrieves student quiz attempt history.
     """
+    ensure_owns_student(student_id, current_user)
+
     attempts = (
         db.query(QuizAttempt)
         .filter(QuizAttempt.student_id == student_id)

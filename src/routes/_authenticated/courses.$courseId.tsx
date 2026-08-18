@@ -34,6 +34,7 @@ import {
   type CourseDetail,
   type CourseKnowledgeQueryResult,
 } from "@/lib/api/courses";
+import { InlineError } from "@/components/common/InlineError";
 
 export const Route = createFileRoute("/_authenticated/courses/$courseId")({
   head: ({ params }) => ({
@@ -59,15 +60,18 @@ function CourseDetailPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searching, setSearching] = useState(false);
   const [searchResult, setSearchResult] = useState<CourseKnowledgeQueryResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadData() {
       setLoading(true);
+      setError(null);
       try {
         const data = await getCourseDetail(courseId);
         setCourse(data);
       } catch (err) {
         console.error("Failed to load course details:", err);
+        setError(err instanceof Error ? err.message : "Failed to load course details. Is the AI backend reachable?");
       } finally {
         setLoading(false);
       }
@@ -80,11 +84,13 @@ function CourseDetailPage() {
     if (!textToSearch.trim() || searching) return;
 
     setSearching(true);
+    setError(null);
     try {
       const res = await queryCourseKnowledge(courseId, textToSearch);
       setSearchResult(res);
     } catch (err) {
       console.error("Failed to query course knowledge base:", err);
+      setError(err instanceof Error ? err.message : "Failed to query course knowledge base. Is the AI backend reachable?");
     } finally {
       setSearching(false);
     }
@@ -101,10 +107,18 @@ function CourseDetailPage() {
     );
   }
 
-  if (!course) return null;
+  if (!course) {
+    return error ? (
+      <div className="mx-auto max-w-2xl py-12">
+        <InlineError message={error} />
+      </div>
+    ) : null;
+  }
 
   return (
     <div className="space-y-8">
+      {error ? <InlineError message={error} /> : null}
+
       {/* ── BREADCRUMB ── */}
         <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
           <Link to="/dashboard/student" className="hover:text-emerald-700 transition-colors">

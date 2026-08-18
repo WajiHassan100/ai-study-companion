@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { generatePracticeExam, evaluatePracticeExam, type PracticeExam, type ExamEvaluationResponse } from "@/lib/api/exam";
+import { InlineError } from "@/components/common/InlineError";
 
 interface ExamGeneratorCardProps {
   studentId: string;
@@ -21,9 +22,11 @@ export function ExamGeneratorCard({ studentId, onAskTutor }: ExamGeneratorCardPr
   const [topic, setTopic] = useState("Gradient Vectors & Partial Derivatives");
   const [userAnswers, setUserAnswers] = useState<Record<string, string>>({});
   const [result, setResult] = useState<ExamEvaluationResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleGenerate = async (targetDifficulty = difficulty) => {
     setGenerating(true);
+    setError(null);
     setResult(null);
     setUserAnswers({});
     try {
@@ -31,6 +34,7 @@ export function ExamGeneratorCard({ studentId, onAskTutor }: ExamGeneratorCardPr
       setExam(data);
     } catch (err) {
       console.error("Failed to generate exam:", err);
+      setError(err instanceof Error ? err.message : "Failed to generate exam. Is the AI backend reachable?");
     } finally {
       setGenerating(false);
     }
@@ -43,11 +47,13 @@ export function ExamGeneratorCard({ studentId, onAskTutor }: ExamGeneratorCardPr
   const handleSubmitExam = async () => {
     if (!exam || evaluating) return;
     setEvaluating(true);
+    setError(null);
     try {
       const res = await evaluatePracticeExam(exam.exam_id, studentId, userAnswers);
       setResult(res);
     } catch (err) {
       console.error("Failed to evaluate exam:", err);
+      setError(err instanceof Error ? err.message : "Failed to evaluate exam. Is the AI backend reachable?");
     } finally {
       setEvaluating(false);
     }
@@ -84,6 +90,8 @@ export function ExamGeneratorCard({ studentId, onAskTutor }: ExamGeneratorCardPr
       </CardHeader>
 
       <CardContent className="space-y-4 text-sm">
+        {error ? <InlineError message={error} /> : null}
+
         {/* Course & Topic Selection */}
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">

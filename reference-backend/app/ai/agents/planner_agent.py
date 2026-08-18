@@ -16,7 +16,7 @@ from app.ai.services.llm_service import get_llm
 from app.ai.prompts.planner_prompt import get_planner_prompt_template
 from app.models.models import StudentProfile, Assignment, StudyPlan, Course
 from app.ai.services.student_memory_service import student_memory_service
-from app.ai.utils import clean_llm_json
+from app.ai.utils import clean_llm_json, AgentOutputError
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +46,7 @@ class PlannerAgent:
         # Fetch deep student profile memory context
         p = student_memory_service.get_or_create_profile(db, student_id)
         student_level = p.get("current_level", "beginner")
-        weaknesses = p.get("weaknesses", ["General Concepts"])
+        weaknesses = p.get("weaknesses", [])
         previous_mistakes = p.get("previous_mistakes", [])
         topic_mastery = p.get("topic_mastery", {})
 
@@ -81,38 +81,18 @@ class PlannerAgent:
         try:
             parsed = json.loads(cleaned_text)
         except Exception as e:
-            logger.warning("Failed to parse Planner JSON output: %s. Using fallback plan.", e)
-            parsed = {
-                "title": f"{target_days}-Day Targeted Study Plan",
-                "summary": "Focus on weak topics and daily consistent review.",
-                "schedule": [
-                    {
-                        "day": "Day 1",
-                        "topic": weaknesses[0] if weaknesses else "General Study",
-                        "duration_minutes": 45,
-                        "priority": "high",
-                        "description": "Review core concepts and complete worked practice problems.",
-                    },
-                    {
-                        "day": "Day 2",
-                        "topic": "Assignment & Homework Prep",
-                        "duration_minutes": 30,
-                        "priority": "normal",
-                        "description": "Read through active course materials and outline key notes.",
-                    },
-                ],
-                "action_items": [
-                    "Complete daily 30-min revision session",
-                    "Ask AI Tutor for guidance on weak concepts",
-                ],
-            }
+            logger.warning("Failed to parse Planner JSON output: %s", e)
+            raise AgentOutputError("Study Planner Agent could not produce a valid study plan.") from e
 
         import urllib.parse
 
         title = parsed.get("title", f"{target_days}-Day Personalized Study Plan")
         summary = parsed.get("summary", "Personalized study schedule.")
-        schedule = parsed.get("schedule", [])
-        action_items = parsed.get("action_items", [])
+        schedule = parsed.get("schedule", []) or []
+        action_items = parsed.get("action_items", []) or []
+
+        if not schedule:
+            raise AgentOutputError("Study Planner Agent produced an empty schedule.")
 
         # Enrich each schedule block with YouTube video search URL
         for block in schedule:

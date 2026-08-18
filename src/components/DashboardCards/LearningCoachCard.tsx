@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { getLearningCoachInsights, type LearningCoachResponse } from "@/lib/api/coach";
+import { InlineError } from "@/components/common/InlineError";
 
 interface LearningCoachCardProps {
   studentId: string;
@@ -14,41 +15,19 @@ interface LearningCoachCardProps {
 
 export function LearningCoachCard({ studentId, onAskTutor, onRebalancePlan }: LearningCoachCardProps) {
   const [loading, setLoading] = useState(false);
-  const [coachData, setCoachData] = useState<LearningCoachResponse | null>({
-    student_id: studentId,
-    timeframe: "weekly",
-    coach_title: "AI Mentor Insights & Strategic Guidance",
-    consistency_score: 82,
-    missed_sessions_count: 1,
-    performance_recommendations: [
-      "You improved by +12% in Mathematics this week, but Physics practice decreased by -5%.",
-      "Great job maintaining 4 consecutive days of active Socratic Tutor practice!",
-    ],
-    problem_detection: [
-      "You missed 1 planned study session on Multivariable Calculus partial derivatives.",
-      "Biology photosynthesis quiz score dropped slightly below your target threshold.",
-    ],
-    strategic_improvements: [
-      "Reallocate 45 mins from Biology to Calculus before your upcoming problem set deadline.",
-      "Review derivative chain rule worked examples with the Socratic AI Tutor.",
-    ],
-    planner_rebalance_action: {
-      suggested_action: "rebalance_5_day_plan",
-      reasoning: "Rebalance 5-day study plan to prioritize Calculus derivatives.",
-    },
-    socratic_tutor_prompts: [
-      "Explain how partial derivatives relate to 3D slope directional vectors",
-    ],
-  });
+  const [coachData, setCoachData] = useState<LearningCoachResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [timeframe, setTimeframe] = useState<"weekly" | "monthly">("weekly");
 
   const fetchInsights = async (targetTimeframe = timeframe) => {
     setLoading(true);
+    setError(null);
     try {
       const data = await getLearningCoachInsights(studentId, targetTimeframe);
       setCoachData(data);
     } catch (err) {
       console.error("Failed to fetch coach insights:", err);
+      setError(err instanceof Error ? err.message : "Failed to load coach insights. Is the AI backend reachable?");
     } finally {
       setLoading(false);
     }
@@ -80,6 +59,8 @@ export function LearningCoachCard({ studentId, onAskTutor, onRebalancePlan }: Le
       </CardHeader>
 
       <CardContent className="space-y-4 text-sm">
+        {error ? <InlineError message={error} /> : null}
+
         {/* Metric Cards Banner */}
         <div className="grid grid-cols-3 gap-2">
           <div className="p-2.5 rounded-xl bg-background border border-border/60 text-center space-y-0.5">

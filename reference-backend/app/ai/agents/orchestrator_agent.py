@@ -9,6 +9,8 @@ tasks to specialized agents, and coordinates inter-agent communication.
 import json
 import logging
 from typing import Any, Callable, Dict, List, Optional
+
+import anyio
 from sqlalchemy.orm import Session as DBSession
 
 from langchain_core.messages import HumanMessage
@@ -241,7 +243,10 @@ Return a JSON object with:
 
         # PIPELINE 1: TUTOR + RAG + PROFILER
         if intent == "tutor":
-            rag_results = rag_agent.query_course_knowledge(course_id=course_id, query=query, top_k=2)
+            # rag_agent uses a sync LLM call — run it off the event loop.
+            rag_results = await anyio.to_thread.run_sync(
+                rag_agent.query_course_knowledge, course_id, query, 2
+            )
             rag_citations = rag_results.get("cited_sources", [])
 
             if db:
@@ -358,7 +363,10 @@ Return a JSON object with:
 
         # PIPELINE 8: RAG COURSE KNOWLEDGE
         elif intent == "rag":
-            rag_res = rag_agent.query_course_knowledge(course_id=course_id, query=query, top_k=3)
+            # rag_agent uses a sync LLM call — run it off the event loop.
+            rag_res = await anyio.to_thread.run_sync(
+                rag_agent.query_course_knowledge, course_id, query, 3
+            )
             return {
                 "orchestrator_decision": classification,
                 "response": rag_res.get("answer", f"Found grounded course information for '{query}'."),

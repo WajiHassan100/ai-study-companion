@@ -4,9 +4,11 @@ API Routes for Agent #6: Teacher Assistant Agent (teacher.py)
 Exposes endpoints for lesson plan drafting and automated assignment grading.
 """
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.ai.agents.teacher_agent import teacher_agent
+from app.api.deps import require_roles
+from app.models.models import AppRole, User
 from app.schemas.schemas import (
     TeacherGradeRequest,
     TeacherGradeResponse,
@@ -18,7 +20,10 @@ router = APIRouter(prefix="/ai/teacher", tags=["Agent #6: Teacher Assistant Agen
 
 
 @router.post("/lesson-plan", response_model=TeacherLessonPlanResponse, status_code=status.HTTP_200_OK)
-async def draft_lesson_plan(req: TeacherLessonPlanRequest) -> TeacherLessonPlanResponse:
+async def draft_lesson_plan(
+    req: TeacherLessonPlanRequest,
+    _: User = Depends(require_roles(AppRole.teacher, AppRole.admin)),
+) -> TeacherLessonPlanResponse:
     """
     Drafts a pedagogically structured lesson plan for a given topic and grade level.
     """
@@ -38,7 +43,10 @@ async def draft_lesson_plan(req: TeacherLessonPlanRequest) -> TeacherLessonPlanR
 
 
 @router.post("/grade", response_model=TeacherGradeResponse, status_code=status.HTTP_200_OK)
-async def grade_student_submission(req: TeacherGradeRequest) -> TeacherGradeResponse:
+async def grade_student_submission(
+    req: TeacherGradeRequest,
+    _: User = Depends(require_roles(AppRole.teacher, AppRole.admin)),
+) -> TeacherGradeResponse:
     """
     Evaluates a student assignment submission and generates score, feedback, and strengths.
     """

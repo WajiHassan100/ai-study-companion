@@ -10,7 +10,8 @@ from app.models.models import AppRole
 class UserCreate(BaseModel):
     email: EmailStr
     full_name: str = Field(min_length=1, max_length=255)
-    password: str = Field(min_length=8, max_length=128)
+    # bcrypt only processes the first 72 bytes of a password.
+    password: str = Field(min_length=8, max_length=72)
     role: AppRole = AppRole.student
 
 

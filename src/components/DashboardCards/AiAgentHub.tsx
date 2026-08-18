@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   Bot,
@@ -15,27 +14,32 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import type { AgentStatus } from "@/lib/api/analytics";
 
 interface AiAgentHubProps {
+  agentStatuses?: Record<string, AgentStatus>;
   onAskTutor?: (prompt: string) => void;
   onOpenPlanner?: () => void;
   onOpenAssessment?: () => void;
 }
 
-export function AiAgentHub({ onAskTutor, onOpenPlanner, onOpenAssessment }: AiAgentHubProps) {
-  const [activeTab, setActiveTab] = useState<string>("all");
-
+export function AiAgentHub({
+  agentStatuses,
+  onAskTutor,
+  onOpenPlanner,
+  onOpenAssessment,
+}: AiAgentHubProps) {
   const agents = [
     {
       id: "tutor",
       name: "AI Socratic Tutor",
       role: "Concept Explanation & Q&A",
-      status: "Online",
+      status: agentStatuses?.tutor?.status || "Online",
       statusVariant: "emerald",
       icon: MessageSquare,
       iconBg: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
       description: "Explains complex concepts, breaks down step-by-step math problems, and provides socratic guidance on demand.",
-      recentActivity: "Answered 4 Calculus questions & generated worked examples 20m ago",
+      recentActivity: agentStatuses?.tutor?.last_activity || "Ready for Socratic Q&A sessions",
       buttonText: "Chat with Tutor",
       buttonAction: () => onAskTutor?.("Can you explain a concept step-by-step with an example?"),
       secondaryLink: "/tutor",
@@ -44,12 +48,12 @@ export function AiAgentHub({ onAskTutor, onOpenPlanner, onOpenAssessment }: AiAg
       id: "planner",
       name: "Learning Planner",
       role: "Schedule & Workload Rebalancer",
-      status: "Active",
+      status: agentStatuses?.planner?.status || "Active",
       statusVariant: "sky",
       icon: Calendar,
       iconBg: "bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20",
       description: "Creates personalized 7-day study schedules, balances daily revision blocks, and adjusts to your focus hours.",
-      recentActivity: "Rebalanced 7-day revision schedule for MATH 201 & BIOL 101 1h ago",
+      recentActivity: agentStatuses?.planner?.last_activity || "Ready to build personalized revision plans",
       buttonText: "Generate Study Plan",
       buttonAction: () => onOpenPlanner?.(),
       secondaryLink: "/profile",
@@ -58,12 +62,12 @@ export function AiAgentHub({ onAskTutor, onOpenPlanner, onOpenAssessment }: AiAg
       id: "assessment",
       name: "Assessment & Diagnostics",
       role: "Adaptive Quizzes & Exam Simulator",
-      status: "Online",
+      status: agentStatuses?.assessment?.status || "Online",
       statusVariant: "purple",
       icon: FileCheck,
       iconBg: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20",
       description: "Generates multi-format practice tests (MCQs, Numerical, Conceptual), grades homework, and pinpoints skill bottlenecks.",
-      recentActivity: "Graded Quiz #2 & updated mastery score for Partial Derivatives 3h ago",
+      recentActivity: agentStatuses?.assessment?.last_activity || "Ready to generate adaptive quizzes",
       buttonText: "Create Practice Test",
       buttonAction: () => onOpenAssessment?.(),
       secondaryLink: "/mastery",
@@ -72,14 +76,14 @@ export function AiAgentHub({ onAskTutor, onOpenPlanner, onOpenAssessment }: AiAg
       id: "analytics",
       name: "Progress Analytics",
       role: "Behavior & Risk Forecasting",
-      status: "Active",
+      status: agentStatuses?.analytics?.status || "Active",
       statusVariant: "blue",
       icon: TrendingUp,
       iconBg: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
       description: "Tracks consistency scores, monitors mastery growth trends, and forecasts exam readiness with AI risk models.",
-      recentActivity: "Forecasted 94% Math 201 exam readiness based on 14-day quiz accuracy",
+      recentActivity: agentStatuses?.analytics?.last_activity || "Monitoring active learning patterns",
       buttonText: "View Learning Insights",
-      buttonAction: () => {},
+      buttonAction: () => onAskTutor?.("Show me a detailed breakdown of my learning progress and risk forecast"),
       secondaryLink: "/mastery",
     },
   ];
@@ -128,7 +132,7 @@ export function AiAgentHub({ onAskTutor, onOpenPlanner, onOpenAssessment }: AiAg
             <span>"You have an autonomous team of AI assistants working for your academic success."</span>
           </div>
           <span className="text-[11px] text-muted-foreground font-semibold shrink-0 hidden md:inline">
-            🟢 All 4 Systems Operational
+            🟢 Real-time Agent Synchronization
           </span>
         </div>
 
@@ -136,6 +140,7 @@ export function AiAgentHub({ onAskTutor, onOpenPlanner, onOpenAssessment }: AiAg
         <div className="grid gap-4 sm:grid-cols-2">
           {agents.map((agent) => {
             const IconComp = agent.icon;
+            const isOnline = agent.status === "Online" || agent.status === "Active";
 
             return (
               <div
@@ -159,8 +164,14 @@ export function AiAgentHub({ onAskTutor, onOpenPlanner, onOpenAssessment }: AiAg
                       </div>
                     </div>
 
-                    <Badge className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-[10px] font-bold gap-1 px-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <Badge
+                      className={`text-[10px] font-bold gap-1 px-2 border ${
+                        isOnline
+                          ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
+                          : "bg-secondary text-muted-foreground border-border"
+                      }`}
+                    >
+                      {isOnline && <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />}
                       {agent.status}
                     </Badge>
                   </div>

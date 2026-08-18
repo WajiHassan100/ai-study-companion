@@ -19,21 +19,28 @@ class StudentMemoryService:
     """Service layer for student intelligence and memory context retrieval."""
 
     def get_or_create_profile(self, db: Optional[DBSession], student_id: str) -> Dict[str, Any]:
-        """Retrieves or initializes a student's profile memory record."""
+        """Retrieves or initializes a student's profile memory record.
+
+        A brand-new profile starts EMPTY — no weaknesses, strong topics, mistakes,
+        or mastery scores are invented. Real data accumulates from actual
+        quiz/assessment/coaching activity.
+        """
+        empty_profile = {
+            "student_id": student_id,
+            "current_level": "beginner",
+            "learning_style": "visual",
+            "preferred_explanation_method": "worked_examples",
+            "weaknesses": [],
+            "strong_topics": [],
+            "previous_mistakes": [],
+            "study_history": [],
+            "progress_trends": {},
+            "recent_queries": [],
+            "topic_mastery": {},
+        }
+
         if not db:
-            return {
-                "student_id": student_id,
-                "current_level": "intermediate",
-                "learning_style": "visual",
-                "preferred_explanation_method": "Worked Examples & Conceptual Analogies",
-                "weaknesses": ["Partial Derivatives", "Thylakoid Electron Transport"],
-                "strong_topics": ["Single Variable Integration", "Cell Membrane Transport"],
-                "previous_mistakes": ["Struggled connecting partial derivatives with 3D slope directional vectors."],
-                "study_history": ["Reviewed Calculus Chapter 14", "Completed 5 Biology Practice Questions"],
-                "progress_trends": {"Calculus": "+12% this week", "Biology": "+8% this week"},
-                "recent_queries": ["What is a gradient vector?"],
-                "topic_mastery": {"BIOL 101": 78.0, "MATH 201": 62.0, "PHYS 101": 84.0},
-            }
+            return empty_profile
 
         profile = db.query(StudentProfile).filter_by(student_id=student_id).first()
         if not profile:
@@ -44,7 +51,7 @@ class StudentMemoryService:
                         id=student_id,
                         email=f"{student_id}@student.edu",
                         full_name="Student",
-                        hashed_password="demo_hashed_password",
+                        hashed_password="!",  # unusable sentinel: this user logs in via Supabase, never password
                         role="student",
                     )
                     db.add(user)
@@ -52,16 +59,16 @@ class StudentMemoryService:
 
                 profile = StudentProfile(
                     student_id=student_id,
-                    current_level="intermediate",
+                    current_level="beginner",
                     learning_style="visual",
-                    preferred_explanation_method="Worked Examples & Conceptual Analogies",
-                    weaknesses_json=json.dumps(["Partial Derivatives", "Thylakoid Electron Transport"]),
-                    strong_topics_json=json.dumps(["Single Variable Integration", "Cell Membrane Transport"]),
-                    previous_mistakes_json=json.dumps(["Struggled connecting partial derivatives with 3D slope directional vectors."]),
-                    study_history_json=json.dumps(["Reviewed Calculus Chapter 14"]),
-                    progress_trends_json=json.dumps({"Calculus": "+12% this week", "Biology": "+8% this week"}),
-                    recent_queries_json=json.dumps([]),
-                    topic_mastery_json=json.dumps({"BIOL 101": 78.0, "MATH 201": 62.0, "PHYS 101": 84.0}),
+                    preferred_explanation_method="worked_examples",
+                    weaknesses_json="[]",
+                    strong_topics_json="[]",
+                    previous_mistakes_json="[]",
+                    study_history_json="[]",
+                    progress_trends_json="{}",
+                    recent_queries_json="[]",
+                    topic_mastery_json="{}",
                 )
                 db.add(profile)
                 db.commit()
@@ -86,25 +93,13 @@ class StudentMemoryService:
                 return {}
 
         if not profile:
-            return {
-                "student_id": student_id,
-                "current_level": "intermediate",
-                "learning_style": "visual",
-                "preferred_explanation_method": "Worked Examples & Conceptual Analogies",
-                "weaknesses": ["Partial Derivatives", "Thylakoid Electron Transport"],
-                "strong_topics": ["Single Variable Integration", "Cell Membrane Transport"],
-                "previous_mistakes": ["Struggled connecting partial derivatives with 3D slope directional vectors."],
-                "study_history": ["Reviewed Calculus Chapter 14", "Completed 5 Biology Practice Questions"],
-                "progress_trends": {"Calculus": "+12% this week", "Biology": "+8% this week"},
-                "recent_queries": ["What is a gradient vector?"],
-                "topic_mastery": {"BIOL 101": 78.0, "MATH 201": 62.0, "PHYS 101": 84.0},
-            }
+            return empty_profile
 
         return {
             "student_id": profile.student_id,
-            "current_level": profile.current_level or "intermediate",
+            "current_level": profile.current_level or "beginner",
             "learning_style": profile.learning_style or "visual",
-            "preferred_explanation_method": getattr(profile, "preferred_explanation_method", "Worked Examples & Conceptual Analogies") or "Worked Examples",
+            "preferred_explanation_method": getattr(profile, "preferred_explanation_method", "worked_examples") or "worked_examples",
             "weaknesses": _safe_json_list(profile.weaknesses_json),
             "strong_topics": _safe_json_list(getattr(profile, "strong_topics_json", "[]")),
             "previous_mistakes": _safe_json_list(getattr(profile, "previous_mistakes_json", "[]")),

@@ -16,7 +16,7 @@ from sqlalchemy.orm import Session as DBSession
 from app.ai.services.llm_service import get_llm
 from app.ai.prompts.quiz_prompt import get_quiz_prompt_template
 from app.models.models import StudentProfile, Quiz, QuizAttempt
-from app.ai.utils import clean_llm_json, robust_parse_json
+from app.ai.utils import clean_llm_json, robust_parse_json, AgentOutputError
 
 logger = logging.getLogger(__name__)
 
@@ -130,44 +130,21 @@ class QuizAgent:
 
         response_msg = await self.llm.ainvoke(prompt_value.to_messages())
         raw_text = response_msg.content.strip()
-        fallback_quiz = {
-            "title": f"{topic} Mastery Quiz",
-            "topic": topic,
-            "difficulty": student_level,
-            "questions": [
-                {
-                    "id": "q1",
-                    "question": f"What is the primary function or definition of {topic}?",
-                    "options": {
-                        "A": f"It is a fundamental process in {topic}.",
-                        "B": "It is an unrelated chemical reaction.",
-                        "C": "It is a historical timeline event.",
-                        "D": "None of the above.",
-                    },
-                    "correct_option": "A",
-                    "explanation": f"Option A accurately describes {topic}.",
-                    "target_concept": topic,
-                },
-                {
-                    "id": "q2",
-                    "question": f"Which component is essential for {topic} to occur effectively?",
-                    "options": {
-                        "A": "Optimal energy input & conditions",
-                        "B": "Absolute zero temperature",
-                        "C": "Zero molecular activity",
-                        "D": "Vacuum state",
-                    },
-                    "correct_option": "A",
-                    "explanation": "Optimal energy and conditions are required for biological and physical processes.",
-                    "target_concept": topic,
-                },
-            ],
-        }
+        parsed = robust_parse_json(raw_text, llm=self.llm, fallback=None)
 
-        parsed = robust_parse_json(raw_text, llm=self.llm, fallback=fallback_quiz)
+        if not parsed:
+            raise AgentOutputError("Quiz Agent could not produce a valid quiz structure.")
+
+        questions = parsed.get("questions", []) or []
+        if not questions:
+            raise AgentOutputError("Quiz Agent generated no questions.")
+
+        # Guard against malformed questions that would crash grading later.
+        for q in questions:
+            if not isinstance(q, dict) or not q.get("id") or not q.get("options"):
+                raise AgentOutputError("Quiz Agent generated a malformed question.")
 
         title = parsed.get("title", f"{topic} Practice Quiz")
-        questions = parsed.get("questions", [])
 
         # Persist quiz record in database
         quiz_record = Quiz(
@@ -202,26 +179,20 @@ class QuizAgent:
         """
         quiz_record = db.query(Quiz).filter_by(id=quiz_id).first()
         if not quiz_record:
-            # Fallback evaluation if quiz record not found
-            questions = [
-                {
-                    "id": q_id,
-                    "correct_option": "A",
-                    "explanation": "Sample correct answer explanation.",
-                    "target_concept": "General",
-                }
-                for q_id in user_answers.keys()
-            ]
-            topic = "General Study"
-        else:
-            try:
-                questions = json.loads(quiz_record.questions_json)
-            except Exception:
-                questions = []
-            topic = quiz_record.topic
+            raise AgentOutputError(f"Quiz {quiz_id} not found — cannot grade an unknown quiz.")
+
+        try:
+            questions = json.loads(quiz_record.questions_json)
+        except Exception:
+            questions = []
+
+        if not questions:
+            raise AgentOutputError(f"Quiz {quiz_id} has no stored questions to grade.")
+
+        topic = quiz_record.topic
 
         correct_count = 0
-        total_count = len(questions) if questions else 1
+        total_count = len(questions)
         question_feedback = {}
 
         for q in questions:

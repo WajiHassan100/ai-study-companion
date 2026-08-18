@@ -10,6 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { getStudentProfile } from "@/lib/api/assessment";
+import { InlineError } from "@/components/common/InlineError";
 
 export const Route = createFileRoute("/_authenticated/mastery")({
   head: () => ({
@@ -119,7 +120,7 @@ function MasteryMap() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const { data: profile, isLoading } = useQuery({
+  const { data: profile, isLoading, isError } = useQuery({
     queryKey: ["student-profile", user?.id],
     queryFn: () => getStudentProfile(user?.id || "demo_student"),
     enabled: !!user?.id,
@@ -193,6 +194,10 @@ function MasteryMap() {
           </span>
         }
       />
+
+      {isError ? (
+        <InlineError message="Couldn't load live mastery data. Showing demo topic scores — connect the AI backend to see real numbers." />
+      ) : null}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatTile label="Overall mastery" value={`${overall}%`} hint="Across all tracked topics" tone="primary" />

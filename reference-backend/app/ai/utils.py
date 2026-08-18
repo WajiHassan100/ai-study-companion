@@ -10,6 +10,16 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+class AgentOutputError(RuntimeError):
+    """
+    Raised when an AI agent cannot produce a valid structured output
+    (LLM call failed or the output did not match the expected schema).
+
+    Agents must raise this instead of returning canned/fabricated results,
+    so callers surface a real error to the user.
+    """
+
+
 def clean_llm_json(raw_text: str) -> str:
     """
     Cleans raw text output from an LLM by stripping markdown code fences (```json ... ```)

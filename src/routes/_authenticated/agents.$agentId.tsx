@@ -116,7 +116,9 @@ function AgentSurface({ agentId, studentId }: { agentId: string; studentId: stri
           description="Open the Tutor Workspace or a course page to use it."
           action={
             <Button asChild size="sm">
-              <Link to="/tutor">Open Tutor Workspace</Link>
+              <Link to="/tutor" search={{ topic: undefined }}>
+                Open Tutor Workspace
+              </Link>
             </Button>
           }
         />

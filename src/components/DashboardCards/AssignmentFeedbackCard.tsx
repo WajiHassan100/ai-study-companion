@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { generateAssignmentFeedback, type AssignmentFeedbackResponse } from "@/lib/api/feedback";
+import { InlineError } from "@/components/common/InlineError";
 
 interface AssignmentFeedbackCardProps {
   studentId: string;
@@ -19,10 +20,12 @@ export function AssignmentFeedbackCard({ studentId, onAskTutor }: AssignmentFeed
   );
   const [analyzing, setAnalyzing] = useState(false);
   const [feedback, setFeedback] = useState<AssignmentFeedbackResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleAnalyze = async () => {
     if (!submissionText.trim() || analyzing) return;
     setAnalyzing(true);
+    setError(null);
     try {
       const res = await generateAssignmentFeedback(
         studentId,
@@ -34,6 +37,7 @@ export function AssignmentFeedbackCard({ studentId, onAskTutor }: AssignmentFeed
       setFeedback(res);
     } catch (err) {
       console.error("Failed to generate feedback:", err);
+      setError(err instanceof Error ? err.message : "Failed to analyze submission. Is the AI backend reachable?");
     } finally {
       setAnalyzing(false);
     }
@@ -65,6 +69,8 @@ export function AssignmentFeedbackCard({ studentId, onAskTutor }: AssignmentFeed
       </CardHeader>
 
       <CardContent className="space-y-4 text-sm">
+        {error ? <InlineError message={error} /> : null}
+
         {/* Submission Controls & Format Tabs */}
         <div className="p-2.5 rounded-xl bg-secondary/50 border border-border/50 flex flex-wrap items-center justify-between gap-2 text-xs">
           <div className="flex items-center gap-2">

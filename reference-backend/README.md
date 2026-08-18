@@ -43,6 +43,16 @@ uvicorn app.main:app --reload --port 8000
 
 Open http://localhost:8000/docs for interactive API docs.
 
+## Auth
+
+- `JWT_SECRET_KEY` signs tokens issued by this backend's `/auth/login` + `/auth/register`.
+- `SUPABASE_JWT_SECRET` (from the Supabase project settings, **JWT Secret** under
+  Authentication → JWT Settings) is optional. When set, the backend also accepts
+  Supabase-issued access tokens, auto-provisions a matching `users` row on first
+  request, and keys all agent data (profiles, plans, attempts) to the Supabase
+  user id — so the frontend's existing `Authorization: Bearer <supabase token>`
+  works with no extra setup. Supabase users always get the `student` role.
+
 ## Roles
 
 `AppRole` is `student | teacher | admin`, matching the roles in the Lovable app.
@@ -56,6 +66,18 @@ from app.models.models import AppRole
 def reports(user = Depends(require_roles(AppRole.admin))):
     ...
 ```
+
+## Tests
+
+```bash
+cd reference-backend
+.venv/Scripts/python.exe -m pytest tests/ -q
+```
+
+The suite covers bcrypt/JWT primitives, Supabase-token acceptance, auth
+requirements on every AI route, student-data ownership (IDOR), and the
+"no fabricated data" guarantees (empty plans/profiles for new students,
+loud failures for unknown quizzes/exams).
 
 ## Adding the AI agents later
 

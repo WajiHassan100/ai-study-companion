@@ -16,6 +16,7 @@ from app.ai.services.llm_service import get_llm
 from app.ai.prompts.profiler_prompt import get_profiler_prompt_template
 from app.models.models import StudentProfile, QuizAttempt, Assignment
 from app.ai.services.student_memory_service import student_memory_service
+from app.ai.utils import AgentOutputError
 
 logger = logging.getLogger(__name__)
 
@@ -107,18 +108,14 @@ class ProfilerAgent:
         weaknesses = memory_profile.get("weaknesses", [])
         previous_mistakes = memory_profile.get("previous_mistakes", [])
 
-        # Build subtopic mastery dynamically from DB profile memory
+        # Build subtopic mastery dynamically from DB profile memory (empty when no data yet)
         subtopic_mastery = {}
         if isinstance(raw_mastery, dict) and raw_mastery:
             for topic, score in raw_mastery.items():
-                subtopic_mastery[topic] = float(score)
-        else:
-            subtopic_mastery = {
-                "Calculus - Derivatives": 80.0,
-                "Calculus - Chain Rule": 65.0,
-                "Calculus - Partial Derivatives": 40.0,
-                "Biology - Cell Structure": 85.0,
-            }
+                try:
+                    subtopic_mastery[topic] = float(score)
+                except (TypeError, ValueError):
+                    continue
 
         # Build dynamic root cause analysis from student weak topics & mistake history
         root_causes = []
@@ -141,21 +138,14 @@ class ProfilerAgent:
                     "action": "Generate targeted adaptive practice quiz to reinforce learning.",
                 })
 
-        if not root_causes:
-            root_causes = [
-                {
-                    "topic": "Gradient Vectors & Partial Derivatives",
-                    "prerequisite": "Multi-variable derivatives",
-                    "explanation": "Calculus performance indicates prerequisite gaps in multivariable rate concepts.",
-                    "action": "Review 15-minute Socratic lesson on Partial Derivatives.",
-                }
-            ]
+        # No fabricated root-cause analysis when there is no supporting data.
 
-        # Generate dynamic remediation actions
+        # Generate dynamic remediation actions from actual weaknesses
         remediation_actions = [
             f"Ask AI Tutor: Clarify {weaknesses[0]}" if weaknesses else "Ask AI Tutor to introduce a new topic",
             f"Generate 5-Question Adaptive Quiz on {weaknesses[-1]}" if len(weaknesses) > 1 else "Complete recommended practice quiz",
         ]
+
 
         return {
             "student_id": student_id,
@@ -227,20 +217,16 @@ class ProfilerAgent:
         try:
             parsed = json.loads(cleaned_text)
         except Exception as e:
-            logger.warning("Failed to parse Profiler JSON output: %s. Using fallback.", e)
-            parsed = {
-                "is_correct": True,
-                "score": 75.0,
-                "feedback": raw_text,
-                "concept_gaps": [],
-                "updated_mastery": min(100.0, current_mastery + 5.0),
-                "recommended_level": profile.current_level,
-            }
+            logger.warning("Failed to parse Profiler JSON output: %s", e)
+            raise AgentOutputError("Profiler Agent could not evaluate the answer.") from e
 
-        is_correct: bool = parsed.get("is_correct", True)
-        score: float = float(parsed.get("score", 75.0))
-        feedback: str = parsed.get("feedback", "Good effort!")
-        concept_gaps: list[str] = parsed.get("concept_gaps", [])
+        if not all(k in parsed for k in ("is_correct", "score", "feedback")):
+            raise AgentOutputError("Profiler Agent returned an incomplete evaluation.")
+
+        is_correct: bool = parsed.get("is_correct")
+        score: float = float(parsed.get("score"))
+        feedback: str = parsed.get("feedback")
+        concept_gaps: list[str] = parsed.get("concept_gaps", []) or []
         updated_mastery: float = float(parsed.get("updated_mastery", current_mastery))
         recommended_level: str = parsed.get("recommended_level", profile.current_level)
 

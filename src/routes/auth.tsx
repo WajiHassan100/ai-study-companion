@@ -338,11 +338,10 @@ function AuthPage() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="student">Student</SelectItem>
-                          <SelectItem value="teacher">Teacher</SelectItem>
                         </SelectContent>
                       </Select>
                       <p className="text-xs text-muted-foreground">
-                        Administrator access is granted by an existing admin.
+                        Teacher and administrator access is granted by an existing admin.
                       </p>
                     </div>
                     <Button type="submit" className="w-full" disabled={busy}>
