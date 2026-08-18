@@ -14,6 +14,8 @@ import {
   Brain,
   CheckCircle2,
   Flame,
+  Quote,
+  Star,
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar/Navbar";
 import { Badge } from "@/components/ui/badge";
@@ -37,7 +39,7 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-// Illustrated cards for the vertical moving columns
+// Illustrated cards for the vertical moving columns in the Hero section
 const leftColCards = [
   {
     title: "Space & Astrophysics",
@@ -98,6 +100,73 @@ const rightColCards = [
     gradient: "from-emerald-900/60 to-sky-950/80",
     aspect: "aspect-[4/5]",
   },
+];
+
+// Student remarks & testimonials data matching the requested SchoolAI format
+const studentRemarks = [
+  {
+    type: "quote",
+    quote: "The magic is the timing. Students get help the moment they need it, so they actually learn instead of just making corrections.",
+    author: "Chrissy Roe",
+    role: "Teacher & Academic Coach",
+    quoteColor: "text-emerald-500",
+  },
+  {
+    type: "photo",
+    imgUrl: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=600&auto=format&fit=crop",
+    bgColor: "bg-sky-200 dark:bg-sky-950/60",
+    name: "Alex",
+  },
+  {
+    type: "quote",
+    quote: "AI has really helped me take on any task by breaking it down into manageable pieces and learning each step thoroughly. I'm confident I can learn anything, anytime.",
+    author: "Michael",
+    role: "Student",
+    quoteColor: "text-sky-500",
+  },
+  {
+    type: "photo",
+    imgUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=600&auto=format&fit=crop",
+    bgColor: "bg-blue-300 dark:bg-blue-950/60",
+    name: "Sarah",
+  },
+  {
+    type: "quote",
+    quote: "Scholar AI's Socratic tutor never just gave me the final answer. It guided me through multivariable calculus step-by-step so I actually aced my midterm.",
+    author: "Sophia Lin",
+    role: "Engineering Student",
+    quoteColor: "text-purple-500",
+  },
+  {
+    type: "photo",
+    imgUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=600&auto=format&fit=crop",
+    bgColor: "bg-amber-200 dark:bg-amber-950/60",
+    name: "David",
+  },
+  {
+    type: "quote",
+    quote: "The 7-day adaptive planner saved my semester. It balanced my assignments across my exams and found the exact video lessons I needed.",
+    author: "Liam Chen",
+    role: "Computer Science Student",
+    quoteColor: "text-amber-500",
+  },
+  {
+    type: "photo",
+    imgUrl: "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=600&auto=format&fit=crop",
+    bgColor: "bg-emerald-200 dark:bg-emerald-950/60",
+    name: "Elena",
+  },
+];
+
+const schoolLogos = [
+  "Stanford University",
+  "MIT",
+  "Harvard College",
+  "UC Berkeley",
+  "Cambridge",
+  "Columbia University",
+  "Oxford",
+  "Carnegie Mellon",
 ];
 
 function Index() {
@@ -253,8 +322,91 @@ function Index() {
         </div>
       </section>
 
-      {/* ── 2. STUDENT SUPERPOWERS & SPACES ── */}
-      <section className="py-16 bg-secondary/40 border-t border-border/60">
+      {/* ── 2. STUDENT REMARKS & TESTIMONIALS CAROUSEL (AS REQUESTED IN PIC) ── */}
+      <section className="py-16 overflow-hidden bg-secondary/30 border-y border-border/60">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 space-y-10">
+          <div className="text-center max-w-2xl mx-auto space-y-3">
+            <Badge className="bg-sky-600 text-white font-bold text-xs px-3 py-1 rounded-full">
+              Real Experiences
+            </Badge>
+            <h2 className="font-display text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
+              What students & educators say about Scholar AI
+            </h2>
+            <p className="text-sm sm:text-base text-muted-foreground">
+              Discover how personalized Socratic guidance and adaptive planning make a difference every day.
+            </p>
+          </div>
+
+          {/* Alternating Squircle Cards Carousel */}
+          <div className="relative w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+            <div className="animate-marquee-left gap-6 py-4">
+              {[...studentRemarks, ...studentRemarks].map((item, idx) => {
+                if (item.type === "quote") {
+                  return (
+                    <div
+                      key={`remark_${idx}`}
+                      className="w-[340px] sm:w-[380px] h-[340px] sm:h-[360px] p-7 sm:p-8 rounded-[40px] bg-card border border-border/80 shadow-sm hover:shadow-md transition-all flex flex-col justify-between shrink-0"
+                    >
+                      <p className="text-sm sm:text-base font-medium leading-relaxed text-foreground/90">
+                        &ldquo;{item.quote}&rdquo;
+                      </p>
+                      
+                      <div className="flex items-center justify-between pt-4 border-t border-border/40">
+                        <div className="space-y-0.5">
+                          <div className="font-display font-bold text-sm text-foreground">
+                            — {item.author}
+                          </div>
+                          <div className="text-xs font-semibold text-muted-foreground">
+                            {item.role}
+                          </div>
+                        </div>
+
+                        {/* Large Quotation Mark Icon */}
+                        <Quote className={`h-8 w-8 ${item.quoteColor} opacity-75`} />
+                      </div>
+                    </div>
+                  );
+                }
+
+                // Photo Card
+                return (
+                  <div
+                    key={`remark_${idx}`}
+                    className={`w-[340px] sm:w-[360px] h-[340px] sm:h-[360px] p-3 rounded-[40px] ${item.bgColor} shadow-sm shrink-0 overflow-hidden relative group`}
+                  >
+                    <div className="w-full h-full rounded-[32px] overflow-hidden relative">
+                      <img
+                        src={item.imgUrl}
+                        alt="Student portrait"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                        loading="lazy"
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* School Districts & University Trust Logo Strip (Matching Pic) */}
+          <div className="pt-6">
+            <div className="max-w-4xl mx-auto rounded-full bg-card/80 border border-border/80 shadow-xs px-6 py-4 flex flex-wrap items-center justify-around gap-6 text-xs font-bold text-muted-foreground">
+              {schoolLogos.map((logo, i) => (
+                <span
+                  key={i}
+                  className="tracking-wider uppercase text-[11px] font-extrabold hover:text-foreground transition-colors cursor-default"
+                >
+                  {logo}
+                </span>
+              ))}
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ── 3. STUDENT SUPERPOWERS & SPACES ── */}
+      <section className="py-16 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 space-y-12">
           <div className="text-center max-w-2xl mx-auto space-y-3">
             <Badge className="bg-sky-600 text-white font-bold text-xs px-3 py-1 rounded-full">
@@ -324,7 +476,7 @@ function Index() {
         </div>
       </section>
 
-      {/* ── 3. STUDENT CALL TO ACTION ── */}
+      {/* ── 4. STUDENT CALL TO ACTION ── */}
       <section className="py-20 max-w-7xl mx-auto px-4 sm:px-8 text-center">
         <div className="p-10 sm:p-16 rounded-[40px] bg-gradient-to-br from-sky-600 via-sky-700 to-indigo-800 text-white space-y-6 shadow-xl">
           <div className="max-w-2xl mx-auto space-y-4">

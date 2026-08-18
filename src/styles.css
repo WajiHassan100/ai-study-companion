@@ -11,7 +11,7 @@
  * • Electric Ocean Blue (#0284c7, #2563eb)
  * • Sun Gold / Honey Amber (#f59e0b, #fbbf24)
  * • Sage Meadow Green (#059669, #10b981)
- * • Soft rounded-full pill buttons & animated vertical moving hero cards
+ * • Soft rounded-full pill buttons & animated moving hero & remarks cards
  */
 
 @theme inline {
@@ -180,6 +180,16 @@
   }
 }
 
+/* Horizontal Moving Remarks / Testimonials Carousel */
+@keyframes scrollLeftInfinite {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
 .animate-marquee-up {
   animation: scrollUpInfinite 35s linear infinite;
 }
@@ -188,8 +198,15 @@
   animation: scrollDownInfinite 40s linear infinite;
 }
 
+.animate-marquee-left {
+  display: flex;
+  width: max-content;
+  animation: scrollLeftInfinite 50s linear infinite;
+}
+
 .animate-marquee-up:hover,
-.animate-marquee-down:hover {
+.animate-marquee-down:hover,
+.animate-marquee-left:hover {
   animation-play-state: paused;
 }
 
