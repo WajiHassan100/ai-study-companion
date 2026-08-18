@@ -32,7 +32,7 @@ class Settings(BaseSettings):
 
     # AI Configuration & Multi-Provider Keys
     llm_provider: str = "openrouter"
-    llm_model: str = "google/gemini-2.5-flash"
+    llm_model: str = "openrouter/free"
     llm_temperature: float = 0.7
     llm_max_tokens: int = 4096
 
