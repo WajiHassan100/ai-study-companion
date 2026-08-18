@@ -48,7 +48,8 @@ export async function apiFetch(input: string, init: RequestInit = {}): Promise<R
       headers.set(key, value);
     }
   }
-  if (init.body && !headers.has("Content-Type")) {
+  // Only set application/json if not already set AND body is not FormData
+  if (init.body && !(init.body instanceof FormData) && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
   }
   return fetch(input, { ...init, headers });

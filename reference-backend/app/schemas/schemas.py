@@ -219,9 +219,11 @@ class SourceCitationItem(BaseModel):
 
 
 class RAGQueryRequest(BaseModel):
-    course_id: str = Field(min_length=1, description="Course ID e.g. biol_101")
+    course_id: str = Field(min_length=1, description="Course ID e.g. biol_101 or general_study")
     query: str = Field(min_length=1, description="Student academic query")
     top_k: int = Field(default=3, ge=1, le=10, description="Number of context passages to retrieve")
+    material_title: str | None = Field(default=None, description="Optional attached document title for targeted grounding")
+    material_id: str | None = Field(default=None, description="Optional attached document ID")
 
 
 class RAGQueryResponse(BaseModel):

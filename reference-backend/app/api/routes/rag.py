@@ -1,4 +1,5 @@
 import io
+import logging
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 
@@ -12,6 +13,8 @@ from app.schemas.schemas import (
     RAGUploadResponse,
     RAGLearningActionRequest,
 )
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/ai/rag", tags=["Agent #5: RAG Course Knowledge Agent"])
 
@@ -29,9 +32,12 @@ def query_course_knowledge(
             course_id=req.course_id,
             query=req.query,
             top_k=req.top_k,
+            material_title=req.material_title,
+            material_id=req.material_id,
         )
         return RAGQueryResponse(**res)
     except Exception as e:
+        logger.error("Error processing RAG query: %s", e, exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to process RAG course knowledge query: {str(e)}",
@@ -54,6 +60,7 @@ def execute_rag_learning_action(
         )
         return RAGQueryResponse(**res)
     except Exception as e:
+        logger.error("Error executing RAG learning action: %s", e, exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to execute RAG learning action: {str(e)}",
@@ -79,6 +86,7 @@ def upload_course_material(
         )
         return RAGUploadResponse(**res)
     except Exception as e:
+        logger.error("Error uploading course material: %s", e, exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to index course material: {str(e)}",
@@ -95,7 +103,6 @@ async def upload_course_file(
     Parses and indexes binary document files (.pdf, .docx, .txt, .md) using python-docx and pypdf.
     """
     filename = file.filename or "uploaded_document"
-    # Read in bounded chunks to avoid unbounded memory use on large files.
     file_bytes = b""
     max_bytes = 20 * 1024 * 1024  # 20 MB cap
     while True:
@@ -108,41 +115,81 @@ async def upload_course_file(
                 status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
                 detail="File too large (max 20 MB).",
             )
+    
+    if len(file_bytes) == 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Uploaded file is empty (0 bytes).",
+        )
+
     extracted_text = ""
     pages_count = 1
+    file_ext = filename.lower().split(".")[-1] if "." in filename else "txt"
 
     try:
-        if filename.lower().endswith(".pdf"):
-            import pypdf
-            reader = pypdf.PdfReader(io.BytesIO(file_bytes))
-            pages_count = len(reader.pages)
-            page_texts = [p.extract_text() for p in reader.pages if p.extract_text()]
-            extracted_text = "\n\n".join(page_texts)
+        if file_ext == "pdf":
+            try:
+                import pypdf
+                reader = pypdf.PdfReader(io.BytesIO(file_bytes))
+                pages_count = max(1, len(reader.pages))
+                page_texts = []
+                for idx, p in enumerate(reader.pages, 1):
+                    t = p.extract_text()
+                    if t and t.strip():
+                        page_texts.append(f"[Page {idx}]\n{t.strip()}")
+                extracted_text = "\n\n".join(page_texts)
+            except Exception as pdf_err:
+                logger.warning("PDF extraction error: %s", pdf_err)
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Could not extract text from PDF '{filename}'. Please ensure the PDF is not password-protected or corrupted.",
+                )
 
-        elif filename.lower().endswith(".docx"):
-            import docx
-            doc = docx.Document(io.BytesIO(file_bytes))
-            paragraphs = [p.text.strip() for p in doc.paragraphs if p.text.strip()]
-            extracted_text = "\n\n".join(paragraphs)
-            pages_count = max(1, len(paragraphs) // 5)
+        elif file_ext in ("docx", "doc"):
+            try:
+                import docx
+                doc = docx.Document(io.BytesIO(file_bytes))
+                paragraphs = [p.text.strip() for p in doc.paragraphs if p.text.strip()]
+                extracted_text = "\n\n".join(paragraphs)
+                pages_count = max(1, len(paragraphs) // 5)
+            except Exception as docx_err:
+                logger.warning("DOCX extraction error: %s", docx_err)
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Could not read DOCX '{filename}'.",
+                )
+
+        elif file_ext in ("txt", "md", "csv", "json", "py", "c", "cpp", "java", "js", "ts", "html"):
+            try:
+                extracted_text = file_bytes.decode("utf-8")
+            except UnicodeDecodeError:
+                extracted_text = file_bytes.decode("latin-1", errors="ignore")
+            pages_count = max(1, len(extracted_text) // 1000)
 
         else:
+            # Fallback text decoder
             extracted_text = file_bytes.decode("utf-8", errors="ignore")
             pages_count = max(1, len(extracted_text) // 1000)
 
         if not extracted_text.strip():
-            extracted_text = f"Document '{filename}' uploaded successfully."
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"No readable text found in '{filename}'. If this is a scanned document, please use a PDF with selectable text.",
+            )
 
         res = rag_agent.index_new_material(
             course_id=course_id,
             material_title=filename,
             content=extracted_text,
-            material_type=filename.split(".")[-1],
+            material_type=file_ext,
             chapters_covered="Uploaded Document",
             pages_count=pages_count,
         )
         return RAGUploadResponse(**res)
+    except HTTPException:
+        raise
     except Exception as e:
+        logger.error("Failed to parse and index file '%s': %s", filename, str(e), exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to parse and index file '{filename}': {str(e)}",

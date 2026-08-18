@@ -209,7 +209,12 @@ export function AiAssistantPanel({
 
     try {
       if (attachedDoc) {
-        const ragRes: RAGQueryResponse = await queryRAGDocument("general_study", textToSend);
+        const ragRes: RAGQueryResponse = await queryRAGDocument(
+          "general_study",
+          textToSend,
+          attachedDoc.name,
+          attachedDoc.materialId
+        );
         const cleanAnswer = (ragRes.answer || "")
           .replace(/PK[\s\S]*?xml/g, "")
           .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "")
@@ -306,8 +311,8 @@ export function AiAssistantPanel({
 
     try {
       const ragRes: RAGQueryResponse = await executeRAGLearningAction(
-        "biol_101",
-        attachedDoc?.name || "BIOL101_Cell_Biology_Notes.pdf",
+        "general_study",
+        attachedDoc?.name,
         action
       );
 
@@ -318,7 +323,7 @@ export function AiAssistantPanel({
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         data: {
           topic: `RAG Learning Action: ${actionLabel}`,
-          encouragement: `Grounded in ${attachedDoc?.name || "BIOL101_Cell_Biology_Notes.pdf"}`,
+          encouragement: `Grounded in ${attachedDoc?.name || "course document"}`,
           citations: ragRes.cited_sources || [],
         } as any,
       };
@@ -327,7 +332,7 @@ export function AiAssistantPanel({
     } catch (err: any) {
       console.error("Learning Action error:", err);
       setConnectionOk(false);
-      setError("Failed to execute RAG Learning Action.");
+      setError(err.message || "Failed to execute RAG Learning Action.");
     } finally {
       setLoading(false);
     }

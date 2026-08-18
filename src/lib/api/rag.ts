@@ -1,7 +1,7 @@
 /**
  * RAG Document Upload & Query Client (Agent #5 Integrator)
  * =========================================================
- * Provides helper functions for uploading student/teacher document files (PDFs, TXT, MD)
+ * Provides helper functions for uploading student/teacher document files (PDFs, TXT, MD, DOCX)
  * and querying Agent #5 RAG Knowledge Agent with grounded citations.
  */
 
@@ -52,7 +52,12 @@ export async function uploadDocumentToRAG(
   });
 
   if (!response.ok) {
-    throw new Error(`Upload failed with status ${response.status}`);
+    let detail = `Upload failed with status ${response.status}`;
+    try {
+      const errJson = await response.json();
+      if (errJson.detail) detail = errJson.detail;
+    } catch {}
+    throw new Error(detail);
   }
 
   return await response.json();
@@ -65,45 +70,55 @@ export async function uploadFileObjectToRAG(
   courseId: string,
   file: File
 ): Promise<RAGUploadResponse> {
-  try {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("course_id", courseId);
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("course_id", courseId);
 
-    const response = await apiFetch(`${API_BASE_URL}/ai/rag/upload-file`, {
-      method: "POST",
-      body: formData,
-    });
+  const response = await apiFetch(`${API_BASE_URL}/ai/rag/upload-file`, {
+    method: "POST",
+    body: formData,
+  });
 
-    if (!response.ok) {
-      throw new Error(`File upload failed with status ${response.status}`);
-    }
-
-    return await response.json();
-  } catch (err) {
-    // Binary parsing is backend-only; if it is unavailable, fall back to a raw-text upload.
-    console.warn("Binary file upload failed, falling back to text upload:", err);
-    const text = await file.text();
-    return uploadDocumentToRAG(courseId, file.name, text, file.name.split(".").pop() || "pdf");
+  if (!response.ok) {
+    let detail = `File upload failed with status ${response.status}`;
+    try {
+      const errJson = await response.json();
+      if (errJson.detail) detail = errJson.detail;
+    } catch {}
+    throw new Error(detail);
   }
+
+  return await response.json();
 }
 
 /**
  * Queries Agent #5 RAG Knowledge Agent for a document-grounded answer with citations.
  */
-export async function queryRAGDocument(courseId: string, query: string): Promise<RAGQueryResponse> {
+export async function queryRAGDocument(
+  courseId: string,
+  query: string,
+  materialTitle?: string,
+  materialId?: string
+): Promise<RAGQueryResponse> {
   const response = await apiFetch(`${API_BASE_URL}/ai/rag/query`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       course_id: courseId,
       query: query,
-      top_k: 3,
+      top_k: 4,
+      material_title: materialTitle || null,
+      material_id: materialId || null,
     }),
   });
 
   if (!response.ok) {
-    throw new Error(`RAG query failed with status ${response.status}`);
+    let detail = `RAG query failed with status ${response.status}`;
+    try {
+      const errJson = await response.json();
+      if (errJson.detail) detail = errJson.detail;
+    } catch {}
+    throw new Error(detail);
   }
 
   return await response.json();
@@ -128,7 +143,12 @@ export async function executeRAGLearningAction(
   });
 
   if (!response.ok) {
-    throw new Error(`RAG Learning Action failed with status ${response.status}`);
+    let detail = `RAG Learning Action failed with status ${response.status}`;
+    try {
+      const errJson = await response.json();
+      if (errJson.detail) detail = errJson.detail;
+    } catch {}
+    throw new Error(detail);
   }
 
   return await response.json();
