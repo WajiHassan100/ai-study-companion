@@ -18,337 +18,388 @@ import {
   ShieldCheck,
   MessageSquare,
   Compass,
-  Cpu,
+  Lock,
+  Award,
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar/Navbar";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Scholar AI — Autonomous AI Education & Mentorship Platform" },
+      { title: "Scholar AI — AI Built for Personalized Education" },
       {
         name: "description",
         content:
-          "Your personal AI education command team: Socratic Tutor, 7-Day Revision Planner, RAG Document Studio, and Adaptive Diagnostic Engine.",
+          "AI that helps every teacher reach every student. Scholar AI makes personalized Socratic learning, 7-day study planning, and classroom Spaces practical for every school.",
       },
-      { property: "og:title", content: "Scholar AI — Autonomous AI Education Platform" },
+      { property: "og:title", content: "Scholar AI — AI Built for Education" },
       {
         property: "og:description",
-        content:
-          "Socratic AI Tutor, 7-Day Revision Planner with Video Lessons, RAG PDF Document Studio, and Teacher Essay Auto-Grader.",
+        content: "Personalized AI Socratic Tutoring, Course Spaces, and Real-time Mastery Diagnostics.",
       },
     ],
   }),
   component: Index,
 });
 
-type RoleType = "Students" | "Teachers" | "Administrators";
+type RoleType = "Teachers" | "Students" | "Leaders" | "Higher Ed";
 
-const roleContentMap: Record<
-  RoleType,
-  { headline: string; highlight: string; subtitle: string; primaryLink: string; primaryText: string; tag: string }
-> = {
-  Students: {
-    tag: "Autonomous Student Copilot",
-    headline: "An autonomous AI team guiding every step of your",
-    highlight: "learning & exam revision",
-    subtitle:
-      "Get 1-on-1 Socratic concept guidance, continuous cognitive behavior tracking, 7-day revision timetables, and exact page citations from your course PDFs.",
-    primaryLink: "/dashboard/student",
-    primaryText: "Open Student Command Workspace",
-  },
+const roleDescriptions: Record<RoleType, { headline: string; subtitle: string; primaryLink: string; primaryLabel: string }> = {
   Teachers: {
-    tag: "Educator AI Co-Pilot",
-    headline: "AI that drafts minute-by-minute lesson plans and",
-    highlight: "auto-evaluates submissions",
-    subtitle:
-      "Automate class timelines, construct diagnostic quizzes in seconds, and grade student submissions with rubric-backed constructive feedback.",
+    headline: "AI that connects teachers with",
+    subtitle: "See how every student is doing, know what to do next, and spend more time with the students who need you most.",
     primaryLink: "/dashboard/teacher",
-    primaryText: "Open Educator Assistant",
+    primaryLabel: "I'm a teacher",
   },
-  Administrators: {
-    tag: "Institutional Intelligence",
-    headline: "Centralized multi-agent management for every",
-    highlight: "department & curriculum",
-    subtitle:
-      "Monitor student engagement health, system load, API throughput, role permissions, and course vector indices from a single enterprise console.",
+  Students: {
+    headline: "An AI personal tutor for",
+    subtitle: "Get step-by-step Socratic hints, 7-day revision timetables, practice exam simulations, and instant answers cited from your lecture notes.",
+    primaryLink: "/dashboard/student",
+    primaryLabel: "I'm a student",
+  },
+  Leaders: {
+    headline: "Safe, institutional AI for",
+    subtitle: "Equip your school or district with enterprise-grade learning spaces, FERPA/COPPA compliance, and live curriculum analytics.",
     primaryLink: "/dashboard/admin",
-    primaryText: "Open Admin Console",
+    primaryLabel: "I'm a leader",
+  },
+  "Higher Ed": {
+    headline: "Autonomous research & tutoring for",
+    subtitle: "Scale departmental tutoring, automated coding & essay rubric feedback, and vector RAG document intelligence across university courses.",
+    primaryLink: "/courses",
+    primaryLabel: "Explore Higher Ed",
   },
 };
 
-const agentFeatures = [
+// Illustrated cards for the vertical moving columns
+const leftColCards = [
   {
-    id: "tutor",
-    badge: "Socratic Dialogues",
-    title: "AI Socratic Tutor",
-    icon: MessageSquare,
-    description:
-      "Step-by-step concept breakdown with interactive scaffolding hints, visual analogies, and worked mathematical derivations.",
-    highlights: ["Interactive socratic hints", "Mathematical LaTeX formulas", "Custom analogies"],
-    accent: "from-emerald-500/20 to-teal-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400",
+    title: "Space & Astrophysics",
+    category: "Astronomy",
+    imgUrl: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=800&auto=format&fit=crop",
+    gradient: "from-sky-900/60 to-indigo-950/80",
+    aspect: "aspect-[4/5]",
   },
   {
-    id: "planner",
-    badge: "Adaptive Scheduling",
-    title: "Academic Learning Planner",
-    icon: Zap,
-    description:
-      "Constructs personalized 7-day study timetables tailored to upcoming assignment deadlines, peak focus hours, and decay curves.",
-    highlights: ["Smart workload rebalancing", "Curated video lesson links", "Daily progress checklist"],
-    accent: "from-sky-500/20 to-blue-500/10 border-sky-500/30 text-sky-600 dark:text-sky-400",
+    title: "Ancient Architecture & Rome",
+    category: "History",
+    imgUrl: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?q=80&w=800&auto=format&fit=crop",
+    gradient: "from-amber-900/60 to-orange-950/80",
+    aspect: "aspect-[16/11]",
   },
   {
-    id: "assessment",
-    badge: "Diagnostic Mastery",
-    title: "Mastery & Assessment Diagnostics",
-    icon: FileCheck,
-    description:
-      "Generates multi-format adaptive quizzes (MCQs, Numerical, Conceptual) and practice exams with instant rubric-based evaluation.",
-    highlights: ["Adaptive difficulty tuning", "Sub-topic mastery bars", "Automated rubric grading"],
-    accent: "from-purple-500/20 to-pink-500/10 border-purple-500/30 text-purple-600 dark:text-purple-400",
+    title: "Creative Arts & Design",
+    category: "Art & Studio",
+    imgUrl: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?q=80&w=800&auto=format&fit=crop",
+    gradient: "from-rose-900/60 to-pink-950/80",
+    aspect: "aspect-[4/5]",
   },
   {
-    id: "analytics",
-    badge: "Cognitive Intelligence",
-    title: "Progress & Predictive Analytics",
-    icon: TrendingUp,
-    description:
-      "Evaluates retention spacing consistency scores (0-100), monitors mastery growth trajectories, and forecasts exam readiness.",
-    highlights: ["Explainable [Why?] AI reasoning", "Exam outcome predictions", "Streak retention tracking"],
-    accent: "from-blue-500/20 to-cyan-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400",
+    title: "Molecular Genetics & DNA",
+    category: "Biology",
+    imgUrl: "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?q=80&w=800&auto=format&fit=crop",
+    gradient: "from-emerald-900/60 to-teal-950/80",
+    aspect: "aspect-[16/11]",
+  },
+];
+
+const rightColCards = [
+  {
+    title: "Roman Colosseum Heritage",
+    category: "World History",
+    imgUrl: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?q=80&w=800&auto=format&fit=crop",
+    gradient: "from-amber-900/60 to-yellow-950/80",
+    aspect: "aspect-[16/11]",
   },
   {
-    id: "rag",
-    badge: "Vector Knowledge Search",
-    title: "Course Document RAG Studio",
-    icon: Layers,
-    description:
-      "Index lecture slides, textbook PDFs, and lab notes into vector embeddings for instant questions with verified page citations.",
-    highlights: ["PDF & slide document upload", "Verified page citations", "Instant lecture summaries"],
-    accent: "from-teal-500/20 to-emerald-500/10 border-teal-500/30 text-teal-600 dark:text-teal-400",
+    title: "Earth Ecosystems & Geology",
+    category: "Earth Science",
+    imgUrl: "https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?q=80&w=800&auto=format&fit=crop",
+    gradient: "from-cyan-900/60 to-blue-950/80",
+    aspect: "aspect-[4/5]",
   },
   {
-    id: "coach",
-    badge: "Continuous Coaching",
-    title: "Consistency & Study Habits Coach",
-    icon: Compass,
-    description:
-      "Detects study bottlenecks, burnout patterns, and optimal focus windows, actively nudging you before knowledge decays.",
-    highlights: ["Peak focus hour discovery", "Spaced interval alerts", "Milestone celebrations"],
-    accent: "from-amber-500/20 to-orange-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400",
+    title: "Calculus & Quantum Mechanics",
+    category: "Mathematics",
+    imgUrl: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=800&auto=format&fit=crop",
+    gradient: "from-purple-900/60 to-indigo-950/80",
+    aspect: "aspect-[16/11]",
+  },
+  {
+    title: "Data Structures & Neural Networks",
+    category: "Computer Science",
+    imgUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=800&auto=format&fit=crop",
+    gradient: "from-emerald-900/60 to-sky-950/80",
+    aspect: "aspect-[4/5]",
   },
 ];
 
 function Index() {
-  const { isAuthenticated } = useAuth();
-  const [activeRole, setActiveRole] = useState<RoleType>("Students");
-  const content = roleContentMap[activeRole];
+  const { isAuthenticated, role } = useAuth();
+  const [selectedRole, setSelectedRole] = useState<RoleType>("Teachers");
+
+  const activeContent = roleDescriptions[selectedRole];
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col selection:bg-emerald-500/20">
+    <div className="min-h-screen bg-background text-foreground flex flex-col selection:bg-sky-500/20">
       <Navbar />
 
-      <main className="flex-1">
-        {/* ── HERO SECTION ── */}
-        <section className="relative overflow-hidden pt-12 pb-20 md:pt-20 md:pb-28 border-b border-border/40">
-          {/* Radial Ambient Glows */}
-          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-radial from-emerald-500/15 via-sky-500/5 to-transparent blur-3xl pointer-events-none" />
-          <div className="absolute top-10 right-10 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
-
-          <div className="mx-auto max-w-6xl px-4 sm:px-6 relative space-y-8 text-center">
-            {/* Top Pill Badge */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-1 text-xs font-semibold text-emerald-800 dark:text-emerald-300 shadow-xs">
-              <Sparkles className="h-3.5 w-3.5 animate-pulse text-emerald-600" />
-              <span>Multi-Agent AI Education Platform</span>
-              <span className="text-muted-foreground">•</span>
-              <span className="font-bold text-[11px] text-foreground">4 Autonomous Agents Active</span>
-            </div>
-
-            {/* Main Headline */}
-            <div className="max-w-4xl mx-auto space-y-4">
-              <h1 className="font-display text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-foreground leading-[1.08]">
-                {content.headline}{" "}
-                <span className="bg-linear-to-r from-emerald-600 via-teal-600 to-sky-600 bg-clip-text text-transparent">
-                  {content.highlight}.
-                </span>
-              </h1>
-              <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed font-medium">
-                {content.subtitle}
-              </p>
-            </div>
-
-            {/* Role Switcher Tabs */}
-            <div className="inline-flex p-1 rounded-2xl bg-secondary/60 border border-border/80 text-xs font-semibold shadow-xs">
-              {(["Students", "Teachers", "Administrators"] as RoleType[]).map((role) => (
+      {/* ── 1. SCHOOLAI HERO SECTION (WITH MOVING PICTURE COLUMNS ON RIGHT) ── */}
+      <section className="relative overflow-hidden pt-8 pb-16 lg:py-20 max-w-7xl mx-auto px-4 sm:px-8 w-full flex-1">
+        <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          
+          {/* Left Column: Role Switcher Pill + Big Typography + Action Pills (7 Cols) */}
+          <div className="lg:col-span-6 space-y-6 lg:space-y-8 z-10">
+            {/* SchoolAI-style Floating Pill Role Switcher */}
+            <div className="inline-flex items-center bg-card border border-border/80 rounded-full p-1.5 gap-1.5 shadow-md">
+              <span className="pl-3 pr-1 text-xs font-bold text-muted-foreground">Scholar AI for...</span>
+              {(["Teachers", "Students", "Leaders", "Higher Ed"] as RoleType[]).map((r) => (
                 <button
-                  key={role}
-                  onClick={() => setActiveRole(role)}
-                  className={`px-4 py-2 rounded-xl transition-all font-bold ${
-                    activeRole === role
-                      ? "bg-card text-foreground shadow-sm border border-border/60"
-                      : "text-muted-foreground hover:text-foreground"
+                  key={r}
+                  onClick={() => setSelectedRole(r)}
+                  className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                    selectedRole === r
+                      ? "bg-slate-900 text-white dark:bg-sky-600 dark:text-white shadow-xs"
+                      : "text-foreground hover:bg-secondary/60"
                   }`}
                 >
-                  For {role}
+                  {r}
                 </button>
               ))}
             </div>
 
-            {/* CTAs */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-              <Link to={isAuthenticated ? content.primaryLink : "/auth"}>
-                <Button size="lg" className="h-12 px-7 rounded-2xl bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-sm gap-2 shadow-md hover:shadow-lg transition-all">
-                  <Sparkles className="h-4 w-4" />
-                  <span>{isAuthenticated ? content.primaryText : "Get Started Free"}</span>
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
+            {/* Main Headline with SchoolAI Yellow Brushstroke Accent */}
+            <div className="space-y-4">
+              <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-[1.12]">
+                {activeContent.headline}{" "}
+                <span className="relative whitespace-nowrap inline-block text-sky-600 dark:text-sky-400">
+                  every student
+                  {/* Playful Yellow Brushstroke Underline SVG */}
+                  <svg
+                    viewBox="0 0 200 14"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="absolute -bottom-2 left-0 w-full h-3.5 text-amber-400 pointer-events-none"
+                    preserveAspectRatio="none"
+                  >
+                    <path
+                      d="M2 10C50 3 150 3 198 10"
+                      stroke="currentColor"
+                      strokeWidth="5"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </span>
+              </h1>
+
+              <p className="text-base sm:text-lg text-muted-foreground font-normal leading-relaxed max-w-xl">
+                {activeContent.subtitle}
+              </p>
+            </div>
+
+            {/* SchoolAI-style Rounded Big Action Buttons */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
+              <Link
+                to={isAuthenticated ? (role === "teacher" ? "/dashboard/teacher" : "/dashboard/student") : "/auth"}
+                className="inline-flex items-center justify-between gap-4 h-14 pl-7 pr-3.5 rounded-full bg-sky-600 hover:bg-sky-700 text-white font-bold text-base shadow-lg shadow-sky-600/25 transition-all hover:-translate-y-0.5 group"
+              >
+                <span>{activeContent.primaryLabel}</span>
+                <span className="h-9 w-9 rounded-full bg-sky-800 flex items-center justify-center shrink-0 group-hover:translate-x-0.5 transition-transform">
+                  <ArrowRight className="h-4 w-4 text-white" />
+                </span>
               </Link>
 
-              <Link to="/auth">
-                <Button size="lg" variant="outline" className="h-12 px-6 rounded-2xl border-border hover:bg-accent font-semibold text-sm gap-2">
-                  <Cpu className="h-4 w-4 text-emerald-600" />
-                  <span>Explore Live 1-Click Demo</span>
-                </Button>
+              <Link
+                to="/courses"
+                className="inline-flex items-center justify-between gap-4 h-14 pl-7 pr-3.5 rounded-full bg-card hover:bg-secondary/60 text-foreground border border-border/80 font-bold text-base shadow-sm transition-all hover:-translate-y-0.5 group"
+              >
+                <span>Join a Space</span>
+                <span className="h-9 w-9 rounded-full bg-secondary flex items-center justify-center shrink-0 group-hover:translate-x-0.5 transition-transform">
+                  <Sparkles className="h-4 w-4 text-sky-600" />
+                </span>
               </Link>
             </div>
 
-            {/* Interactive Hero Preview Card */}
-            <div className="pt-8 max-w-4xl mx-auto">
-              <Card className="border border-border/80 bg-card/80 backdrop-blur shadow-2xl rounded-3xl overflow-hidden text-left">
-                <div className="bg-secondary/40 border-b border-border/60 px-5 py-3 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="h-3 w-3 rounded-full bg-rose-500/80" />
-                    <span className="h-3 w-3 rounded-full bg-amber-500/80" />
-                    <span className="h-3 w-3 rounded-full bg-emerald-500/80" />
-                    <span className="text-xs font-bold text-muted-foreground ml-2">scholar-ai // command-team</span>
-                  </div>
-                  <Badge className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 text-[10px] font-bold">
-                    🟢 Socratic Multi-Agent Orchestrator Online
-                  </Badge>
-                </div>
-
-                <div className="p-6 grid gap-4 sm:grid-cols-3 bg-card">
-                  <div className="p-3.5 rounded-2xl bg-secondary/30 border border-border/60 space-y-1.5">
-                    <div className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
-                      <Bot className="h-3.5 w-3.5" /> Socratic AI Tutor
-                    </div>
-                    <p className="text-xs font-semibold text-foreground">"Step-by-step calculus derivation for chain rule."</p>
-                    <span className="text-[10px] text-muted-foreground">Answered with LaTeX math & worked hints.</span>
-                  </div>
-
-                  <div className="p-3.5 rounded-2xl bg-secondary/30 border border-border/60 space-y-1.5">
-                    <div className="text-[11px] font-bold text-sky-700 dark:text-sky-400 flex items-center gap-1.5">
-                      <Zap className="h-3.5 w-3.5" /> Learning Planner
-                    </div>
-                    <p className="text-xs font-semibold text-foreground">"7-Day Revision plan calibrated for BIOL 101."</p>
-                    <span className="text-[10px] text-muted-foreground">Rebalanced to 7:00 PM peak focus window.</span>
-                  </div>
-
-                  <div className="p-3.5 rounded-2xl bg-secondary/30 border border-border/60 space-y-1.5">
-                    <div className="text-[11px] font-bold text-purple-700 dark:text-purple-400 flex items-center gap-1.5">
-                      <TrendingUp className="h-3.5 w-3.5" /> Predictive Analytics
-                    </div>
-                    <p className="text-xs font-semibold text-foreground">"94% Math 201 Exam Readiness Forecast."</p>
-                    <span className="text-[10px] text-muted-foreground">Calculated across 14-day quiz accuracy.</span>
-                  </div>
-                </div>
-              </Card>
+            {/* Compliance & Trust Badges */}
+            <div className="pt-4 flex flex-wrap items-center gap-2 text-xs text-muted-foreground font-semibold">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-800 dark:text-sky-300">
+                <ShieldCheck className="h-3.5 w-3.5 text-sky-600" />
+                <span>FERPA & COPPA Compliant</span>
+              </div>
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:text-emerald-300">
+                <Lock className="h-3.5 w-3.5 text-emerald-600" />
+                <span>SOC 2 Type II Certified</span>
+              </div>
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-800 dark:text-amber-300">
+                <Award className="h-3.5 w-3.5 text-amber-600" />
+                <span>1EdTech TrustEd Apps</span>
+              </div>
             </div>
           </div>
-        </section>
 
-        {/* ── 6 SPECIALIZED AGENT GRID ── */}
-        <section className="py-20 md:py-28 px-4 sm:px-6 max-w-6xl mx-auto space-y-12">
-          <div className="text-center space-y-3 max-w-2xl mx-auto">
-            <Badge className="bg-emerald-800 text-white font-bold text-[11px]">Specialized AI Ecosystem</Badge>
-            <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
-              A Dedicated Team of AI Assistants Working For You
+          {/* Right Column: SchoolAI-Style Animated Moving Masonry Picture Showcase (5 Cols) */}
+          <div className="lg:col-span-6 relative h-[520px] sm:h-[580px] overflow-hidden rounded-[40px] [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)]">
+            <div className="grid grid-cols-2 gap-4 h-full">
+              
+              {/* Column 1: Moves Smoothly Upward */}
+              <div className="flex flex-col gap-4 animate-marquee-up">
+                {[...leftColCards, ...leftColCards].map((card, idx) => (
+                  <div
+                    key={`col1_${idx}`}
+                    className={`relative overflow-hidden rounded-[32px] sm:rounded-[40px] border border-border/60 group shadow-md ${card.aspect}`}
+                  >
+                    <img
+                      src={card.imgUrl}
+                      alt={card.title}
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      loading="lazy"
+                    />
+                    <div className={`absolute inset-0 bg-gradient-to-t ${card.gradient} opacity-70 group-hover:opacity-60 transition-opacity`} />
+                    <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5 text-white space-y-1">
+                      <span className="text-[10px] font-bold uppercase tracking-wider bg-white/20 backdrop-blur-md px-2 py-0.5 rounded-full">
+                        {card.category}
+                      </span>
+                      <h4 className="font-display font-bold text-sm sm:text-base leading-tight drop-shadow-sm">
+                        {card.title}
+                      </h4>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Column 2: Moves Smoothly Downward */}
+              <div className="flex flex-col gap-4 animate-marquee-down">
+                {[...rightColCards, ...rightColCards].map((card, idx) => (
+                  <div
+                    key={`col2_${idx}`}
+                    className={`relative overflow-hidden rounded-[32px] sm:rounded-[40px] border border-border/60 group shadow-md ${card.aspect}`}
+                  >
+                    <img
+                      src={card.imgUrl}
+                      alt={card.title}
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      loading="lazy"
+                    />
+                    <div className={`absolute inset-0 bg-gradient-to-t ${card.gradient} opacity-70 group-hover:opacity-60 transition-opacity`} />
+                    <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5 text-white space-y-1">
+                      <span className="text-[10px] font-bold uppercase tracking-wider bg-white/20 backdrop-blur-md px-2 py-0.5 rounded-full">
+                        {card.category}
+                      </span>
+                      <h4 className="font-display font-bold text-sm sm:text-base leading-tight drop-shadow-sm">
+                        {card.title}
+                      </h4>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ── 2. SCHOOLAI SPACES & MULTI-AGENT CAPABILITIES ── */}
+      <section className="py-16 bg-secondary/40 border-t border-border/60">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 space-y-12">
+          <div className="text-center max-w-2xl mx-auto space-y-3">
+            <Badge className="bg-sky-600 text-white font-bold text-xs px-3 py-1 rounded-full">
+              Classroom & Course Spaces
+            </Badge>
+            <h2 className="font-display text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
+              Every course gets a dedicated AI Space
             </h2>
-            <p className="text-sm text-muted-foreground font-medium">
-              Each agent is trained with a dedicated role—from Socratic guidance to automated grading and vector document citations.
+            <p className="text-sm sm:text-base text-muted-foreground">
+              Interactive environments grounded in your curriculum notes, lecture slides, and Socratic Dot AI tutors.
             </p>
           </div>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {agentFeatures.map((agent) => {
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              {
+                title: "Personal Socratic Tutor",
+                desc: "Guides students step-by-step with hints, analogies, and derivations without spoiling answers.",
+                icon: MessageSquare,
+                badge: "Dot AI Tutor",
+                color: "bg-sky-500/10 text-sky-600 border-sky-500/20",
+              },
+              {
+                title: "7-Day Revision Planner",
+                desc: "Generates custom daily timetables with curated YouTube lessons and spaced repetition intervals.",
+                icon: Zap,
+                badge: "Learning Planner",
+                color: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
+              },
+              {
+                title: "Diagnostic Quizzes & Exams",
+                desc: "Adaptive practice tests that pinpoint exact sub-topic weaknesses and update mastery scores.",
+                icon: FileCheck,
+                badge: "Assessment Engine",
+                color: "bg-purple-500/10 text-purple-600 border-purple-500/20",
+              },
+              {
+                title: "Lecture Document RAG",
+                desc: "Upload PDFs and lecture slides to get answers with exact slide citations and page numbers.",
+                icon: BookOpen,
+                badge: "Vector Knowledge Base",
+                color: "bg-amber-500/10 text-amber-600 border-amber-500/20",
+              },
+            ].map((agent, i) => {
               const IconComp = agent.icon;
               return (
                 <div
-                  key={agent.id}
-                  className="p-6 rounded-3xl border border-border/80 bg-card hover:border-emerald-600/40 hover:shadow-lg transition-all space-y-4 flex flex-col justify-between group"
+                  key={i}
+                  className="p-6 rounded-3xl bg-card border border-border/80 shadow-xs hover:shadow-md hover:border-sky-500/40 transition-all space-y-4 flex flex-col justify-between"
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <div className={`p-3 rounded-2xl border ${agent.accent}`}>
-                        <IconComp className="h-6 w-6" />
+                      <div className={`p-3 rounded-2xl border ${agent.color}`}>
+                        <IconComp className="h-5 w-5" />
                       </div>
-                      <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-wider">
+                      <Badge variant="outline" className="text-[10px] font-bold rounded-full">
                         {agent.badge}
                       </Badge>
                     </div>
-
-                    <h3 className="font-display text-lg font-bold text-foreground group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
-                      {agent.title}
-                    </h3>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      {agent.description}
-                    </p>
-                  </div>
-
-                  <div className="space-y-2 pt-3 border-t border-border/40">
-                    {agent.highlights.map((h, i) => (
-                      <div key={i} className="flex items-center gap-2 text-xs font-semibold text-foreground/90">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-                        <span>{h}</span>
-                      </div>
-                    ))}
+                    <h3 className="font-display font-bold text-base text-foreground">{agent.title}</h3>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{agent.desc}</p>
                   </div>
                 </div>
               );
             })}
           </div>
-        </section>
-
-        {/* ── CALL TO ACTION BANNER ── */}
-        <section className="py-16 px-4 sm:px-6 max-w-5xl mx-auto pb-24">
-          <Card className="border border-emerald-600/40 bg-linear-to-r from-emerald-950/20 via-background to-sky-950/20 shadow-xl rounded-3xl p-8 sm:p-12 text-center relative overflow-hidden space-y-6">
-            <div className="absolute -top-24 -right-24 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-
-            <div className="max-w-2xl mx-auto space-y-3 relative">
-              <Badge className="bg-emerald-700 text-white font-bold text-xs">Ready to Elevate Your Learning?</Badge>
-              <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-foreground">
-                Experience Your Personal AI Study Companion Today
-              </h2>
-              <p className="text-sm text-muted-foreground font-medium">
-                Log in instantly via Google or try our 1-click workspace demo to explore the full multi-agent dashboard.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-              <Link to="/auth">
-                <Button size="lg" className="h-12 px-8 rounded-2xl bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-sm gap-2 shadow-md">
-                  <span>Enter Student Workspace →</span>
-                </Button>
-              </Link>
-            </div>
-          </Card>
-        </section>
-      </main>
-
-      {/* ── FOOTER ── */}
-      <footer className="border-t border-border/50 py-8 px-6 bg-secondary/20 text-xs text-muted-foreground text-center">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-foreground">Scholar AI</span>
-            <span>— Autonomous Multi-Agent Educational Suite</span>
-          </div>
-          <p>© {new Date().getFullYear()} Scholar AI. All rights reserved.</p>
         </div>
-      </footer>
+      </section>
+
+      {/* ── 3. BOTTOM CALL TO ACTION ── */}
+      <section className="py-20 max-w-7xl mx-auto px-4 sm:px-8 text-center">
+        <div className="p-10 sm:p-16 rounded-[40px] bg-gradient-to-br from-sky-600 via-sky-700 to-indigo-800 text-white space-y-6 shadow-xl">
+          <div className="max-w-2xl mx-auto space-y-4">
+            <h2 className="font-display text-3xl sm:text-5xl font-extrabold tracking-tight">
+              Ready to transform your classroom?
+            </h2>
+            <p className="text-sm sm:text-base text-sky-100 font-medium">
+              Join thousands of students and teachers using Scholar AI to reach their full potential.
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+            <Link
+              to="/auth"
+              className="inline-flex items-center justify-center h-12 px-8 rounded-full bg-white text-slate-900 font-bold text-sm hover:bg-slate-100 shadow-md transition-all hover:scale-105"
+            >
+              Get Started Free
+            </Link>
+            <Link
+              to="/dashboard/student"
+              className="inline-flex items-center justify-center h-12 px-8 rounded-full bg-sky-900/60 hover:bg-sky-900 text-white border border-white/20 font-bold text-sm transition-all"
+            >
+              Launch Live Workspace
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

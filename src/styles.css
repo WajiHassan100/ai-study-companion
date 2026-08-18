@@ -11,7 +11,7 @@
  * • Electric Ocean Blue (#0284c7, #2563eb)
  * • Sun Gold / Honey Amber (#f59e0b, #fbbf24)
  * • Sage Meadow Green (#059669, #10b981)
- * • Soft rounded-full pill buttons, smooth card radii, & micro-borders
+ * • Soft rounded-full pill buttons & animated vertical moving hero cards
  */
 
 @theme inline {
@@ -62,7 +62,7 @@
 
 :root {
   --radius: 1.25rem;
-  /* Light Mode: Clean SchoolAI Slate Canvas + Ocean Blue & Sun Gold */
+  /* Light Mode: SchoolAI Canvas */
   --background: #f8fafc;
   --foreground: #0f172a;
   --card: #ffffff;
@@ -82,11 +82,11 @@
   --border: #e2e8f0;
   --input: #e2e8f0;
   --ring: #0284c7;
-  --chart-1: #0284c7; /* Ocean Blue */
-  --chart-2: #10b981; /* Meadow Green */
-  --chart-3: #f59e0b; /* Sun Gold */
-  --chart-4: #8b5cf6; /* Royal Purple */
-  --chart-5: #ec4899; /* Coral Pink */
+  --chart-1: #0284c7;
+  --chart-2: #10b981;
+  --chart-3: #f59e0b;
+  --chart-4: #8b5cf6;
+  --chart-5: #ec4899;
   --sidebar: #ffffff;
   --sidebar-foreground: #0f172a;
   --sidebar-primary: #0284c7;
@@ -98,14 +98,14 @@
 }
 
 .dark {
-  /* Dark Mode: Deep Midnight Navy + Luminous Ocean & Sun Gold */
+  /* Dark Mode: Deep Midnight Navy */
   --background: #090d16;
   --foreground: #f8fafc;
   --card: #0f1422;
   --card-foreground: #f8fafc;
   --popover: #0f1422;
   --popover-foreground: #f8fafc;
-  --primary: #38bdf8; /* Luminous Ocean */
+  --primary: #38bdf8;
   --primary-foreground: #082f49;
   --secondary: #182032;
   --secondary-foreground: #f8fafc;
@@ -144,9 +144,9 @@
     font-family: var(--font-sans);
     letter-spacing: -0.012em;
     background-image: 
-      radial-gradient(at 10% 10%, rgba(2, 132, 199, 0.06) 0px, transparent 50%),
-      radial-gradient(at 90% 15%, rgba(245, 158, 11, 0.05) 0px, transparent 50%),
-      radial-gradient(at 50% 85%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
+      radial-gradient(at 10% 10%, rgba(2, 132, 199, 0.05) 0px, transparent 50%),
+      radial-gradient(at 90% 15%, rgba(245, 158, 11, 0.04) 0px, transparent 50%),
+      radial-gradient(at 50% 85%, rgba(16, 185, 129, 0.04) 0px, transparent 50%);
     background-attachment: fixed;
   }
 
@@ -161,51 +161,36 @@
   }
 }
 
-/* SchoolAI Pill Button & Card Utility Classes */
-.btn-pill-primary {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
-  height: 3rem;
-  padding-left: 1.5rem;
-  padding-right: 0.625rem;
-  padding-top: 0.625rem;
-  padding-bottom: 0.625rem;
-  border-radius: 9999px;
-  background-color: #0284c7;
-  color: #ffffff;
-  font-weight: 600;
-  transition: all 200ms ease;
-  box-shadow: 0 4px 14px 0 rgba(2, 132, 199, 0.3);
+/* Vertical Moving Showcase Animation (SchoolAI Hero style) */
+@keyframes scrollUpInfinite {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
 }
 
-.btn-pill-primary:hover {
-  background-color: #0369a1;
-  transform: translateY(-1px);
+@keyframes scrollDownInfinite {
+  0% {
+    transform: translateY(-50%);
+  }
+  100% {
+    transform: translateY(0);
+  }
 }
 
-.btn-pill-white {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
-  height: 3rem;
-  padding-left: 1.5rem;
-  padding-right: 0.625rem;
-  padding-top: 0.625rem;
-  padding-bottom: 0.625rem;
-  border-radius: 9999px;
-  background-color: #ffffff;
-  color: #0f172a;
-  border: 1px solid #e2e8f0;
-  font-weight: 600;
-  transition: all 200ms ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+.animate-marquee-up {
+  animation: scrollUpInfinite 35s linear infinite;
 }
 
-.btn-pill-white:hover {
-  background-color: #f8fafc;
-  border-color: #cbd5e1;
-  transform: translateY(-1px);
+.animate-marquee-down {
+  animation: scrollDownInfinite 40s linear infinite;
+}
+
+.animate-marquee-up:hover,
+.animate-marquee-down:hover {
+  animation-play-state: paused;
 }
 
 /* Custom sleek scrollbar */
