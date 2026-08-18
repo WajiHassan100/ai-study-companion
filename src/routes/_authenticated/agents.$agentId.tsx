@@ -12,6 +12,7 @@ import { ExamGeneratorCard } from "@/components/DashboardCards/ExamGeneratorCard
 import { AssignmentFeedbackCard } from "@/components/DashboardCards/AssignmentFeedbackCard";
 import { WeaknessTrackerCard } from "@/components/DashboardCards/WeaknessTrackerCard";
 import { TeacherAssistantCard } from "@/components/DashboardCards/TeacherAssistantCard";
+import { AiAssistantPanel } from "@/components/DashboardCards/AiAssistantPanel";
 
 export const Route = createFileRoute("/_authenticated/agents/$agentId")({
   loader: ({ params }) => {
@@ -63,9 +64,9 @@ function AgentWorkspace() {
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       <Button asChild variant="ghost" size="sm" className="-ml-2 gap-1.5 text-xs font-semibold">
-        <Link to="/agents">
+        <Link to="/dashboard/student">
           <ArrowLeft className="h-3.5 w-3.5" />
-          Agents Hub
+          Back to Overview
         </Link>
       </Button>
 
@@ -94,6 +95,14 @@ function AgentWorkspace() {
 
 function AgentSurface({ agentId, studentId }: { agentId: string; studentId: string }) {
   switch (agentId) {
+    case "tutor":
+      return (
+        <AiAssistantPanel
+          title="Socratic Tutor"
+          description="Interactive concept guidance, step-by-step math derivations, and course note citations."
+          studentId={studentId}
+        />
+      );
     case "coach":
       return <LearningCoachCard studentId={studentId} onAskTutor={() => {}} onRebalancePlan={() => {}} />;
     case "planner":

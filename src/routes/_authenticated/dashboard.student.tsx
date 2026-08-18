@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   BookOpen,
@@ -127,6 +127,9 @@ function StudentDashboard() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [activeTab, setActiveTab] = useState("spaces");
 
+  const assistantRef = useRef<HTMLDivElement>(null);
+  const tabsRef = useRef<HTMLDivElement>(null);
+
   const name = profile?.full_name?.split(" ")[0] || user?.email?.split("@")[0] || "there";
 
   // Fetch real analytics data from the backend
@@ -134,6 +137,21 @@ function StudentDashboard() {
 
   const handleProfileUpdated = () => {
     setRefreshKey((prev) => prev + 1);
+  };
+
+  const handleAskTutor = (query: string) => {
+    setSelectedQuery(query);
+    // Smooth scroll to tutor panel
+    if (assistantRef.current) {
+      assistantRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  const handleSwitchTab = (tab: string) => {
+    setActiveTab(tab);
+    if (tabsRef.current) {
+      tabsRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   };
 
   return (
@@ -144,30 +162,32 @@ function StudentDashboard() {
           userName={name}
           analytics={analytics}
           isLoading={analyticsLoading}
-          onAskTutor={(query) => setSelectedQuery(query)}
-          onOpenPlanner={handleProfileUpdated}
+          onAskTutor={handleAskTutor}
+          onOpenPlanner={() => handleSwitchTab("planner")}
+          onOpenAssessment={() => handleSwitchTab("practice")}
+          onOpenAssignments={() => handleSwitchTab("assignments")}
         />
       </ComponentErrorBoundary>
 
       {/* ── 2. MAIN WORKSPACE WITH TABS & STICKY SOCRATIC TUTOR ── */}
       <div className="grid gap-6 lg:grid-cols-12 items-start">
         {/* Left Side: Course Spaces & Study Tabs (7 Cols) */}
-        <div className="space-y-6 lg:col-span-7">
+        <div ref={tabsRef} className="space-y-6 lg:col-span-7">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-5">
             <TabsList className="w-full grid grid-cols-4 p-1.5 rounded-full bg-secondary/80 border border-border/70 h-auto shadow-xs">
-              <TabsTrigger value="spaces" className="rounded-full py-2 font-bold text-xs gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm">
+              <TabsTrigger value="spaces" className="rounded-full py-2 font-bold text-xs gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm cursor-pointer">
                 <BookOpen className="h-3.5 w-3.5 text-sky-600" />
                 <span>Course Spaces</span>
               </TabsTrigger>
-              <TabsTrigger value="practice" className="rounded-full py-2 font-bold text-xs gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm">
+              <TabsTrigger value="practice" className="rounded-full py-2 font-bold text-xs gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm cursor-pointer">
                 <Target className="h-3.5 w-3.5 text-purple-600" />
                 <span>Practice & Quiz</span>
               </TabsTrigger>
-              <TabsTrigger value="planner" className="rounded-full py-2 font-bold text-xs gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm">
+              <TabsTrigger value="planner" className="rounded-full py-2 font-bold text-xs gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm cursor-pointer">
                 <CalendarClock className="h-3.5 w-3.5 text-emerald-600" />
                 <span>7-Day Plan</span>
               </TabsTrigger>
-              <TabsTrigger value="assignments" className="rounded-full py-2 font-bold text-xs gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm">
+              <TabsTrigger value="assignments" className="rounded-full py-2 font-bold text-xs gap-1.5 data-[state=active]:bg-card data-[state=active]:shadow-sm cursor-pointer">
                 <ClipboardList className="h-3.5 w-3.5 text-amber-600" />
                 <span>Assignments</span>
               </TabsTrigger>
@@ -237,9 +257,10 @@ function StudentDashboard() {
               <ComponentErrorBoundary fallbackTitle="Study Assistants Team">
                 <AiAgentHub
                   agentStatuses={analytics?.agent_statuses}
-                  onAskTutor={(query) => setSelectedQuery(query)}
-                  onOpenPlanner={handleProfileUpdated}
-                  onOpenAssessment={handleProfileUpdated}
+                  onAskTutor={handleAskTutor}
+                  onOpenPlanner={() => handleSwitchTab("planner")}
+                  onOpenAssessment={() => handleSwitchTab("practice")}
+                  onOpenMastery={() => handleSwitchTab("practice")}
                 />
               </ComponentErrorBoundary>
 
@@ -274,7 +295,7 @@ function StudentDashboard() {
               <ComponentErrorBoundary fallbackTitle="Practice Exam Simulator">
                 <ExamGeneratorCard
                   studentId={user?.id || "demo_student"}
-                  onAskTutor={(query) => setSelectedQuery(query)}
+                  onAskTutor={handleAskTutor}
                 />
               </ComponentErrorBoundary>
 
@@ -282,7 +303,7 @@ function StudentDashboard() {
                 <WeaknessTrackerCard
                   key={`weakness_${refreshKey}`}
                   studentId={user?.id || "demo_student"}
-                  onAskTutor={(query) => setSelectedQuery(query)}
+                  onAskTutor={handleAskTutor}
                 />
               </ComponentErrorBoundary>
             </TabsContent>
@@ -292,14 +313,14 @@ function StudentDashboard() {
               <ComponentErrorBoundary fallbackTitle="7-Day Revision Planner">
                 <StudyPlannerCard
                   studentId={user?.id || "demo_student"}
-                  onAskTutor={(query) => setSelectedQuery(query)}
+                  onAskTutor={handleAskTutor}
                 />
               </ComponentErrorBoundary>
 
               <ComponentErrorBoundary fallbackTitle="Academic Mentor & Consistency Coach">
                 <LearningCoachCard
                   studentId={user?.id || "demo_student"}
-                  onAskTutor={(query) => setSelectedQuery(query)}
+                  onAskTutor={handleAskTutor}
                   onRebalancePlan={handleProfileUpdated}
                 />
               </ComponentErrorBoundary>
@@ -310,7 +331,7 @@ function StudentDashboard() {
               <ComponentErrorBoundary fallbackTitle="Assignment Homework Coach">
                 <AssignmentFeedbackCard
                   studentId={user?.id || "demo_student"}
-                  onAskTutor={(query) => setSelectedQuery(query)}
+                  onAskTutor={handleAskTutor}
                 />
               </ComponentErrorBoundary>
 
@@ -326,7 +347,7 @@ function StudentDashboard() {
         </div>
 
         {/* Right Sticky Column: Socratic Tutor (5 Cols) */}
-        <div className="lg:col-span-5 lg:sticky lg:top-20 space-y-4">
+        <div ref={assistantRef} className="lg:col-span-5 lg:sticky lg:top-20 space-y-4">
           <ComponentErrorBoundary fallbackTitle="Socratic Tutor">
             <AiAssistantPanel
               title="Socratic Tutor"

@@ -17,6 +17,7 @@ interface AiAgentHubProps {
   onAskTutor?: (prompt: string) => void;
   onOpenPlanner?: () => void;
   onOpenAssessment?: () => void;
+  onOpenMastery?: () => void;
 }
 
 export function AiAgentHub({
@@ -24,6 +25,7 @@ export function AiAgentHub({
   onAskTutor,
   onOpenPlanner,
   onOpenAssessment,
+  onOpenMastery,
 }: AiAgentHubProps) {
   const agents = [
     {
@@ -37,7 +39,7 @@ export function AiAgentHub({
       buttonText: "Ask Tutor",
       buttonAction: () => onAskTutor?.("Can you guide me through a concept step-by-step with an example?"),
       buttonClass: "bg-emerald-700 hover:bg-emerald-800 text-white",
-      status: "Available",
+      route: "/tutor",
     },
     {
       id: "planner",
@@ -50,7 +52,7 @@ export function AiAgentHub({
       buttonText: "Generate Plan",
       buttonAction: () => onOpenPlanner?.(),
       buttonClass: "bg-sky-600 hover:bg-sky-700 text-white",
-      status: "Available",
+      route: "/agents/planner",
     },
     {
       id: "assessment",
@@ -63,7 +65,7 @@ export function AiAgentHub({
       buttonText: "Start Practice",
       buttonAction: () => onOpenAssessment?.(),
       buttonClass: "bg-purple-700 hover:bg-purple-800 text-white",
-      status: "Available",
+      route: "/agents/quiz",
     },
     {
       id: "analytics",
@@ -74,9 +76,9 @@ export function AiAgentHub({
       accentBorder: "hover:border-amber-500/40",
       description: "Monitors topic mastery, memory decay curves, and forecasts exam readiness.",
       buttonText: "View Mastery",
-      buttonAction: () => onAskTutor?.("Show me a detailed breakdown of my topic mastery and revision priorities"),
+      buttonAction: () => onOpenMastery?.(),
       buttonClass: "bg-amber-700 hover:bg-amber-800 text-white",
-      status: "Available",
+      route: "/mastery",
     },
   ];
 
@@ -128,15 +130,22 @@ export function AiAgentHub({
                 <p className="text-xs text-muted-foreground leading-relaxed">{agent.description}</p>
               </div>
 
-              <div className="pt-2 border-t border-border/40">
+              <div className="pt-2 border-t border-border/40 flex items-center gap-2">
                 <Button
                   size="sm"
                   onClick={agent.buttonAction}
-                  className={`w-full h-8 text-xs font-bold rounded-full ${agent.buttonClass} shadow-xs justify-between px-3.5`}
+                  className={`flex-1 h-8 text-xs font-bold rounded-full ${agent.buttonClass} shadow-xs justify-between px-3.5`}
                 >
                   <span>{agent.buttonText}</span>
                   <ArrowRight className="h-3 w-3" />
                 </Button>
+                <Link
+                  to={agent.route}
+                  search={agent.route === "/tutor" ? { topic: undefined } : undefined}
+                  className="text-[11px] font-semibold text-muted-foreground hover:text-foreground px-2 py-1 rounded-lg hover:bg-secondary transition-colors"
+                >
+                  Open Page ↗
+                </Link>
               </div>
             </div>
           );

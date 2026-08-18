@@ -11,9 +11,19 @@ interface AiDailyBriefingProps {
   isLoading?: boolean;
   onAskTutor?: (prompt: string) => void;
   onOpenPlanner?: () => void;
+  onOpenAssessment?: () => void;
+  onOpenAssignments?: () => void;
 }
 
-export function AiDailyBriefing({ userName, analytics, isLoading, onAskTutor, onOpenPlanner }: AiDailyBriefingProps) {
+export function AiDailyBriefing({
+  userName,
+  analytics,
+  isLoading,
+  onAskTutor,
+  onOpenPlanner,
+  onOpenAssessment,
+  onOpenAssignments,
+}: AiDailyBriefingProps) {
   // Time-aware greeting
   const hour = new Date().getHours();
   const greetingTime = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
@@ -28,6 +38,19 @@ export function AiDailyBriefing({ userName, analytics, isLoading, onAskTutor, on
     : streakDays === 0
       ? { title: "Start Today's Study Session", detail: "Complete a 15-minute concept review to build your learning streak.", prompt: "Let's review my key course concepts today" }
       : { title: "Generate 7-Day Study Plan", detail: "Balance your upcoming assignments and optimize retention.", prompt: "Generate my 7-day revision schedule" };
+
+  const handlePrimaryClick = () => {
+    const titleLower = primaryAction.title.toLowerCase();
+    if (titleLower.includes("plan") || titleLower.includes("schedule")) {
+      onOpenPlanner?.();
+    } else if (titleLower.includes("quiz") || titleLower.includes("test") || titleLower.includes("practice")) {
+      onOpenAssessment?.();
+    } else if (titleLower.includes("assignment") || titleLower.includes("homework")) {
+      onOpenAssignments?.();
+    } else {
+      onAskTutor?.(primaryAction.prompt || primaryAction.title);
+    }
+  };
 
   return (
     <div className="rounded-3xl border border-border/80 bg-card p-6 sm:p-7 shadow-xs space-y-6">
@@ -59,14 +82,8 @@ export function AiDailyBriefing({ userName, analytics, isLoading, onAskTutor, on
           </div>
           <Button
             size="sm"
-            onClick={() => {
-              if (primaryAction.title.includes("Plan")) {
-                onOpenPlanner?.();
-              } else {
-                onAskTutor?.(primaryAction.prompt || "Let's begin today's study session");
-              }
-            }}
-            className="rounded-full bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs px-4 h-9 shadow-xs shrink-0 whitespace-nowrap gap-1.5"
+            onClick={handlePrimaryClick}
+            className="rounded-full bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs px-4 h-9 shadow-xs shrink-0 whitespace-nowrap gap-1.5 cursor-pointer"
           >
             <span>Start Now</span>
             <ArrowRight className="h-3.5 w-3.5" />
@@ -90,9 +107,12 @@ export function AiDailyBriefing({ userName, analytics, isLoading, onAskTutor, on
               {streakDays > 0 ? "Daily consistency active" : "Start today to begin streak"}
             </p>
           </div>
-          <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full ${streakDays > 0 ? "bg-amber-500/10 text-amber-700 dark:text-amber-300" : "bg-muted text-muted-foreground"}`}>
-            {streakDays > 0 ? "🔥 Active" : "Start Today"}
-          </span>
+          <button
+            onClick={() => onAskTutor?.("Let's review key concepts to keep my streak active today")}
+            className={`text-[11px] font-bold px-2.5 py-1 rounded-full cursor-pointer transition-opacity hover:opacity-80 ${streakDays > 0 ? "bg-amber-500/10 text-amber-700 dark:text-amber-300" : "bg-muted text-muted-foreground"}`}
+          >
+            {streakDays > 0 ? "🔥 Active" : "Start Today →"}
+          </button>
         </div>
 
         {/* Metric 2: Concepts Under Review */}
@@ -109,9 +129,12 @@ export function AiDailyBriefing({ userName, analytics, isLoading, onAskTutor, on
               {weakTopics.length > 0 ? `${weakTopics[0]?.topic || "1 topic"} needs review` : "All topics above 60% mastery"}
             </p>
           </div>
-          <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full ${weakTopics.length > 0 ? "bg-rose-500/10 text-rose-700 dark:text-rose-300" : "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"}`}>
-            {weakTopics.length > 0 ? "Needs Review" : "On Track ✓"}
-          </span>
+          <button
+            onClick={() => onOpenAssessment ? onOpenAssessment() : onAskTutor?.(weakTopics.length > 0 ? `Explain ${weakTopics[0]?.topic} step-by-step` : "Create a diagnostic practice quiz")}
+            className={`text-[11px] font-bold px-2.5 py-1 rounded-full cursor-pointer transition-opacity hover:opacity-80 ${weakTopics.length > 0 ? "bg-rose-500/10 text-rose-700 dark:text-rose-300" : "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"}`}
+          >
+            {weakTopics.length > 0 ? "Review Now →" : "On Track ✓"}
+          </button>
         </div>
 
         {/* Metric 3: Scheduled Study Tasks */}
@@ -128,13 +151,16 @@ export function AiDailyBriefing({ userName, analytics, isLoading, onAskTutor, on
               {actions.length > 0 ? actions[0]?.title : "Revision & quiz tasks"}
             </p>
           </div>
-          <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-sky-500/10 text-sky-700 dark:text-sky-300">
-            Available
-          </span>
+          <button
+            onClick={() => onOpenPlanner?.()}
+            className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-sky-500/10 text-sky-700 dark:text-sky-300 cursor-pointer hover:bg-sky-500/20 transition-colors"
+          >
+            View Plan →
+          </button>
         </div>
       </div>
 
-      {/* ── RECOMMENDED PATHWAY CHIPS (CONCISE) ── */}
+      {/* ── RECOMMENDED PATHWAY CHIPS ── */}
       {actions.length > 0 && (
         <div className="space-y-2 pt-2">
           <span className="text-xs font-bold text-foreground">Suggested Study Pathway:</span>
@@ -142,7 +168,12 @@ export function AiDailyBriefing({ userName, analytics, isLoading, onAskTutor, on
             {actions.slice(0, 2).map((act, i) => (
               <button
                 key={i}
-                onClick={() => onAskTutor?.(act.prompt || act.title)}
+                onClick={() => {
+                  const actLower = act.title.toLowerCase();
+                  if (actLower.includes("plan")) onOpenPlanner?.();
+                  else if (actLower.includes("quiz") || actLower.includes("practice")) onOpenAssessment?.();
+                  else onAskTutor?.(act.prompt || act.title);
+                }}
                 className="p-3 rounded-2xl bg-card border border-border/80 hover:border-sky-500/40 hover:bg-secondary/40 text-left transition-all flex items-center justify-between group cursor-pointer"
               >
                 <div className="space-y-0.5 pr-2">
