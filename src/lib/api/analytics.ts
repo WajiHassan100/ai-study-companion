@@ -73,18 +73,28 @@ export interface DashboardAnalytics {
   indexed_documents: IndexedDocument[];
 }
 
-// ── API Function ─────────────────────────────────────────────────────────
+// ── API Methods ──────────────────────────────────────────────────────────
 
-export async function getDashboardAnalytics(
-  studentId: string
-): Promise<DashboardAnalytics> {
-  const res = await apiFetch(
-    `${API_BASE_URL}/student/${encodeURIComponent(studentId)}/dashboard-analytics`
-  );
-
+/**
+ * Fetch aggregated student dashboard analytics from the backend.
+ */
+export async function getDashboardAnalytics(studentId: string): Promise<DashboardAnalytics> {
+  const res = await apiFetch(`${API_BASE_URL}/student/${studentId}/dashboard-analytics`);
   if (!res.ok) {
-    throw new Error(`Dashboard analytics fetch failed (${res.status})`);
+    throw new Error(`Failed to fetch dashboard analytics: ${res.statusText}`);
   }
-
   return res.json();
+}
+
+/**
+ * Quick backend health check.
+ */
+export async function checkBackendHealth(): Promise<boolean> {
+  try {
+    const healthUrl = API_BASE_URL.replace("/api/v1", "/health");
+    const res = await fetch(healthUrl);
+    return res.ok;
+  } catch {
+    return false;
+  }
 }
