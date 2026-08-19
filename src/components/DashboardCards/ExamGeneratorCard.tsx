@@ -169,7 +169,7 @@ export function ExamGeneratorCard({ studentId, onAskTutor }: ExamGeneratorCardPr
               {exam.questions.map((q, idx) => {
                 const IconComp = typeIconMap[q.type] || HelpCircle;
                 const badgeColor = typeBadgeMap[q.type] || "bg-secondary text-secondary-foreground";
-                const qResult = result?.feedback?.[q.id];
+                const qResult = result?.question_feedback?.[q.id];
 
                 return (
                   <div key={q.id} className="p-4 rounded-2xl bg-card border border-border/80 space-y-3 shadow-xs">
@@ -228,18 +228,18 @@ export function ExamGeneratorCard({ studentId, onAskTutor }: ExamGeneratorCardPr
                     {qResult && (
                       <div className="p-3 rounded-xl bg-secondary/60 border border-border/70 space-y-1.5 text-xs">
                         <div className="flex items-center justify-between font-bold">
-                          <span>Awarded: {qResult.marks_awarded} / {qResult.max_marks} marks</span>
-                          {qResult.marks_awarded > 0 ? (
+                          <span>Awarded: {qResult.score} / {qResult.max_marks} marks</span>
+                          {qResult.is_correct || qResult.score > 0 ? (
                             <span className="text-emerald-600 flex items-center gap-1"><CheckCircle2 className="h-3.5 w-3.5" /> Graded</span>
                           ) : (
                             <span className="text-rose-600">Review Needed</span>
                           )}
                         </div>
                         <p className="text-muted-foreground">{qResult.feedback}</p>
-                        {qResult.model_solution && (
+                        {q.model_solution && (
                           <div className="p-2 rounded-lg bg-indigo-500/5 border border-indigo-500/20 text-[11px] text-indigo-900 dark:text-indigo-200">
                             <span className="font-bold">Model Solution: </span>
-                            <span>{qResult.model_solution}</span>
+                            <span>{q.model_solution}</span>
                           </div>
                         )}
                       </div>
@@ -268,7 +268,7 @@ export function ExamGeneratorCard({ studentId, onAskTutor }: ExamGeneratorCardPr
                     <p className="text-xs text-muted-foreground">Mastery profile updated</p>
                   </div>
                   <Badge className="bg-indigo-600 text-white font-extrabold text-sm px-3 py-1">
-                    {result.percentage}% ({result.earned_marks} / {result.total_marks} Marks)
+                    {result.score_percentage}% ({result.earned_marks} / {result.total_marks} Marks)
                   </Badge>
                 </div>
                 <Button
